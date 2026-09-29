@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>闪存，涨价和三万个零件：为什么偏偏今年都在涨？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站热门</div>
+<h1>闪存，涨价和三万个零件：为什么偏偏今年都在涨？</h1>
+<p class="sub">《半径三百公里》第二期（UP主空山猎人，33分钟，财经商业区）：2026年9月手机/电脑/汽车同步涨价，根因是同一批存储产能被抢——车规存储3个月暴涨180%、单车存储成本从25美元涨到110美元，AI数据中心对HBM/DRAM的吞噬式采购挤出了消费与汽车端；SK海力士电话会称所有客户需求都无法满足、价格全年上涨，库存降至历史低位。32条参考信源（TrendForce、SK海力士电话会、零跑财报、中汽协）的产业链级复盘，存储超级周期+产能分配+成本传导+汽车利润挤压一气呵成，正是他要的芯片竞争深度分析。未读到视频正片文字稿与评论区（反爬拦截），大纲按简介与32条参考信源重构。</p>
+<p class="meta">2026-09-29</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1rHh16CEfm">https://www.bilibili.com/video/BV1rHh16CEfm</a></div>
+<div class="sec"><h2>大纲</h2><ul>
+<li><strong>现象：2026 年 9 月的同步涨价潮</strong></li>
+<li>手机涨价：iPhone 18 系列 BOM 被存储成本推高，苹果一次上调 14 款产品价格（含 MacBook、iPad）</li>
+<li>电脑涨价：2026 年 DIY 装机成本最高飙升 72%，入门配置突破 6000 元</li>
+<li>汽车涨价：中国车企最高涨价 6000 元；表象之下是「同一年、同一批工厂、同一批被抢走的产能」</li>
+<li><strong>根因：存储芯片超级周期（memory supercycle）</strong></li>
+<li>车规存储 3 个月暴涨 180%（TrendForce），单车存储芯片成本从 25 美元涨到 110 美元</li>
+<li>SK 海力士高盛电话会：「所有客户需求都无法满足，今年存储价格持续上涨」；2026 年库存降至历史低位，卖方市场</li>
+<li>需求侧挤压：AI 数据中心对 HBM/DRAM 的吞噬式采购，挤出了消费电子与汽车的产能分配</li>
+<li><strong>传导链条：从晶圆厂到终端</strong></li>
+<li>产能分配（fab allocation）→ 存储模组价格 → 手机 BOM / 整车成本 → 终端售价上调</li>
+<li>苹果日本 iPhone 涨价、Mac 涨价后股价创一年最大跌幅（市场不买账的另一面）</li>
+<li><strong>利润挤压：汽车行业的冰与火</strong></li>
+<li>2026 年 1-7 月汽车行业利润率 3.6%，收入 +2.7%、成本 +3.8%、利润 -20%；整车制造利润率仅 1.5%，处于历史低位</li>
+<li>产业链利润向上游转移：零跑成立金属材料公司、「为了抠门连钢板都要自己压」式降本自救</li>
+<li><strong>何时结束：2027 年前难缓解</strong></li>
+<li>供给端：扩产周期长、车规认证门槛高，新增产能远水难解近渴</li>
+<li>跟踪框架：库存水位 × 产能开出节奏 × AI 需求强度，三变量决定拐点</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[2026年9月 手机/电脑/汽车同步涨价] --&gt; B[同一批工厂 同一批被抢走的产能]
+    B --&gt; C[存储超级周期: 车规存储3个月暴涨180%]
+    C --&gt; D[单车存储芯片成本 25美元→110美元]
+    D --&gt; E[SK海力士电话会: 所有客户需求都无法满足]
+    E --&gt; F[存储价格全年上涨 库存降至历史低位]
+    F --&gt; G[卖方市场形成]
+    C --&gt; H[需求侧: AI数据中心吞噬HBM/DRAM产能]
+    H --&gt; I[消费电子与汽车产能分配被挤出]
+    I --&gt; J[传导链: 模组价格→手机BOM/整车成本→终端涨价]
+    J --&gt; K[苹果14款产品涨价 车企最高涨6000元]
+    J --&gt; L[DIY装机成本最高飙升72%]
+    K --&gt; M[汽车行业利润被挤压]
+    M --&gt; N[整车制造利润率仅1.5% 处于历史低位]
+    N --&gt; O[车企降本自救: 零跑成立金属材料公司自己压钢板]
+    G --&gt; P[何时结束? 扩产周期长 车规认证门槛高]
+    P --&gt; Q[2027年前难缓解]
+    Q --&gt; R[跟踪三变量: 库存水位/产能开出/AI需求强度]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">投资</span><span class="tag">商业</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-09-29</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

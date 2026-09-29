@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Forecast</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">想法 IDEA · 想法工厂</div>
+<h1>Agent Forecast</h1>
+<p class="sub">研究 AI Agent 能否预测事件结果：梳理 ForecastBench、FutureSim、CivBench 三个预测 benchmark，自带 Brier Score 交互实验台，拆解预测 Agent 的工作流程、典型失败模式与可审计的评估 schema。</p>
+<p class="meta">2026-09-29</p>
+</div>
+<div class="src">原文链接：<a href="https://muse.ai/s/agent-forecast-xdxp67xuxixx907r">https://muse.ai/s/agent-forecast-xdxp67xuxixx907r</a></div>
+<div class="sec"><h2>大纲</h2><h2>核心问题</h2>
+<ul>
+<li>Agent 能否预测事件结果？这不是聊天能力，而是把世界建模成概率分布的能力</li>
+<li>预测质量决定了 Agent 在长任务中的资源分配与止损决策</li>
+</ul>
+<h2>三个 Benchmark</h2>
+<ul>
+<li>ForecastBench：真实世界事件预测，覆盖政治、经济、科技等多领域</li>
+<li>FutureSim：未来情景模拟，考验多步推理与情景展开</li>
+<li>CivBench：文明级复杂系统预测，长周期、高不确定性</li>
+</ul>
+<h2>Brier Score 实验台</h2>
+<ul>
+<li>Brier Score：概率预测的均方误差，越低越好</li>
+<li>交互实验：拖动预测概率，实时看分数变化</li>
+<li>为什么 Brier Score 是 proper scoring rule：说真话才是最优策略</li>
+<li>校准性 vs 锐度：又准又敢是两回事</li>
+</ul>
+<h2>预测 Agent 的工作流程</h2>
+<ul>
+<li>信息收集：多源检索，区分事实与观点</li>
+<li>假设生成：列出互斥情景</li>
+<li>概率校准：用 base rate 锚定，再按证据更新</li>
+<li>持续更新：新证据到来时按贝叶斯方式修正</li>
+</ul>
+<h2>典型失败模式</h2>
+<ul>
+<li>过度自信：概率推得太极端</li>
+<li>锚定：被第一个数字带走</li>
+<li>忽视 base rate：小样本故事压倒大数定律</li>
+<li>更新不足：证据变了，概率不动</li>
+</ul>
+<h2>Benchmark 设计清单</h2>
+<ul>
+<li>可审计 schema：预测内容、依据、时间戳、结果全部留痕</li>
+<li>防止事后诸葛：预测必须在结果揭晓前锁定</li>
+<li>区分运气与能力：看长期 Brier Score 均值，不是单次命中</li>
+</ul>
+<h2>边界声明</h2>
+<ul>
+<li>benchmark 数据为 2026-09-29 快照，后续版本会变化</li>
+<li>页面为静态研究页，无后端</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[待预测事件] --&gt; B[信息收集]
+    B --&gt; C[生成互斥情景]
+    C --&gt; D[base rate 锚定]
+    D --&gt; E[按证据给概率]
+    E --&gt; F[Brier Score 自检]
+    F --&gt; G{新证据到来}
+    G --&gt;|有| E
+    G --&gt;|无| H[锁定预测并留痕]
+    H --&gt; I[结果揭晓]
+    I --&gt; J[复盘校准偏差]
+    J --&gt; D</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">想法工厂</span><span class="tag">AI Agent</span><span class="tag">预测</span><span class="tag">Benchmark</span></div>
+<div class="footer">Papa-Panda / deep-reads · 想法工厂归档 · 2026-09-29</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

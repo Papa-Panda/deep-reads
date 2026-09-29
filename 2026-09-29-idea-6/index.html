@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop / Graph Engineering</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">想法 IDEA · 想法工厂</div>
+<h1>Loop / Graph Engineering</h1>
+<p class="sub">澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套系统；覆盖状态、条件边、终止预算、恢复、幂等、人工介入、Trace 与评估，附状态机代码骨架、六类常见误区与是否需要 Graph 的五问自测。</p>
+<p class="meta">2026-09-29</p>
+</div>
+<div class="src">原文链接：<a href="https://muse.ai/s/loop-graph-engineering-xvxb67xuxixb2lcxl">https://muse.ai/s/loop-graph-engineering-xvxb67xuxixb2lcxl</a></div>
+<div class="sec"><h2>大纲</h2><h2>三个概念的区分</h2>
+<ul>
+<li>Loop：运行时控制结构，while、重试、反思循环都是 loop</li>
+<li>Graph：控制流的显式表示，节点与边把流程画出来</li>
+<li>Engineering：让循环在生产环境可靠的整套系统</li>
+<li>混淆三者是大多数 Agent 故障的根源</li>
+</ul>
+<h2>核心机制</h2>
+<ul>
+<li>状态：循环每次迭代携带什么记忆，状态放哪里</li>
+<li>条件边：满足什么条件走哪条边，判断逻辑归谁</li>
+<li>终止预算：最大步数、时间上限、token 上限，三者缺一不可</li>
+<li>恢复：失败后从哪里继续，重放还是续跑</li>
+<li>幂等：重试安全的设计，同一节点跑两次结果不变</li>
+<li>人工介入：什么情况下升级给人，升级时带什么上下文</li>
+</ul>
+<h2>可观测性与评估</h2>
+<ul>
+<li>Trace：每一步的输入输出留痕，可回放</li>
+<li>评估：循环是否收敛、是否发散、成本多少</li>
+</ul>
+<h2>状态机代码骨架</h2>
+<ul>
+<li>最小可运行的状态机示例：状态定义、转移函数、预算检查</li>
+<li>代码为示意，无后端</li>
+</ul>
+<h2>六类常见误区</h2>
+<ul>
+<li>把 Graph 当银弹：图只是表示法，不解决可靠性</li>
+<li>循环无预算：无限反思烧掉所有 token</li>
+<li>状态到处泄漏：隐式状态导致不可复现</li>
+<li>条件边写死：环境一变就走错分支</li>
+<li>无人工兜底：关键决策无人把关</li>
+<li>只测 happy path：异常路径从没跑过</li>
+</ul>
+<h2>五问自测</h2>
+<ul>
+<li>五个问题判断你的任务是否真的需要 Graph，还是普通 loop 就够</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[任务输入] --&gt; B[初始化状态与预算]
+    B --&gt; C[执行当前节点]
+    C --&gt; D[Trace 留痕]
+    D --&gt; E{条件边判断}
+    E --&gt;|继续| F{预算是否耗尽}
+    F --&gt;|否| C
+    F --&gt;|是| G[终止并报告原因]
+    E --&gt;|需要人工| H[人工介入]
+    H --&gt; C
+    E --&gt;|完成| I[输出结果]
+    C --&gt;|异常| J{是否可恢复}
+    J --&gt;|是| K[从检查点恢复]
+    K --&gt; C
+    J --&gt;|否| G</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">想法工厂</span><span class="tag">AI Agent</span><span class="tag">工程</span></div>
+<div class="footer">Papa-Panda / deep-reads · 想法工厂归档 · 2026-09-29</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>理解加强</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">想法 IDEA · 想法工厂</div>
+<h1>理解加强</h1>
+<p class="sub">把“理解复杂的东西”拆成可执行的训练系统：四层诊断（词/图/机/界）定位卡点，十分钟初接触协议避免一上来就陷进去，一周训练循环用反馈密度换速度；核心公式是 速度 ≈ 先验结构 × 问题质量 × 反馈密度。</p>
+<p class="meta">2026-09-29</p>
+</div>
+<div class="src">原文链接：<a href="https://muse.ai/s/space-9-xai67xuxixcxcfgxo">https://muse.ai/s/space-9-xai67xuxixcxcfgxo</a></div>
+<div class="sec"><h2>大纲</h2><h2>核心公式</h2>
+<ul>
+<li>理解速度 ≈ 先验结构 × 问题质量 × 反馈密度</li>
+<li>先验结构：你已有的框架越多，新知识挂靠越快</li>
+<li>问题质量：好问题切开结构，坏问题只在表面打转</li>
+<li>反馈密度：单位时间内的验证次数</li>
+</ul>
+<h2>四层诊断</h2>
+<ul>
+<li>词：术语有没有精确定义，能否一句话讲清</li>
+<li>图：结构关系能不能画出来</li>
+<li>机：因果链能不能讲通，机制是否自洽</li>
+<li>界：边界条件清不清楚，哪里会失效</li>
+</ul>
+<h2>十分钟初接触协议</h2>
+<ul>
+<li>前十分钟只做定位与审题：这是什么领域、难在哪、和我已知的什么相像</li>
+<li>不许深入细节，先画地图再进城</li>
+</ul>
+<h2>一周训练循环</h2>
+<ul>
+<li>每天一小步：输入、输出、反馈三件套</li>
+<li>用反馈密度换速度，而不是用时长换速度</li>
+</ul>
+<h2>三类工作台</h2>
+<ul>
+<li>论文工作台：从问题到方法的逆向拆解，先找问题再看方法</li>
+<li>系统工作台：从接口到实现的正向搭建，先跑起来再深挖</li>
+<li>模糊任务工作台：信息不全时先定框架，框架先行、细节后补</li>
+</ul>
+<h2>数据说明</h2>
+<ul>
+<li>练习数据只保留在当前页面，刷新即失</li>
+<li>需要留存请下载 Markdown</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[遇到复杂主题] --&gt; B[十分钟初接触：定位与审题]
+    B --&gt; C[四层诊断]
+    C --&gt; D{卡在哪一层}
+    D --&gt;|词| E[精确定义术语]
+    D --&gt;|图| F[画出结构关系]
+    D --&gt;|机| G[讲出因果链]
+    D --&gt;|界| H[明确边界条件]
+    E --&gt; I[进入一周训练循环]
+    F --&gt; I
+    G --&gt; I
+    H --&gt; I
+    I --&gt; J[每日输入输出反馈]
+    J --&gt; K[复测四层诊断]
+    K --&gt;|仍有卡点| D
+    K --&gt;|通过| L[理解达标]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">想法工厂</span><span class="tag">学习方法</span><span class="tag">理解</span></div>
+<div class="footer">Papa-Panda / deep-reads · 想法工厂归档 · 2026-09-29</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

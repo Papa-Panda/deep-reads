@@ -5,6 +5,9 @@
 | 日期 | 类型 | 标题 | 一句话 |
 |---|---|---|---|
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-09-30 | 扫读 | [一文读懂KVCache](./sweep-113-一文读懂kvcache/) | 2024 年经典硬核长文（1861 赞、3629 收藏）：从 GPT2 实测讲起——新增 token 时历史 embed |
+| 2026-09-30 | 扫读 | [面试官：SFT之后做RL，模型为啥先变差再变好？](./sweep-112-面试官-sft之后做rl-模型为啥先变差再变好/) | 7 分钟大模型面试题精讲：SFT 后做 RL 为何性能先降后升——SFT 优化已知文本分布，RL 在奖励空间优化，分布切 |
+| 2026-09-30 | 扫读 | [为什么 GPT-6 Astra 玩《我的世界》被炸毁进度后连续数小时种植土豆？这种异常行为怎么产生的？](./sweep-111-为什么-gpt-6-astra-玩-我的世界-被炸毁进度后连续数小时种植土豆-这种异常行为怎么产/) | 47 答、61 万浏览：GPT-6 Astra 在《我的世界》攒 50 小时的进度被苦力怕炸毁后，连续数小时只种土豆、不 |
 | 2026-09-30 | 扫读 | [Dylan Patel: 扩展 AI 算力的头号瓶颈](./sweep-108-dylan-patel-扩展-ai-算力的头号瓶颈/) | SemiAnalysis 创始人 Dylan Patel 在 Dwarkesh Podcast 深谈扩展 AI 算力的三 |
 | 2026-09-30 | 扫读 | [【青稞Talk 155期】SkyRL：模块化 RL 后训练框架设计，与 397B Office Work Agent 的 RL 训练实战](./sweep-107-青稞talk-155期-skyrl-模块化-rl-后训练框架设计-与-397b-office-w/) | SkyRL 作者亲自讲模块化 RL 后训练框架的设计思路，下半场是 397B Office Work Agent 的 A |
 | 2026-09-30 | 扫读 | [RL loss 是近似的一阶 Taylor 展开](./sweep-106-rl-loss-是近似的一阶-taylor-展开/) | 第一性原理重推 LLM 后训练 RL loss：想优化序列级 reward 却用 token 级加权似然训练，重要性比率 |

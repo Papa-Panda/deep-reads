@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面试官：SFT之后做RL，模型为啥先变差再变好？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站收藏</div>
+<h1>面试官：SFT之后做RL，模型为啥先变差再变好？</h1>
+<p class="sub">7 分钟大模型面试题精讲：SFT 后做 RL 为何性能先降后升——SFT 优化已知文本分布，RL 在奖励空间优化，分布切换带来初期震荡；评论区追问 DPO 与 RLVR 的区分，以及 mid-training 已成新常态。配他手头的 RL 配方（id 96/101/106）对照看最对味。未读到视频口播逐字稿，按标签与评论区整理。</p>
+<p class="meta">2026-09-30</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV13oVH6DEGZ/">https://www.bilibili.com/video/BV13oVH6DEGZ/</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>问题：SFT 之后接 RL，模型性能为什么先变差再变好</li>
+<li>视角一：优化目标切换</li>
+<li>SFT：拟合已知文本分布，本质是行为克隆</li>
+<li>RL：在奖励空间里优化，鼓励偏离 SFT 分布的探索</li>
+<li>切换初期策略离开舒适区，指标震荡下探</li>
+<li>视角二：从 loss 看（评论区补充）</li>
+<li>SFT loss 把策略约束在示范数据流形上</li>
+<li>RL 目标是期望奖励，梯度方向与 SFT 不一致</li>
+<li>回升机制</li>
+<li>探索到高奖励区域后策略收敛，性能回升</li>
+<li>最终超越 SFT 起点：对齐与能力双收益</li>
+<li>评论区追问</li>
+<li>回答时要不要区分 DPO 和 RLVR</li>
+<li>mid-training 已成标配，SFT→RL 的边界在前移</li>
+<li>面试回答建议：先讲分布切换，再讲 loss 视角，最后落到实证曲线</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[SFT拟合文本分布] --&gt; B[切到RL优化奖励]
+B --&gt; C[策略偏离SFT分布]
+C --&gt; D[指标先下探]
+D --&gt; E[探索到高奖励区]
+E --&gt; F[策略收敛回升]
+F --&gt; G[超越SFT起点]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">RL</span><span class="tag">后训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-09-30</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

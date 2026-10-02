@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待zeta5（ζ5）已经被一个大二学生证明是无理数？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何看待zeta5（ζ5）已经被一个大二学生证明是无理数？</h1>
+<p class="sub">2026-09 大二学生 Aabir Fauzan 在 Zenodo 发布单作者预印本，声称证明 ζ(5) 无理——这是 Apéry 1978 年证明 ζ(3) 无理后悬置近 50 年的公开问题。知乎 18 个回答多为背景科普（Basel 问题、Bernoulli 数、Apéry 定理），无逐行技术核验；真正的专家验证在无理性专家 Frank Calegari 的博客：论证已在 Lean 中形式化验证通过，核心是 Prévost 正测度 + Hankel 行列式 + Zudilin 无理性判据的组合，同时他判定论文几乎完全由 AI 生成、作者「仅用于校对」的披露不诚实。AI 产出完整前沿数学证明的里程碑，数学第一性原理含量高。</p>
+<p class="meta">2026-10-01</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2086480318463268480">https://www.zhihu.com/question/2086480318463268480</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>事件：ζ(5) 无理性的证明声称（2026-09）</li>
+<li>声称者：大二学生 Aabir Fauzan；单作者预印本发在 Zenodo（非 arXiv）</li>
+<li>历史坐标：Apéry 1978 年证明 ζ(3) 无理；此后近 50 年 ζ(5) 无进展</li>
+<li>作者声明：AI 主要用于校对（是否用于推导未说明）</li>
+<li>知乎讨论现状（18 答、23.7 万浏览，未见逐行技术核验）</li>
+<li>高赞 1（煌月千星，245 赞）：贴出预印本链接，表态「做出来就是他的」，未做技术验证</li>
+<li>高赞 2（数学答主，165 赞）：纯数学背景科普<ul>
+<li>ζ(s) 在 Re(s)&gt;1 由积分判别法收敛；除 s=1 外可解析延拓</li>
+<li>Basel 问题：Euler 由 sin x/x 无穷乘积得 ζ(2m) 的 Bernoulli 数闭式</li>
+<li>奇数位 ζ(2m+1) 无闭式，有理性曾完全未知；Apéry 定理（1978）</li>
+<li>结论上把该声称当作已解决的事实陈述</li>
+</ul>
+</li>
+<li>高赞 3（99 赞）：AI 时代评价体系的元评论（「挖矿方程」类比），无数学内容</li>
+<li>专家验证：Frank Calegari 博客分析（galoisrepresentations.org，2026-09-24）</li>
+<li>结论：论证已在 Lean 中形式化验证通过</li>
+<li>判断：论文「几乎完全由 AI 生成」，作者「仅用于校对」的披露不诚实</li>
+<li>数学考古：关键想法均可溯源，并非凭空而来<ul>
+<li>Prévost 的正测度 + 余项 Padé 逼近（Hurwitz zeta 的 Stieltjes 表示）</li>
+<li>矩序列的 Hankel 行列式 = 正定 Gram 矩阵 → 行列式非零</li>
+<li>新论证把单极点换成多极点型修正：行列式次数从 O(n) 升到 O(n²)，分子幂次提高带来的分母额外消去恰好补偿</li>
+<li>Zudilin 无理性判据：归一化整数多项式在该点取值非零且趋于 0 → 无理</li>
+<li>文献谱系：Prévost → Uvarov/Krattenthaler（有理修正的行列式恒等式）→ Zudilin（行列式无理性方法）→ Brown（分母约化技巧）</li>
+</ul>
+</li>
+<li>Calegari 用 ChatGPT 做了文献溯源，并引用了它的结论</li>
+<li>为什么值得他看</li>
+<li>AI 独立产出完整前沿数学证明的里程碑事件（披露诚信另当别论）</li>
+<li>无理性证明的经典套路「整数线性型 + 趋零估计」的完整当代实例</li>
+<li>与 AI for Math / Lean 形式化验证趋势直接相关</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[&quot;ζ5 无理性 50 年未解&quot;] --&gt; B[&quot;Aabir Fauzan Zenodo 单作者预印本&quot;]
+B --&gt; C{&quot;知乎 18 个回答&quot;}
+C --&gt; D[&quot;高赞多为背景科普&quot;]
+C --&gt; E[&quot;无逐行技术核验&quot;]
+B --&gt; F[&quot;Calegari 博客分析&quot;]
+F --&gt; G[&quot;论证已在 Lean 中形式化验证&quot;]
+F --&gt; H[&quot;判为几乎全 AI 生成 披露不诚实&quot;]
+F --&gt; I[&quot;数学考古：溯源关键想法&quot;]
+I --&gt; J[&quot;Prévost 正测度 + Padé 逼近&quot;]
+J --&gt; K[&quot;单极点换成多极点 Hankel 行列式&quot;]
+K --&gt; L[&quot;分母消去补偿 次数升至平方级&quot;]
+L --&gt; M[&quot;Zudilin 判据：整数线性型趋零&quot;]
+M --&gt; N[&quot;ζ5 无理&quot;]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-01</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拉马努金圆周率公式的原理是什么？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>拉马努金圆周率公式的原理是什么？</h1>
+<p class="sub">知乎热榜 51 万热度、147.7 万浏览的经典硬核数学题：拉马努金 1/π 级数里 26390、1103、99 这些看似天外飞来的数字到底从哪来。前三答分别给出 Borwein 复乘路线、四次理论+J 不变量重写、以及三次模方程手算原型——Clausen 公式把超几何级数接到椭圆积分，n=58 奇异值与类不变量定出全部常数。纯数学第一性原理，正对他的口味。已读默认排序前 3 答全文。</p>
+<p class="meta">2026-10-05</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/26427252">https://www.zhihu.com/question/26427252</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>问题与公式（18 答、147.7 万浏览）</li>
+<li>目标：1/π = (2√2/99²) Σ (4k)!/(k!⁴) · (26390k+1103)/396^(4k)，k=1 时即溢出计算器精度，每项约贡献 8 位小数</li>
+<li>起点：椭圆积分与超几何的桥（5342 赞、Hyacinth 352 赞）</li>
+<li>Clausen 公式：₃F₂(1/4,3/4,1/2;1,1;z) = (2K(k)/π)² 型恒等式，π 从 K 的周期比里出现</li>
+<li>θ 函数、AGM 与 Dedekind η：(2K/π) = θ₃²(q)，模变换给出 q = e^(−πK'/K)</li>
+<li>模方程与奇异值：26390 与 1103 的出处</li>
+<li>K'(k₁)/K(k₁) = n·K'(k₂)/K(k₂) 时 k₁、k₂ 满足代数模方程；取 n=58、q = e^(−π√58)</li>
+<li>类不变量（判别式 −232、类数 1、基本单位 (5+√29)/2）给出 c(k) = 1/99⁴ 与 √29 项</li>
+<li>Guillera 式对乘子求导定出 a、b，正好拼成 26390k+1103（Hyacinth 答给出 α₀、m₀ 的完整代入）</li>
+<li>三条读法</li>
+<li>5342 赞答主：Borwein 兄弟路线，复乘 + Kronecker 极限公式，最深最硬</li>
+<li>Hyacinth：四次理论 + J 不变量的现代重写，常数来源最清楚</li>
+<li>Eliauk（75 赞）：先用三次模方程手算 4/π 原型再推广到 58，最适合入门跟算</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[目标公式：每加一项多约 8 位精度] --&gt; B[Clausen 公式搭桥]
+B --&gt; C[超几何级数 3F2 等于椭圆积分 K 的平方]
+C --&gt; D[模方程：K&#x27;/K 取根号 n 倍关系]
+D --&gt; E[取 n=58 的奇异值 q=e^{-π√58}]
+E --&gt; F[类不变量给出 1/99^4 与根号29 系数]
+D --&gt; G[对模方程乘子求导定出线性项]
+F --&gt; H[26390k+1103 的来历闭合]
+G --&gt; H
+H --&gt; I[公式从神奇数字变回模形式结构]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-05</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

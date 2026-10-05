@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>为什么有的人认路靠方向，有的人认路依赖地标和建筑，这两种空间记忆模式有什么区别？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>为什么有的人认路靠方向，有的人认路依赖地标和建筑，这两种空间记忆模式有什么区别？</h1>
+<p class="sub">知乎热榜 70 万热度、20 个回答中少见的硬核神经科学题：方向感与地标依赖对应自我中心与环境中心两套空间参考框架。高赞回答串起伦敦出租车司机海马研究、外侧内嗅皮层与大鼠十字迷宫实验，把路痴差异拆到坐标系选择与脑区机制，正对他数学坐标系的直觉。已读默认排序前 3 答。</p>
+<p class="meta">2026-10-04</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2084358901101871338">https://www.zhihu.com/question/2084358901101871338</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>问题：认路靠方向 vs 靠地标，是两种什么模式（101 关注、20 答）</li>
+<li>参考框架（华沙 160 赞、李竞捷 39 赞）</li>
+<li>自我中心 egocentric：以身体为原点，记向前、左转的动作序列</li>
+<li>环境中心 allocentric：以外部世界为原点，记目的地在广场北边式的地图</li>
+<li>脑机制证据</li>
+<li>伦敦出租车司机研究（Maguire）：16 名司机 MRI 与海马结构差异</li>
+<li>外侧内嗅皮层（LEC）编码物体相对自身方向的神经元</li>
+<li>Packard &amp; McGaugh 1996 大鼠十字迷宫：操纵脑区改变导航策略</li>
+<li>另一种解释（言意之庭心理 12 赞）</li>
+<li>Witkin 场独立/场依存：依赖内部参照 vs 外部环境线索</li>
+<li>三分法：地标风格、路线风格、概览（全局地图）风格</li>
+<li>个体差异来源：框架偏好、学习经历与熟悉程度的长期塑造</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[日常观察：有人靠方向有人靠地标] --&gt; B[空间参考框架之争]
+B --&gt; C[自我中心：以身体为原点记左转右转]
+B --&gt; D[环境中心：以外部世界为原点记方位地图]
+C --&gt; E[海马与内嗅皮层编码空间表征]
+D --&gt; E
+E --&gt; F[伦敦出租车司机海马结构证据]
+E --&gt; G[大鼠十字迷宫脑区操纵实验]
+F --&gt; H[个体差异来自框架偏好与经验塑造]
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">神经科学</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-04</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

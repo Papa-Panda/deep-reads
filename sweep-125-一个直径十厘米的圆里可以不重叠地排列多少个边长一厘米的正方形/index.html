@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一个直径十厘米的圆里可以不重叠地排列多少个边长一厘米的正方形？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>一个直径十厘米的圆里可以不重叠地排列多少个边长一厘米的正方形？</h1>
+<p class="sub">知乎热榜 54 万热度、20 个回答中的硬核几何优化题：直径 10 的圆里最多能塞几个边长 1 的正方形。前排回答给的是可复现的精确结果而非拼图直觉——67 个有对称格点构造，66 个构造附有理数坐标与逐对分离轴验证代码，68 个的最小已知半径约 5.032、只比 5 大 0.6% 且上界只证到 70。整数规划、模拟退火与精确算术验证的完整链条，正合数学出身的慢读口味。已读默认排序前 3 答。</p>
+<p class="meta">2026-10-05</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/450006212">https://www.zhihu.com/question/450006212</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>问题设定</li>
+<li>半径 5 的圆内放边长 1 的正方形，互不重叠，最多几个；难点在旋转角度与圆周约束耦合</li>
+<li>67 个可行（237 赞答）</li>
+<li>对称构造：正方形中心落在整数/半整数格点上</li>
+<li>利用 3-4-5 勾股关系把顶点恰好顶到半径 5 的圆周，靠整数规划搜索得到</li>
+<li>66 个构造的可复现验证（228 赞答）</li>
+<li>给出全部有理数坐标与转角编码，附精确有理算术验证代码</li>
+<li>对全部 2145 对正方形做分离轴检查，顶点半径小于 4.9995、两两间隙大于 0.0005，避免浮点误判</li>
+<li>同一答主用模拟退火多起点继续搜 67/68，两小时未果，说明构造不是随手拼图</li>
+<li>68 个的边界（128 赞答）</li>
+<li>轴对称情形已被验证至多 67 个，若有 68 反例必须全旋转</li>
+<li>68 个的最小已知半径约 5.0316，只比 5 大约 0.6%，最小间隙约十万分之三</li>
+<li>一般情形上界目前只证到 70，67 与 68 之间的窄缝尚未闭合</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题：直径10的圆能放几个边长1正方形] --&gt; B[67个可行：对称格点构造]
+B --&gt; C[中心落在整数与半整数格点]
+C --&gt; D[借3-4-5勾股把顶点顶到圆周]
+A --&gt; E[66个构造可逐对复现验证]
+E --&gt; F[有理数坐标编码中心与转角]
+F --&gt; G[分离轴检查全部2145对 顶点半径与间隙均留正余量]
+A --&gt; H[68个为何卡住]
+H --&gt; I[最小已知半径约5.032 仅比5大0.6%]
+H --&gt; J[轴对称情形已验证至多67]
+H --&gt; K[一般情形上界只证到70 窄缝未闭合]
+I --&gt; L[当前答案：67可行 68未定]
+K --&gt; L</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">几何优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-05</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

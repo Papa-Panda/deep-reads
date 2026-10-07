@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站收藏</div>
+<h1>跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent</h1>
+<p class="sub">涌现Lab 对谈两位英伟达工程师：相关工作烧掉约四五千万元等值 token 之后的方法论沉淀。核心是规格驱动的 RLCR 循环（写规格而非写代码、构建者加审查者双模型），同一套循环搬到 KDA 内核优化，六周赛期做到全赛道前三、单内核收敛从 24 小时压到 6–8 小时；并断言多智能体照搬公司组织是过家家、新模型一来要先拆旧 harness。对他的 agent 工程与 harness 观察是难得的一线样本。字幕稿经核验吻合，前 33 分钟据稿整理、后段据简介时间线。</p>
+<p class="meta">2026-10-07</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1ubHp6MEvp">https://www.bilibili.com/video/BV1ubHp6MEvp</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（前约 33 分钟据字幕稿整理，字幕经核验与视频吻合；后段据 UP 简介时间线）</h2>
+<ul>
+<li>背景：两位英伟达工程师朱力耕、刘思皓，相关工作合计消耗约 4,000–5,000 万元人民币等值 token</li>
+<li>Humanize 起源：由刘思皓 PhD 项目 Loom（多核异构加速器框架，约 60 万行代码、近一人完成）演化；工作方式从写代码转为写 1–2k 行自然语言规格，由 agent 生成上万行代码</li>
+<li>GAAC 的教训：把 GitHub 的 issues/PR 当 agent 上下文，处理一百多个 issue 后退化；诊断是照搬公司组织分工行不通——agent 之间传递上下文是有损压缩，多智能体照搬人类分工被称作过家家</li>
+<li>RLCR 循环：计划 → Claude 构建 → Codex/GPT 审查是否真的按规格实现（Gemini 与小模型委员会当审查者都试过，效果弱）；Humanize v1 可连续运行 10–20 小时完整实现规格；迭代哲学是小步累积，1–2% 的改进乘以 100 轮，约 5 轮无进展就停</li>
+<li>KDA 内核优化：同一循环加两件套——Kernel Wiki（近期热门仓库已合并 PR 的经验汇总）与细粒度 profiler（从 NCU 出发，暴露 bank conflict、SM 利用率等，而不只是最终时延）；六周赛期内核心开发约一周，成绩全赛道前三；单个内核收敛从 24 小时以上压到通常 6–8 小时</li>
+<li>Agent 原生 DSL：CUDA/Triton 是为人设计的；一位嘉宾称自己的 Codex 两个月写出约 800 万与 1,600 万行代码；他们转向 Cake、TileX 等 agent 原生语言</li>
+<li>接力流：RLCR 缺多样性，改用两个强模型接力——一个跑满预算后被强制总结并停下，交棒给另一个，再交回；用模型多样性逃出单个模型到不了的局部最优</li>
+<li>后段主题（据简介时间线）：token 如何变成真实生产力；无数学背景的跨领域团队挑战数学榜；批量生成算子之后软件工程怎么变；新模型一来先拆掉旧 harness；模型学会的 skill 与工程师的转向；代码不是护城河，时间才是；RSI 的阿拉丁神灯：用 token 换效率、用效率换更多 token</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[烧掉四五千万Token] --&gt; B[方法转向写规格]
+B --&gt; C[RLCR构建审查循环]
+C --&gt; D[Humanize长程实现规格]
+C --&gt; E[KDA内核优化实战]
+E --&gt; F[收敛从24小时到6至8小时]
+C --&gt; G[双强模型接力逃局部最优]
+A --&gt; H[多智能体照搬组织是过家家]
+H --&gt; I[价值在组织可验证工作流]
+I --&gt; J[新模型先拆旧Harness]
+J --&gt; K[RSI式Token复投]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent</span><span class="tag">英伟达</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-07</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -4,7 +4,65 @@
 
 | 日期 | 类型 | 标题 | 一句话 |
 |---|---|---|---|
+| sweep-98-待 | 深读 | [（待读）Agent CPU](./sweep-98-待读-agent-cpu/) |  |
+| sweep-94-h | 深读 | [https://www.youtube.com/watch?si=fwNwPRcuvcL-41le&amp;v=JtomF4bGxHs&amp;feature=youtu.be](./sweep-94-https-www-youtube-com-watch-si-fwnwprcuvcl-41le/) |  |
+| sweep-9-知乎 | 深读 | [知乎回答 2052754000 - 抓取受限](./sweep-9-知乎回答-2052754000-抓取受限/) |  |
+| sweep-84-c | 深读 | [Context management](./sweep-84-context-management/) |  |
+| sweep-83-t | 深读 | [Tesla P100 硬核拆解：Pascal 架构如何凭 FP16+HBM+NVLink 突破性能天花板？](./sweep-83-tesla-p100-硬核拆解-pascal-架构如何凭-fp16-hbm-nvlink-突破性/) |  |
+| sweep-80-疫 | 深读 | [疫情结束后，Zoom靠什么继续增长？从拉新到做深企业客户｜Zoom商业模式_哔哩哔哩_bilibili](./sweep-80-疫情结束后-zoom靠什么继续增长-从拉新到做深企业客户-zoom商业模式-哔哩哔哩-bilib/) |  |
+| sweep-79-l | 深读 | [Lennar：一家盖房子的公司，为什么越来越不愿意买地？](./sweep-79-lennar-一家盖房子的公司-为什么越来越不愿意买地/) |  |
+| sweep-78-拥 | 深读 | [拥有卡车车队的经济学原理。](./sweep-78-拥有卡车车队的经济学原理/) |  |
+| sweep-77-b | 深读 | [【b站最全梳理】巴菲特投比亚迪14年38倍怎么发现的？马斯克嘲讽BYD为什么?为什么能持有这么久？当年发生了什么？_哔哩哔哩_bilibili](./sweep-77-b站最全梳理-巴菲特投比亚迪14年38倍怎么发现的-马斯克嘲讽byd为什么-为什么能持有这么久/) |  |
+| sweep-76-u | 深读 | [uber 值得多少钱](./sweep-76-uber-值得多少钱/) |  |
+| sweep-75-疫 | 深读 | [疫情结束以后，Zoom到底靠什么继续增长？](./sweep-75-疫情结束以后-zoom到底靠什么继续增长/) |  |
+| sweep-74-s | 深读 | [ServiceNow 的合规型切换成本：即使企业能自建，Legal/审计依然偏好用它](./sweep-74-servicenow-的合规型切换成本-即使企业能自建-legal-审计依然偏好用它/) |  |
+| sweep-73-w | 深读 | [Why AI Agents Could Finally Reinvent the Credit Card](./sweep-73-why-ai-agents-could-finally-reinvent-the-credit/) |  |
+| sweep-72-j | 深读 | [Jump Trading：如何构建量化 Multi-Agent 系统](./sweep-72-jump-trading-如何构建量化-multi-agent-系统/) |  |
+| sweep-71-l | 深读 | [labubu很快要凉？为什么Hello Kitty却能火50年-哔哩哔哩](./sweep-71-labubu很快要凉-为什么hello-kitty却能火50年-哔哩哔哩/) |  |
+| sweep-70-e | 深读 | [Elon Musk on Optimus: We&#x27;ll build over 1 billion robots a year \| Lex Fridman Podcast](./sweep-70-elon-musk-on-optimus-we-ll-build-over-1-billion/) |  |
+| sweep-7-什么 | 深读 | [什么是 Self-evolving / self-improving / RSI ？一篇文章搞懂自进化](./sweep-7-什么是-self-evolving-self-improving-rsi-一篇文章搞懂自进化/) |  |
+| sweep-66-p | 深读 | [Pop Mart财报拆解：同店 vs 新IP vs 海外 vs 渠道 - IP复利怎么证伪](./sweep-66-pop-mart财报拆解-同店-vs-新ip-vs-海外-vs-渠道-ip复利怎么证伪/) |  |
+| sweep-65-i | 深读 | [Inside AppLovin’s $100B Ad Engine](./sweep-65-inside-applovin-s-100b-ad-engine/) |  |
+| sweep-63-w | 深读 | [What Happens When the AI Boom Runs Out of Money](./sweep-63-what-happens-when-the-ai-boom-runs-out-of-money/) |  |
+| sweep-61-唐 | 深读 | [唐杰 scalibg law](./sweep-61-唐杰-scalibg-law/) |  |
+| sweep-60-z | 深读 | [Zuckerberg: the future is for everyone](./sweep-60-zuckerberg-the-future-is-for-everyone/) |  |
+| sweep-58-p | 深读 | [Pop Mart vs Miniso — per-store, total revenue, margins &amp; store model 2026-08-19](./sweep-58-pop-mart-vs-miniso-per-store-total-revenue-margi/) |  |
+| sweep-56-2 | 深读 | [2026年腾讯二季度财报分析和对AI资本开支看法](./sweep-56-2026年腾讯二季度财报分析和对ai资本开支看法/) |  |
+| sweep-55-不 | 深读 | [不卷 AI 也不回购，“吝啬” 的京东还能行吗？](./sweep-55-不卷-ai-也不回购-吝啬-的京东还能行吗/) |  |
+| sweep-54-茅 | 深读 | [茅台财报](./sweep-54-茅台财报/) |  |
+| sweep-48-知 | 深读 | [知乎回答 2058448873…](./sweep-48-知乎回答-2058448873/) |  |
+| sweep-46-从 | 深读 | [从三份年报到研究交付，AI工具怎么帮你做金融研究？_哔哩哔哩_bilibili](./sweep-46-从三份年报到研究交付-ai工具怎么帮你做金融研究-哔哩哔哩-bilibili/) |  |
+| sweep-45-t | 深读 | [test time reinforcement learning](./sweep-45-test-time-reinforcement-learning/) |  |
+| sweep-41-a | 深读 | [applovin q2财报](./sweep-41-applovin-q2财报/) |  |
+| sweep-39-g | 深读 | [Gary Vaynerchuk on the rise of live social shopping: It will disrupt multiple industries](./sweep-39-gary-vaynerchuk-on-the-rise-of-live-social-shopp/) |  |
+| sweep-38-h | 深读 | [How TikTok Shop Became The Fastest Growing Social Media Shopping Platform](./sweep-38-how-tiktok-shop-became-the-fastest-growing-socia/) |  |
+| sweep-35-美 | 深读 | [美团 agwnt](./sweep-35-美团-agwnt/) |  |
+| sweep-34-大 | 深读 | [大厂便利店](./sweep-34-大厂便利店/) |  |
+| sweep-33-i | 深读 | [inference 技术](./sweep-33-inference-技术/) |  |
+| sweep-32-p | 深读 | [pltr 财报](./sweep-32-pltr-财报/) |  |
+| sweep-31-知 | 深读 | [知乎问答 2065552444… kimi不用rope](./sweep-31-知乎问答-2065552444-kimi不用rope/) |  |
+| sweep-30-雪 | 深读 | [雪球 403598369 思科复盘](./sweep-30-雪球-403598369-思科复盘/) |  |
+| sweep-29-互 | 深读 | [互联网流量，崩塌了](./sweep-29-互联网流量-崩塌了/) |  |
+| sweep-26-雪 | 深读 | [雪球 403456698](./sweep-26-雪球-403456698/) |  |
+| sweep-25-雪 | 深读 | [雪球 403305949](./sweep-25-雪球-403305949/) |  |
+| sweep-24-雪 | 深读 | [雪球 402290638](./sweep-24-雪球-402290638/) |  |
+| sweep-23-雪 | 深读 | [雪球 403302387](./sweep-23-雪球-403302387/) |  |
+| sweep-22-知 | 深读 | [知乎问答 2067210442…](./sweep-22-知乎问答-2067210442/) |  |
+| sweep-21-雪 | 深读 | [雪球 403297154](./sweep-21-雪球-403297154/) |  |
+| sweep-20-知 | 深读 | [知乎问答 2064491487…](./sweep-20-知乎问答-2064491487/) |  |
+| sweep-18-a | 深读 | [Amazon Q2 FY26 Earnings Call \| $AMZN \| 🔴 WATCH LIVE](./sweep-18-amazon-q2-fy26-earnings-call-amzn-watch-live/) |  |
+| sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
+| sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
+| sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
+| sweep-12-c | 深读 | [Coinbase：币价 “退潮” 再探底，还能等到政策东风吗？](./sweep-12-coinbase-币价-退潮-再探底-还能等到政策东风吗/) |  |
+| sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
+| sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-10-08 | 扫读 | [【科学史】那些年，科学家用光遗传做的鬼畜实验……](./sweep-138-科学史-那些年-科学家用光遗传做的鬼畜实验/) | B站热门条目，芳斯塔芙的科学史短片（8分11秒，约60.6万播放、9千余收藏），被 B 站编入 2026 诺贝尔生理学或 |
+| 2026-10-08 | 扫读 | [如何看待 OpenAI 公开 722 份数学手稿，宣布解决包含「准黎曼猜想」的数百个数学问题？](./sweep-137-如何看待-openai-公开-722-份数学手稿-宣布解决包含-准黎曼猜想-的数百个数学问题/) | 知乎热榜条目，578 个回答、约 561 万浏览。前排回答恰好构成三种读法：高赞答主认为准黎曼级结果若成立将改写数学图景 |
+| 2026-10-07 | 扫读 | [余承东称华为将不得不涨价，存储元器件大涨使每部手机增超两百美元成本，会对消费者及手机市场有多大影响？](./sweep-136-余承东称华为将不得不涨价-存储元器件大涨使每部手机增超两百美元成本-会对消费者及手机市场有多大影/) | 知乎热榜约214万热度、233个回答。最值得看的是两条数据型回答：一条从供给侧拆解——AI服务器为绕开内存墙大量采购HB |
+| 2026-10-07 | 扫读 | [【漫士】为了抓住幽灵，人类在南极挖了1立方公里的冰](./sweep-135-漫士-为了抓住幽灵-人类在南极挖了1立方公里的冰/) | 漫士沉思录在2026物理诺奖独授IceCube领军人Halzen数小时后上线：23分44秒讲清为什么抓中微子要在南极冰盖 |
+| 2026-10-07 | 扫读 | [如何看待法国 AI 公司 Mistral 发布的最新模型 Mistral Large 4？](./sweep-134-如何看待法国-ai-公司-mistral-发布的最新模型-mistral-large-4/) | 知乎热榜114万热度、仅24个回答，却罕见地数据密集：三位答主分别拆架构、算力与基准价格且数字互相印证。总参1.05T、 |
 | 2026-10-07 | 扫读 | [跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent](./sweep-133-跑掉四五千万人民币等值token之后-两位英伟达工程师重新理解了agent/) | 涌现Lab 对谈两位英伟达工程师：相关工作烧掉约四五千万元等值 token 之后的方法论沉淀。核心是规格驱动的 RLCR |
 | 2026-10-07 | 扫读 | [一人干翻2000人大厂！41岁程序员靠AI年入4亿美元，奥特曼：我想见他](./sweep-132-一人干翻2000人大厂-41岁程序员靠ai年入4亿美元-奥特曼-我想见他/) | 新智元据纽约时报报道写的 AI 商业故事：41 岁创始人 Matthew Gallagher 用 2 万美元启动远程医疗 |
 | 2026-10-07 | 扫读 | [一口气实测GrokBot和Meta Muse/个人Agent Harness系统设计/跨harness记忆实测](./sweep-131-一口气实测grokbot和meta-muse-个人agent-harness系统设计-跨harn/) | 肖恩君Sean 实测两周 Grok Bot 与 Meta Muse 两套个人 Agent Harness 并拆架构：Gr |
@@ -33,10 +91,8 @@
 | 2026-09-30 | 扫读 | [RL loss 是近似的一阶 Taylor 展开](./sweep-106-rl-loss-是近似的一阶-taylor-展开/) | 第一性原理重推 LLM 后训练 RL loss：想优化序列级 reward 却用 token 级加权似然训练，重要性比率 |
 | 2026-09-30 | 扫读 | [如何评价DeepSeek Harness桌面版正式发布？](./sweep-105-如何评价deepseek-harness桌面版正式发布/) | 知乎热榜讨论（18 答、13.4 万浏览）：DeepSeek Harness 桌面版 v0.2.0 正式发布——dsh  |
 | 2026-09-29 | 扫读 | [闪存，涨价和三万个零件：为什么偏偏今年都在涨？](./sweep-99-闪存-涨价和三万个零件-为什么偏偏今年都在涨/) | 《半径三百公里》第二期（UP主空山猎人，33分钟，财经商业区）：2026年9月手机/电脑/汽车同步涨价，根因是同一批存储 |
-| 2026-09-29 | 扫读 | [（待读）Agent CPU](./sweep-98-待读-agent-cpu/) | 微信反爬验证拦截，未读到原文细节。主题：Agent CPU。你把正文贴过来后，我补大纲与流程图并生成深读 HTML。 |
 | 2026-09-29 | 扫读 | [怎么看媒体曝 Anthropic 提交 IPO 招股书，25 年营收增长 12 倍，净亏损 420 亿美元？](./sweep-104-怎么看媒体曝-anthropic-提交-ipo-招股书-25-年营收增长-12-倍-净亏损-42/) | 知乎热榜讨论（22 答）：媒体披露 Anthropic IPO 招股书——2025 年营收 46 亿美元（同比约 12  |
 | 2026-09-29 | 扫读 | [如何看待 AMD 收购李飞飞创立的 World Labs，李飞飞将任 AMD 执行副总裁兼首席科学家？](./sweep-103-如何看待-amd-收购李飞飞创立的-world-labs-李飞飞将任-amd-执行副总裁兼首席科/) | 知乎热榜讨论（89 答、41.8 万浏览）：围绕 AMD 以 82 亿美元全股票收购 World Labs、李飞飞任执行 |
-| 2026-09-29 | 扫读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
 | 2026-09-29 | 扫读 | [LoRA 一作、OpenAI o1 核心成员的新工作：首次公开 397B 模型的 Agent RL 训练配方](./sweep-101-lora-一作-openai-o1-核心成员的新工作-首次公开-397b-模型的-agent-r/) | LoRA 一作、OpenAI o1 核心成员 Edward Hu 加入 Mercor 后与 SkyRL 团队联合发布：Q |
 | 2026-09-29 | 扫读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) | 基于 1884 个 TypeScript 源文件的 Claude Code 架构级拆解（3.4 万播放、2144 收藏） |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
@@ -47,55 +103,4 @@
 | 2026-09-28 | 扫读 | [双汇火腿肠销量连续下滑，传统火腿肠为何越来越卖不动？方便面触底反弹，火腿肠却持续下滑，问题出在哪里？](./sweep-97-双汇火腿肠销量连续下滑-传统火腿肠为何越来越卖不动-方便面触底反弹-火腿肠却持续下滑-问题出在哪/) | 知乎热榜提问（129 答、23.8 万浏览）：双汇包装肉制品销量从 2020 年 158.6 万吨峰值连降五年至 136 |
 | 2026-09-28 | 扫读 | [万字长文总结RL/on policy distillation的一些进展](./sweep-96-万字长文总结rl-on-policy-distillation的一些进展/) | 知乎收藏的万字长文（YiFan-Zhang，910 赞/1488 收藏），系统梳理 on-policy learning |
 | 2026-09-28 | 扫读 | [抄袭者如何把原创者熬成山寨？奥利奥：这事儿我熟](./sweep-95-抄袭者如何把原创者熬成山寨-奥利奥-这事儿我熟/) | 商业故事 UP 主「伯格慢」14 分钟讲 Hydrox（1908 年夹心饼干原创者）如何被 1912 年的模仿者奥利奥反 |
-| 2026-09-27 | 扫读 | [https://www.youtube.com/watch?si=fwNwPRcuvcL-41le&v=JtomF4bGxHs&feature=youtu.be](./sweep-94-https-www-youtube-com-watch-si-fwnwprcuvcl-41le/) |  |
 | 2026-09-27 | 扫读 | [【漫士】AI怎么让NS方程爆炸的？流体力学不存在了？](./sweep-92-漫士-ai怎么让ns方程爆炸的-流体力学不存在了/) | AI 博士生 UP 主「漫士沉思录」41 分钟硬核拆解：OpenAI 团队 88 小时给出纳维-斯托克斯方程爆破反例的数 |
-| 2026-09-20 | 扫读 | [Context management](./sweep-84-context-management/) |  |
-| 2026-09-15 | 扫读 | [Tesla P100 硬核拆解：Pascal 架构如何凭 FP16+HBM+NVLink 突破性能天花板？](./sweep-83-tesla-p100-硬核拆解-pascal-架构如何凭-fp16-hbm-nvlink-突破性/) |  |
-| 2026-09-14 | 扫读 | [疫情结束后，Zoom靠什么继续增长？从拉新到做深企业客户｜Zoom商业模式_哔哩哔哩_bilibili](./sweep-80-疫情结束后-zoom靠什么继续增长-从拉新到做深企业客户-zoom商业模式-哔哩哔哩-bilib/) |  |
-| 2026-09-14 | 扫读 | [Lennar：一家盖房子的公司，为什么越来越不愿意买地？](./sweep-79-lennar-一家盖房子的公司-为什么越来越不愿意买地/) |  |
-| 2026-09-08 | 扫读 | [拥有卡车车队的经济学原理。](./sweep-78-拥有卡车车队的经济学原理/) |  |
-| 2026-09-08 | 扫读 | [【b站最全梳理】巴菲特投比亚迪14年38倍怎么发现的？马斯克嘲讽BYD为什么?为什么能持有这么久？当年发生了什么？_哔哩哔哩_bilibili](./sweep-77-b站最全梳理-巴菲特投比亚迪14年38倍怎么发现的-马斯克嘲讽byd为什么-为什么能持有这么久/) |  |
-| 2026-09-06 | 扫读 | [uber 值得多少钱](./sweep-76-uber-值得多少钱/) |  |
-| 2026-09-06 | 扫读 | [疫情结束以后，Zoom到底靠什么继续增长？](./sweep-75-疫情结束以后-zoom到底靠什么继续增长/) |  |
-| 2026-09-04 | 扫读 | [ServiceNow 的合规型切换成本：即使企业能自建，Legal/审计依然偏好用它](./sweep-74-servicenow-的合规型切换成本-即使企业能自建-legal-审计依然偏好用它/) |  |
-| 2026-09-03 | 扫读 | [Why AI Agents Could Finally Reinvent the Credit Card](./sweep-73-why-ai-agents-could-finally-reinvent-the-credit/) |  |
-| 2026-09-01 | 扫读 | [Jump Trading：如何构建量化 Multi-Agent 系统](./sweep-72-jump-trading-如何构建量化-multi-agent-系统/) | Jump Trading 介绍如何把 Multi-Agent 用于量化研究：先从单模型、单 Harness 的最小闭环开 |
-| 2026-08-28 | 扫读 | [labubu很快要凉？为什么Hello Kitty却能火50年-哔哩哔哩](./sweep-71-labubu很快要凉-为什么hello-kitty却能火50年-哔哩哔哩/) |  |
-| 2026-08-26 | 扫读 | [Elon Musk on Optimus: We'll build over 1 billion robots a year \| Lex Fridman Podcast](./sweep-70-elon-musk-on-optimus-we-ll-build-over-1-billion/) |  |
-| 2026-08-25 | 扫读 | [Pop Mart财报拆解：同店 vs 新IP vs 海外 vs 渠道 - IP复利怎么证伪](./sweep-66-pop-mart财报拆解-同店-vs-新ip-vs-海外-vs-渠道-ip复利怎么证伪/) | 泡泡玛特财报里的增长应怎样拆成同店、上新IP、海外扩张与渠道变化，哪一项最能证明IP复利而不是短期爆款？来源 ChatG |
-| 2026-08-21 | 扫读 | [Inside AppLovin’s $100B Ad Engine](./sweep-65-inside-applovin-s-100b-ad-engine/) |  |
-| 2026-08-21 | 扫读 | [What Happens When the AI Boom Runs Out of Money](./sweep-63-what-happens-when-the-ai-boom-runs-out-of-money/) |  |
-| 2026-08-21 | 扫读 | [唐杰 scalibg law](./sweep-61-唐杰-scalibg-law/) |  |
-| 2026-08-20 | 扫读 | [Zuckerberg: the future is for everyone](./sweep-60-zuckerberg-the-future-is-for-everyone/) |  |
-| 2026-08-19 | 扫读 | [Pop Mart vs Miniso — per-store, total revenue, margins & store model 2026-08-19](./sweep-58-pop-mart-vs-miniso-per-store-total-revenue-margi/) | Pop Mart RMB13.04B +106.9% gross 66.8% vs Miniso Q1 RMB3.72B |
-| 2026-08-16 | 扫读 | [2026年腾讯二季度财报分析和对AI资本开支看法](./sweep-56-2026年腾讯二季度财报分析和对ai资本开支看法/) |  |
-| 2026-08-16 | 扫读 | [不卷 AI 也不回购，“吝啬” 的京东还能行吗？](./sweep-55-不卷-ai-也不回购-吝啬-的京东还能行吗/) |  |
-| 2026-08-16 | 扫读 | [茅台财报](./sweep-54-茅台财报/) |  |
-| 2026-08-09 | 扫读 | [知乎回答 2058448873…](./sweep-48-知乎回答-2058448873/) |  |
-| 2026-08-09 | 扫读 | [从三份年报到研究交付，AI工具怎么帮你做金融研究？_哔哩哔哩_bilibili](./sweep-46-从三份年报到研究交付-ai工具怎么帮你做金融研究-哔哩哔哩-bilibili/) |  |
-| 2026-08-06 | 扫读 | [test time reinforcement learning](./sweep-45-test-time-reinforcement-learning/) |  |
-| 2026-08-06 | 扫读 | [applovin q2财报](./sweep-41-applovin-q2财报/) |  |
-| 2026-08-05 | 扫读 | [Gary Vaynerchuk on the rise of live social shopping: It will disrupt multiple industries](./sweep-39-gary-vaynerchuk-on-the-rise-of-live-social-shopp/) |  |
-| 2026-08-05 | 扫读 | [How TikTok Shop Became The Fastest Growing Social Media Shopping Platform](./sweep-38-how-tiktok-shop-became-the-fastest-growing-socia/) |  |
-| 2026-08-04 | 扫读 | [美团 agwnt](./sweep-35-美团-agwnt/) |  |
-| 2026-08-04 | 扫读 | [大厂便利店](./sweep-34-大厂便利店/) |  |
-| 2026-08-04 | 扫读 | [inference 技术](./sweep-33-inference-技术/) |  |
-| 2026-08-04 | 扫读 | [pltr 财报](./sweep-32-pltr-财报/) |  |
-| 2026-08-04 | 扫读 | [知乎问答 2065552444… kimi不用rope](./sweep-31-知乎问答-2065552444-kimi不用rope/) |  |
-| 2026-08-04 | 扫读 | [雪球 403598369 思科复盘](./sweep-30-雪球-403598369-思科复盘/) |  |
-| 2026-08-04 | 扫读 | [互联网流量，崩塌了](./sweep-29-互联网流量-崩塌了/) |  |
-| 2026-08-03 | 扫读 | [雪球 403456698](./sweep-26-雪球-403456698/) |  |
-| 2026-08-03 | 扫读 | [雪球 403305949](./sweep-25-雪球-403305949/) |  |
-| 2026-08-03 | 扫读 | [雪球 402290638](./sweep-24-雪球-402290638/) |  |
-| 2026-08-03 | 扫读 | [雪球 403302387](./sweep-23-雪球-403302387/) |  |
-| 2026-08-02 | 扫读 | [知乎问答 2067210442…](./sweep-22-知乎问答-2067210442/) |  |
-| 2026-08-02 | 扫读 | [雪球 403297154](./sweep-21-雪球-403297154/) |  |
-| 2026-08-02 | 扫读 | [知乎问答 2064491487…](./sweep-20-知乎问答-2064491487/) |  |
-| 2026-08-02 | 扫读 | [Amazon Q2 FY26 Earnings Call \| $AMZN \| 🔴 WATCH LIVE](./sweep-18-amazon-q2-fy26-earnings-call-amzn-watch-live/) |  |
-| 2026-08-02 | 扫读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
-| 2026-08-02 | 扫读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
-| 2026-08-02 | 扫读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
-| 2026-08-02 | 扫读 | [Coinbase：币价 “退潮” 再探底，还能等到政策东风吗？](./sweep-12-coinbase-币价-退潮-再探底-还能等到政策东风吗/) |  |
-| 2026-08-02 | 扫读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
-| 2026-08-01 | 扫读 | [知乎回答 2052754000 - 抓取受限](./sweep-9-知乎回答-2052754000-抓取受限/) |  |
-| 2026-08-01 | 扫读 | [什么是 Self-evolving / self-improving / RSI ？一篇文章搞懂自进化](./sweep-7-什么是-self-evolving-self-improving-rsi-一篇文章搞懂自进化/) |  |

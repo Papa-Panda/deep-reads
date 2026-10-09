@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>【漫士】双曲余弦：三角函数本来就是指数函数</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>【漫士】双曲余弦：三角函数本来就是指数函数</h1>
+<p class="sub">B站游客推荐流条目，漫士沉思录 18 分 11 秒数学科普。标题即论点：圆三角函数与双曲函数本是同一套指数函数在实轴与虚轴上的两种投影——用欧拉公式看，正弦余弦是复指数的实部虚部，双曲余弦则是实指数的偶部。对他是熟悉的分析学地基换个统一视角重走一遍，正合硬核科普口味。注：视频页未提供简介与字幕文本，大纲据标题与该主题的标准结构整理，未读到口播细节。</p>
+<p class="meta">2026-10-08</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1iHHs6DEeG">https://www.bilibili.com/video/BV1iHHs6DEeG</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据标题与主题结构整理；视频页无简介与字幕文本，未读到口播细节）</h2>
+<ul>
+<li>论点</li>
+<li>三角函数与双曲函数不是两套孤立的公式表，而是同一个指数函数在不同方向上的投影</li>
+<li>指数出发的定义</li>
+<li>以 e 的幂级数或微分方程为地基：指数是唯一（差常数倍）导数等于自身的函数</li>
+<li>偶部与奇部分解自然给出 cosh 与 sinh，对应悬链线等实变量问题</li>
+<li>虚轴一转：欧拉公式</li>
+<li>把自变量换成虚数，实指数变为复指数，实部与虚部分别给出 cos 与 sin</li>
+<li>于是 cosh 的虚数版本即 cos：两族函数只差一个虚数单位的方向</li>
+<li>恒等式的统一来源</li>
+<li>双曲恒等式与三角恒等式一一对应（符号差异来自虚数平方），加法公式同源于指数的乘法性质</li>
+<li>几何图像</li>
+<li>单位圆对应圆三角，单位双曲线对应双曲函数；参数都是面积型量角，结构平行</li>
+<li>收束</li>
+<li>记住指数一个对象，整套三角与双曲公式可现场重建</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[指数函数 导数等于自身] --&gt; B[偶部与奇部分解]
+B --&gt; C[实轴投影 双曲函数cosh与sinh]
+A --&gt; D[虚轴代入 欧拉公式]
+D --&gt; E[实部虚部 三角函数cos与sin]
+C --&gt; F[双曲恒等式]
+E --&gt; G[三角恒等式]
+F --&gt; H[两套公式同源 仅差虚数方向]
+G --&gt; H
+H --&gt; I[一个对象重建整套公式表]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-08</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>攒多少钱才能不上班？我和 Opus 5.5 做了一部 46 分钟的关于财务自由和 FIRE 的动画</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>攒多少钱才能不上班？我和 Opus 5.5 做了一部 46 分钟的关于财务自由和 FIRE 的动画</h1>
+<p class="sub">B站游客推荐流条目，plotome 出品的 46 分钟长动画。它不贩卖财务自由鸡汤，而是拆 4% 法则与 25 倍年支出目标背后的脆弱假设：支出常被低估、回报常被高估、还有退休初期最伤人的收益顺序风险，进而引入安全边际重估，并指出退休后的后半程才是更难的问题。对信奉安全边际的他，这是把 FIRE 从口号还原成假设检验的一课；属个人财务而非公司研究。已读视频简介，页面未载入章节与热评。</p>
+<p class="meta">2026-10-10</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1eTHZ6gENk">https://www.bilibili.com/video/BV1eTHZ6gENk</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据视频简介整理；页面未载入章节与热评）</h2>
+<ul>
+<li>起点：目标数字怎么算出来</li>
+<li>从年支出出发：攒够年支出的 25 倍，再按 4% 法则逐年提取，号称可以不上班</li>
+<li>拆假设一：支出被低估</li>
+<li>退休后的真实支出结构与在职时不同，按当下支出外推容易系统性偏低</li>
+<li>拆假设二：回报被高估</li>
+<li>长期平均回报不等于每年到手的回报，波动会吃掉复利叙事</li>
+<li>拆假设三：收益顺序风险</li>
+<li>同样的平均回报，坏年份先来与后来结果天差地别；退休初期的一轮大跌最伤本金</li>
+<li>重估：给目标加安全边际</li>
+<li>在 25 倍之上留缓冲，把目标数字当成带误差的估计而非及格线</li>
+<li>后半程问题</li>
+<li>攒够只是前半程；提取、税务、长寿与支出变化让退休后的管理更难</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题 攒多少才能不上班] --&gt; B[经典答案 年支出25倍加4%法则]
+B --&gt; C[假设检验开始]
+C --&gt; D[支出常被低估]
+C --&gt; E[回报常被高估]
+C --&gt; F[收益顺序风险 坏年份先来最伤]
+D --&gt; G[目标数字系统性偏乐观]
+E --&gt; G
+F --&gt; G
+G --&gt; H[修正 引入安全边际重估目标]
+H --&gt; I[更难的是后半程 提取与长寿管理]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">投资</span><span class="tag">财务自由</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-10</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

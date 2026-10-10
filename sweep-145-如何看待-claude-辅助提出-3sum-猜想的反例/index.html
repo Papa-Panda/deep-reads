@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待 Claude 辅助提出 3SUM 猜想的反例？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何看待 Claude 辅助提出 3SUM 猜想的反例？</h1>
+<p class="sub">知乎热榜条目（176万热度，15个回答，约30万浏览）。一篇新论文借稀疏歪边图中的三角形与一类细矩阵乘法，把两个经典问题压到真正亚二次与真正亚三次，若成立将动摇细粒度复杂性中一批条件性下界。前三答（838/426/267赞）看法互补：技术步本身不大、贵在归约影响广；核心是旧矩阵乘法想法的新递归用法；同时提醒模型离最大的开放问题仍远。对数学出身的他，这是判断模型做算法发现真实水位的硬样本。已读默认排序前3答。</p>
+<p class="meta">2026-10-09</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2090919793809479354">https://www.zhihu.com/question/2090919793809479354</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>事件本体</li>
+<li>问题页 15 个回答、约 30 万浏览、176 万热度；讨论一篇声称突破经典复杂度的算法论文</li>
+<li>据称核心算法最初由模型发现，研究者负责分析、形式化与成文</li>
+<li>结果本身</li>
+<li>经稀疏歪边图中的三角形与细矩阵乘法归约，两个经典问题分别得到真正亚二次与真正亚三次算法</li>
+<li>指数只降了一点点，但足以严格否定长期沿用的难度猜想</li>
+<li>前三答的三种读法</li>
+<li>高赞答主：单步技术新意有限、近于顺手发现，意义主要在归约外溢</li>
+<li>理论答主：细粒度复杂性靠少数核心猜想加归约网支撑，本结果溯源到数十年前的矩形矩阵乘法想法被递归新用</li>
+<li>另一答主：地基被撼动、近期一批条件性论文受影响，但模型在最大开放问题上仍无可比进展</li>
+<li>待核验点</li>
+<li>结果需同行复核；受影响的是以该猜想为前提的下界结论，无前提的结论不动</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[长期难度猜想支撑一批下界] --&gt; B[模型辅助发现新算法线索]
+B --&gt; C[细矩阵乘法改进]
+C --&gt; D[稀疏歪边图三角形归约]
+D --&gt; E[经典问题得到真正亚二次算法]
+E --&gt; F[难度猜想被严格否定]
+F --&gt; G[一批条件性下界需重估]
+F --&gt; H[无前提结论不受影响]
+G --&gt; I[待同行复核后定价]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-09</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待 5090 将停产？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何看待 5090 将停产？</h1>
+<p class="sub">知乎热榜条目（约140万热度，17个回答，约5.6万浏览）。有爆料称英伟达不再向游戏旗舰 5090 分配其大芯片，转而全部供给高价专业线。前排回答（115/61/53赞）大体同向：同一颗芯片在 AI 与专业市场能换来数倍售价和批量订单，游戏业务被降级是算得过账的选择，专业卡被推理需求抢购又进一步挤压游戏卡供给；但也有回答提醒这仍只是爆料、并无官方确认，且显存产能与 AI 存储竞争让消费端份额更紧。对他是观察英伟达如何给稀缺产能定价的一课。已读默认排序前3答。</p>
+<p class="meta">2026-10-10</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2092286756028671952">https://www.zhihu.com/question/2092286756028671952</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>事件本体</li>
+<li>爆料称大芯片不再供游戏旗舰、转供专业产品线；中国特供版本据称也在范围内，但尚无官方公告与时间表</li>
+<li>问题页 17 个回答、约 5.6 万浏览、约 140 万热度</li>
+<li>读法一：同芯不同价的利润逻辑（约 115 赞，最高）</li>
+<li>游戏旗舰定价与转售价已高，但在批量出货的数据中心系统面前仍是小生意</li>
+<li>产能有限时优先高毛利买家，游戏被降级是理性分配</li>
+<li>读法二：推理需求的外溢（约 61 赞）</li>
+<li>专业卡被推理买家批量抢购、街价被推到极端水平</li>
+<li>价差之下，游戏卡被转作推理用途几乎不可避免，供给进一步被抽走</li>
+<li>读法三：先按爆料定价（约 53 赞）</li>
+<li>两个旁证：部分海外渠道已近售罄且成交价远高于指导价；新一代显存与 AI 高带宽存储抢同一批先进产能，消费端份额被压到很小、现货价半年翻倍以上</li>
+<li>大显存的旗舰型号最暴露；存量用户的保修与驱动支持不受影响</li>
+<li>落点</li>
+<li>关键变量不是单个型号存亡，而是稀缺芯片与显存产能在 AI 与游戏之间如何分配；游戏顶级层级可能暂时下移一档</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[爆料 大芯片不再供游戏旗舰] --&gt; B[同芯不同价 专业线售价数倍于游戏卡]
+B --&gt; C[产能有限时优先高毛利买家]
+A --&gt; D[推理需求批量抢购专业卡]
+D --&gt; E[价差抽走游戏卡供给]
+A --&gt; F[不确定性 仍属爆料无官方确认]
+F --&gt; G[旁证 渠道售罄涨价与显存产能竞争]
+C --&gt; H[落点 稀缺产能如何在AI与游戏间定价]
+E --&gt; H
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">芯片</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-10</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 个 AI 组队优化屎山代码，有的快了上千倍，有的比原来还慢｜AI 算法对抗大赛 第 5 集</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>12 个 AI 组队优化屎山代码，有的快了上千倍，有的比原来还慢｜AI 算法对抗大赛 第 5 集</h1>
+<p class="sub">B站游客推荐流条目（约7.3万播放，52分59秒，2026-10-10 发布，本期已同步开源）。12 个 AI 组队、另加 2 支人工队，同题优化一坨遗留代码，结果从提速上千倍到比原版还慢——同一任务、同一基线下，智能体的表现方差大得惊人。包装是娱乐化的对抗赛，但设置有对照组、有开源仓库可复现，对他正对口：这是观察 coding agent 能力分布与失稳方式的活样本，而非厂商演示。注：视频页未载入章节，大纲据标题与简介整理，未读到完整口播细节。</p>
+<p class="meta">2026-10-11</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1JEpv64ERE">https://www.bilibili.com/video/BV1JEpv64ERE</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据标题与视频简介整理；页面未载入章节）</h2>
+<ul>
+<li>实验设置</li>
+<li>同一道题：优化一段质量很差的遗留代码，以运行速度论成绩</li>
+<li>参赛方为 12 个 AI 队伍，另设 2 支人工队作人类基线</li>
+<li>本期代码与过程已在 GitHub 开源（meow-ai-arena），可自行复现核对</li>
+<li>结果分布</li>
+<li>头部队伍提速可达上千倍，说明瓶颈定位与重写策略对了之后上限很高</li>
+<li>也有队伍改完比原版更慢，优化动作本身会引入新的开销与错误</li>
+<li>同题同基线下方差极大，单次演示的最好成绩不代表平均水平</li>
+<li>读法</li>
+<li>与其看冠军，不如看分布：中位数、失败模式、以及人工队落在分布的哪个位置</li>
+<li>组队方式（多智能体分工）与单模型直做之间的差异，是本集真正的变量</li>
+<li>局限</li>
+<li>娱乐化剪辑会放大戏剧性结果，细节口径以开源仓库的测试方法为准</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[同题 优化遗留代码] --&gt; B[12个AI队伍参赛]
+A --&gt; C[2支人工队作基线]
+B --&gt; D[结果 头部提速上千倍]
+B --&gt; E[结果 部分队伍比原版更慢]
+C --&gt; F[人类成绩落在分布中对照]
+D --&gt; G[信号 上限取决于瓶颈定位与策略]
+E --&gt; H[信号 优化也会引入新开销]
+F --&gt; I[落点 看分布与失败模式而非冠军演示]
+G --&gt; I
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAI 发布 175 页四维挂谷猜想证明稿，这意味着什么？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>OpenAI 发布 175 页四维挂谷猜想证明稿，这意味着什么？</h1>
+<p class="sub">知乎热榜条目（约130万热度，59个回答）。王虹与 Zahl 刚解决三维挂谷集合猜想，OpenAI 随即公开两份手稿：一份97页攻三维更强的极大函数版，一份175页声称把四维维数下界从3.059直接推到满维4。两稿都重度建立在王虹团队的估计之上，且未经同行评审，数学界反应审慎。对他是 AI 进军纯数学前沿的样本：先看清猜想本身（全方向线段集合必须满维），再分清哪些是已证、哪些只是宣称。注：知乎原文页未直接读到（登录墙/403），大纲据热榜摘要与公开报道整理，未读到原文细节。</p>
+<p class="meta">2026-10-11</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2092197283857175132">https://www.zhihu.com/question/2092197283857175132</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据热榜摘要与公开报道整理；知乎原文页未直接读到）</h2>
+<ul>
+<li>问题本体</li>
+<li>挂谷猜想：n 维集合只要包含所有方向的单位线段，其 Hausdorff 维数就必须等于 n</li>
+<li>起源是针掉头问题：扫过面积可以任意小甚至为零，但维数被猜想锁死为满维</li>
+<li>二维情形 1971 年解决，三维卡了半个世纪，2025 年王虹与 Zahl 完成一般情形</li>
+<li>OpenAI 的两份手稿</li>
+<li>97 页：三维极大函数版，比集合版更强，需要控制细管的部分涂色与总体积之间的下界</li>
+<li>175 页：四维集合版，声称把维数下界从 3.059 一步推到满维 4</li>
+<li>两稿环环相扣：四维论证借用了三维稿中的加权估计</li>
+<li>方法骨架</li>
+<li>把线段加粗为细管，追踪不同尺度下重叠体积如何变化</li>
+<li>四维难点：细管可以沿二次曲面大量聚集，三维方法控制不住；手稿用二次多项式刻画局部聚集并尝试沿线段延续</li>
+<li>关键输入仍是 Guth、王虹与 Zahl 的集合估计与点积定理——站在已证结果之上，而非另起炉灶</li>
+<li>验证与争议</li>
+<li>两稿均未经同行评审，形式化验证状态在不同报道中说法不一</li>
+<li>批评集中在发布方式：一次性公开数百篇手稿、未公开模型与提示词细节</li>
+<li>读法：结论若成立，改写的是难题进度表；AI 产出是否算数学贡献，学界尚无共识</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[挂谷猜想 全方向线段集合必须满维] --&gt; B[三维集合版 王虹与Zahl已证]
+B --&gt; C[OpenAI 97页 三维极大函数版]
+B --&gt; D[OpenAI 175页 四维满维宣称]
+C --&gt; D
+D --&gt; E[难点 细管沿二次曲面聚集]
+E --&gt; F[工具 二次多项式刻画加前人估计]
+F --&gt; G[待验证 未经同行评审]
+G --&gt; H[落点 分清已证与宣称再评估AI数学能力]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

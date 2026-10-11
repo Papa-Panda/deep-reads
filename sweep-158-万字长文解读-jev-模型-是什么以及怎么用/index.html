@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>万字长文解读 Jev 模型：是什么以及怎么用</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎专栏</div>
+<h1>万字长文解读 Jev 模型：是什么以及怎么用</h1>
+<p class="sub">知乎专栏万字长文（谷粒，2026-09-21）。TypeSafe 的 Jev 把 LLM 的用法反过来：不生成文字，只对给定的 state 回答预先声明好的问题——是非（noul，返回为真概率）、选择（choice，带概率分布）、打分（score），一次前向并行出结果，延迟约 70–500 毫秒，定价为输入 0.042 美元/百万 token、输出免费。快的原因是砍掉自回归逐字解码、多个问题共享前缀与 KV，并用 RLCD 把输出概率校准到大体诚实。文章后半给出失效模式（没有思维链、顺序敏感、被无关选项干扰）、四种设计模式（推测式扇出、置信度门控、复合打分、分层分类）和生产路由：绝大多数判断走 Jev，不确定的才升级给大模型或人工。对他正对口：agent 系统里最高频的路由、校验、打分环节本质都是可枚举的判断题，Jev 是把「判断」从「生成」里拆出来单独定价的一层。注：知乎页面对自动抓取封闭，本条据浏览器通读全文后的结构与要点归纳，价格与延迟为文中转述的官方口径。</p>
+<p class="meta">2026-10-11 · 作者：谷粒</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2084624500726022179">https://zhuanlan.zhihu.com/p/2084624500726022179</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据知乎原文结构整理）</h2>
+<ul>
+<li>问题设定：软件里大量调用 LLM 只为一个判断</li>
+<li>生成式模型是 System 2：慢、贵，输出还要再解析成程序能用的值</li>
+<li>Jev 定位 System 1：一次前向直接给出类型化判断加置信度</li>
+<li>Jev 是什么</li>
+<li>TypeSafe AI 出品，创始人 Diogo Almeida（InstructGPT 作者之一）；名字取自经济学家 Jevons——判断变便宜，调用量反而暴涨</li>
+<li>三种原语：noul（是非题，返回命题为真的概率）、choice（选择题，返回每个选项的概率分布，最多 255 个）、score（在预设有序等级上打分）</li>
+<li>输入是 state（待判断的文本或 JSON）加一组预先声明的问题；一次读入、并行作答，不生成任何文字</li>
+<li>定价与延迟：输入 0.042 美元/百万 token、输出免费；端到端延迟约 70–500 毫秒</li>
+<li>为什么快：底层机制</li>
+<li>砍掉自回归逐字解码，输出空间被开发者给定的槽位锁死，一次前向算完所有选项的概率</li>
+<li>同一 state 上的多个问题共享前缀与 KV cache，读一遍材料答完所有题</li>
+<li>RLCD（为校准决策做的强化学习）：目标是概率大体诚实——给出 90% 把握时统计上约对 90%</li>
+<li>实测（文中 20 行代码小实验加压测）</li>
+<li>输入从数百 token 涨到约 3 万 token，中位延迟只是温和上升</li>
+<li>约 100 个问题并发时延迟仍在 70–100 毫秒量级，并发再高才明显变慢</li>
+<li>失效模式</li>
+<li>没有思维链：需要多步推理的判断先天吃亏</li>
+<li>顺序敏感：选项排列顺序会影响结果</li>
+<li>会被无关选项干扰；正确选项不在集合里时，概率仍被迫在错误选项间分完</li>
+<li>用开源小模型自搭同类系统时，输出分数未经校准，不能直接当概率用</li>
+<li>四种设计模式</li>
+<li>推测式扇出：对同一 state 并行发多路判断，再汇总决策</li>
+<li>置信度门控：高置信自动执行，中置信交大模型复核，低置信转人工</li>
+<li>复合打分：把一个含糊问题拆成多个单因子判断，再加权成总分</li>
+<li>分层分类：先粗分大类，再逐层细化收窄</li>
+<li>生产架构</li>
+<li>路由分工：大部分决策走 Jev，不确定的升级给更大的生成模型或人工审核</li>
+<li>文中以每天 10 万次请求为例，估算这套路由相对全量调用大模型的成本与延迟优势</li>
+<li>什么时候用、什么时候不用</li>
+<li>答案空间可枚举、调用量大、延迟敏感：Jev 这类决策模型</li>
+<li>类别固定且有大量标注数据：传统分类器（如 BERT 系）更便宜可控</li>
+<li>需要推理、解释或生成内容：仍用生成式 LLM，Jev 是补位不是替代</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[痛点 生成模型做判断慢贵难解析] --&gt; B[Jev 定位 System 1 决策模型]
+B --&gt; C[输入 state 加预声明问题]
+C --&gt; D[三原语 noul是非 choice选择 score打分]
+D --&gt; E[单次前向并行作答 不生成文字]
+E --&gt; F[机制 无自回归解码 共享KV RLCD校准概率]
+F --&gt; G[实测 约百问并发仍在70到100毫秒]
+G --&gt; H[失效 无思维链 顺序敏感 无关选项干扰]
+H --&gt; I[四种模式 扇出 置信门控 复合打分 分层分类]
+I --&gt; J[生产路由 Jev打底 不确定升级大模型或人工]
+J --&gt; K[选型 判断可枚举用Jev 推理生成用LLM]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

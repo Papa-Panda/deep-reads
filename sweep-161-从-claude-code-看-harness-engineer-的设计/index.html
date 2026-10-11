@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从 Claude Code 看 Harness Engineer 的设计</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎专栏</div>
+<h1>从 Claude Code 看 Harness Engineer 的设计</h1>
+<p class="sub">知乎专栏（初级程序员，1880 赞同、3401 收藏，2026-04 编辑）。主张很明确：agent 的可靠性不该靠把 CLAUDE.md 写得更长——自然语言指令是概率性的，任务和上下文一长就衰减；可靠性要来自模型外面的结构。四个抓手：工具即契约（MCP 接口隐藏实现、干脆删掉危险操作、返回结果先过滤，不污染上下文）；隐性知识显性化（Skill 把团队约定写成版本化、按任务触发加载的文件，加载时还能注入实时状态）；把希望变成强制（Hook 在调用前拦截、声称完成时重跑测试驳回、压缩后重注入约束，安全检查用确定性代码）；受限即设计（Subagent 的价值在隔离——干净上下文、窄工具集、worktree）。对他正中靶心：这就是 harness engineering 的方法论版，与他把结构约束和可观测性用进自己 agent/训练工作的思路同构。注：全篇是概念论述，没有对照实验和失败率数据，对其他框架的类比是高层断言，搭建与维护成本基本没谈——当框架读，别当证据读。</p>
+<p class="meta">2026-10-11 · 作者：初级程序员</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2021603278606087058">https://zhuanlan.zhihu.com/p/2021603278606087058</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据知乎原文结构整理）</h2>
+<ul>
+<li>问题设定：规则越写越长，错误换个样子重来</li>
+<li>用 Claude Code 的人靠给 CLAUDE.md 补规则打补丁，同类错误仍以变体复发</li>
+<li>作者的定位：问题不只在 prompt 或模型，而在模型外面的 harness（运行系统）</li>
+<li>洞见一：用架构划定能力边界（MCP）</li>
+<li>工具接口是与外部世界的契约：隐藏实现细节，只暴露该暴露的动作</li>
+<li>最小权限：危险操作干脆不提供，而不是靠叮嘱模型别用</li>
+<li>返回结果先过滤，只给相关信息，避免原始输出污染上下文</li>
+<li>洞见二：隐性知识必须显性化（Skill）</li>
+<li>只活在人脑里的团队约定对 agent 不可见</li>
+<li>Skill 把约定写成独立文件：版本可控、按任务触发、用到时才加载进上下文</li>
+<li>加载时可通过 shell 输出注入实时系统状态</li>
+<li>洞见三：把希望变成强制（Hook）</li>
+<li>生命周期钩子把口头要求变机械门禁：工具调用前拦截（PreToolUse）、编辑后检查（PostToolUse）、声称完成时把关（Stop）、上下文压缩后处理（PostCompact）</li>
+<li>声称完成时自动重跑测试，不过就驳回；压缩后自动重新注入关键约束（状态外置于上下文之外）</li>
+<li>安全攸关的检查用确定性代码（如退出码拦截），不再交给另一个 LLM 判断</li>
+<li>洞见四：受限即设计（Subagent）</li>
+<li>子代理的价值主要在隔离，不在并行</li>
+<li>独立干净的上下文加窄工具集（如只读 reviewer；文中以约 5 个工具对比约 50 个工具说明可预测性，属示意数字）</li>
+<li>高风险工作可放进独立 worktree 隔离</li>
+<li>解空间越小，行为越可预测</li>
+<li>四者合流：新增一个后端 API 端点的完整走查</li>
+<li>工具契约加任务 Skill 加编辑后 lint/format 钩子加完成时测试门禁加只读 reviewer</li>
+<li>用户不必在 prompt 里逐条重复规则，规则由系统结构保证执行</li>
+<li>不止 Claude Code</li>
+<li>工具使用不确定、领域知识缺失、不会自检、上下文有限，是 agent 框架的共性问题</li>
+<li>作者称 LangGraph、AutoGen、CrewAI、OpenAI Agents SDK 里都有对应组件（高层类比，未展开各框架语义差异）</li>
+<li>结尾</li>
+<li>换模型、写更长的指令文件都不解决可靠性；给 agent 搭工作系统才是可迁移的设计能力</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[症状 规则越写越长 错误变体复发] --&gt; B[诊断 可靠性不在prompt而在harness]
+B --&gt; C[工具契约 MCP 隐藏实现 删危险操作 过滤返回]
+B --&gt; D[知识显性化 Skill 版本化 按需加载 注入实时状态]
+B --&gt; E[强制执行 Hook 调用拦截 完成验测试 压缩后重注入]
+B --&gt; F[受限隔离 Subagent 窄工具集 只读审查 worktree隔离]
+C --&gt; G[合流场景 新增API端点全程走查]
+D --&gt; G
+E --&gt; G
+F --&gt; G
+G --&gt; H[结论 给agent建工作系统而非写长规则书]
+H --&gt; I[边界 无对照数据 成本与维护未谈]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>怎么看 Cloudflare 宣布 Deno 团队整体加入，原 Deno 运行时一年后停止开发？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>怎么看 Cloudflare 宣布 Deno 团队整体加入，原 Deno 运行时一年后停止开发？</h1>
+<p class="sub">知乎热榜条目（约111万热度，23个回答，浏览约6万）。头部回答（71/47/39赞）质量明显高于一般热榜题：先纠正框架——这不是收购 Deno，而是团队整体加入 Cloudflare；Cloudflare 要的不是 Deno 运行时本身，而是团队的 celld 与 rusty_v8，并入 workerd，让 Workers/Durable Objects 编程模型能自托管。处置时间表很具体：Deno 运行时再维护一年（月度 bugfix 与安全更新）后官方停开发、项目开源待社区接手，Deno Deploy 半年后关闭，JSR 继续。分歧点在价值判断：Deno 作为完整 JS 工具链（一体化包管理、打包、检查与格式化）的价值，是否被运行时之争掩盖。对他正对口 runtime 方向：一个运行时项目的终局，往往由宿主平台的执行模型决定（V8 isolate 短命轻量 vs 完整长驻运行时），而不是语言生态的热度。已读默认排序前3答。</p>
+<p class="meta">2026-10-12</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2092196286669895651">https://www.zhihu.com/question/2092196286669895651</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>事件本体</li>
+<li>Deno 团队整体加入 Cloudflare，目标是把 celld 与 workerd 合并，让 Workers/Durable Objects 编程模型可轻松自托管</li>
+<li>Deno 运行时再支持一年（月度 bugfix 与安全更新），之后官方停止开发；项目仍开源，欢迎社区接手</li>
+<li>问题页 23 个回答，浏览约 6 万，热榜约 111 万热度</li>
+<li>纠偏：要的是团队与资产，不是运行时（约 71 赞，最高）</li>
+<li>Workers 建立在轻量、短命的 V8 isolate 上，Deno 是完整长驻运行时，两者执行模型根本不同</li>
+<li>Cloudflare 真正想要的是 celld 与 rusty_v8 绑定，而非 Deno 本身</li>
+<li>Deno 早年与 Node 不兼容的设计选择伤了生态，后期转向兼容也未能换回关注</li>
+<li>资产处置时间表（约 47 赞）</li>
+<li>对照 Bun 被收购后仍作核心产品保留，Deno 运行时被留给社区</li>
+<li>Deno Deploy 半年后关闭、付费客户迁往 Workers；JSR 在 Cloudflare 基础设施上继续；rusty_v8 继续并整合进 workerd</li>
+<li>附带批评：Workers 付费计划在用量不封顶时的账单风险</li>
+<li>反方：被砍掉的是工具链价值（约 39 赞）</li>
+<li>celld 替代不了 Deno：后者的价值是完整 JS 工具链，包管理、打包、lint、语言服务、格式化一体</li>
+<li>团队为加入新东家放弃了原始愿景中重要的一部分</li>
+<li>落点</li>
+<li>运行时项目的终局由宿主平台的执行模型与资产需求决定，先拆清哪部分资产被要、哪部分被弃，再谈情怀</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[事件 Deno团队整体加入Cloudflare] --&gt; B[纠偏 不是收购运行时]
+B --&gt; C[执行模型 Workers是V8 isolate短命轻量]
+B --&gt; D[目标资产 celld与rusty_v8并入workerd]
+D --&gt; E[收益 Workers编程模型可自托管]
+A --&gt; F[处置时间表 运行时维护一年 Deploy半年关停 JSR继续]
+F --&gt; G[反方质疑 完整JS工具链价值被掩盖]
+E --&gt; H[落点 终局由宿主执行模型决定]
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">运行时</span><span class="tag">开源</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-12</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

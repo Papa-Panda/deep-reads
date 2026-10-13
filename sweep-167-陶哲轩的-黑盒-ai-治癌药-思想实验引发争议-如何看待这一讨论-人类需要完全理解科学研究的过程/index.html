@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>陶哲轩的「黑盒 AI 治癌药」思想实验引发争议，如何看待这一讨论？人类需要完全理解科学研究的过程吗？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>陶哲轩的「黑盒 AI 治癌药」思想实验引发争议，如何看待这一讨论？人类需要完全理解科学研究的过程吗？</h1>
+<p class="sub">知乎热榜条目（约522万热度，239个回答，关注459，浏览约46.2万）。陶哲轩在加州理工「Math 2.0」讲座上提出思想实验：一款黑盒 AI 设计的治癌药，通过三期临床、逻辑自洽，但人类完全不懂其机理——该不该用？头部回答（约600/542/236赞）基本站在反方：医学史上疗效先于机理本是常态（如阿司匹林、全麻），对患者而言拒绝使用在道义上站不住；更深一层，数学共同体把「可理解」当默认前提，恰是形式科学的思维习惯，而纯数学在 AI 时代反而要向外界重新证明自身价值。对他正对口：这场争论的内核是「能用」与「理解」的分离，与他以理解为本的研究方式直接相关。已读默认排序前3答。</p>
+<p class="meta">2026-10-13</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2092937311851902232">https://www.zhihu.com/question/2092937311851902232</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>思想实验本体</li>
+<li>陶哲轩在 Caltech「Math 2.0」讲座提出：黑盒 AI 治癌药通过三期临床且逻辑自洽，但无人理解其机理，问该不该用</li>
+<li>问题页 239 个回答、459 关注、浏览约 46.2 万，话题含人工智能、科学哲学、思想实验</li>
+<li>反方一：道义与效用优先（约 600 赞）</li>
+<li>若疗效已被证明，刻意不用对患者无法交代；医学的目的是救命，不是维护学术圈的理解需求</li>
+<li>大规模临床使用本身还会产生真实患者数据，研究价值高于把药锁在实验室</li>
+<li>反方二：这是形式科学的思维定式（约 542 赞，数学话题优秀答主）</li>
+<li>数学要求人类理解，自然科学历来更看重可验证的结果；理解有助后续开发，但不构成拒绝有效疗法的理由</li>
+<li>应用科学按「是否解决问题」评判，不问方法来自人还是 AI；真正要担心的是结果是否偶然、不可持续</li>
+<li>类比结构生物学拥抱冷冻电镜；更深的问题是纯数学的价值多为圈内共识，AI 时代需要向外界重新说明</li>
+<li>反方三：学科处理理论与现实冲突的方式不同（约 236 赞）</li>
+<li>数学习惯理论先行、理解先行；其他学科在理论与观测冲突时改理论，而不是丢弃现实</li>
+<li>理解仍有价值，但排在「确实有效」之后</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[思想实验 黑盒AI治癌药临床通过但机理不明] --&gt; B[问题 该不该用 理解是否是前提]
+B --&gt; C[患者与道义视角 疗效已证 拒绝使用站不住]
+B --&gt; D[学科范式视角 数学重理解 自然科学重可验证结果]
+C --&gt; E[历史常态 疗效先于机理]
+D --&gt; F[类比 冷冻电镜改变结构生物学门槛]
+D --&gt; G[深层问题 纯数学价值需向外界重新证明]
+E --&gt; H[落点 能用与理解分离 理解后置而非取消]
+F --&gt; H
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">科学哲学</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-13</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

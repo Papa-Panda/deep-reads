@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>田柯宇时隔两年回应字节「模型投毒」事件，当时究竟发生了什么？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>田柯宇时隔两年回应字节「模型投毒」事件，当时究竟发生了什么？</h1>
+<p class="sub">知乎热榜条目（约317万热度，27个回答，关注154，浏览约28.5万）。时隔两年，当事人田柯宇在播客中回应字节大模型训练「投毒」事件，自述版本聚焦与另一名实习生的算力资源冲突；但可见头部回答（608/402/285赞）呈现的是另一套时间线：受害方指控其数月间篡改权重与 PyTorch、制造难以复现的训练故障，并波及 LlamaGen、Goku 等项目。双方说法尖锐对立、诉讼仍在进行，页面内容不能当定论——但这恰是理解大模型训练组织内部算力权力、权限治理与故障归因难度的第一手争论样本，正对他的训练 infra 主线。注：登录墙下仅读到默认排序前 3 答。</p>
+<p class="meta">2026-10-14</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2093344101663863892">https://www.zhihu.com/question/2093344101663863892</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序可见前 3 答整理；登录墙外无法确认全局排序）</h2>
+<ul>
+<li>事件本体</li>
+<li>田柯宇在访谈播客中回应两年前字节大模型训练被指「投毒」事件，给出起因与经过的自述，并澄清部分网传细节</li>
+<li>问题页 27 个回答、154 关注、浏览约 28.5 万，热榜约 317 万热度</li>
+<li>当事人版本（据回答转述）</li>
+<li>冲突源于与另一名实习生之间的算力资源争夺，自述带有「以暴制暴」式干预色彩</li>
+<li>对若干流传说法作出否认或修正</li>
+<li>受害方版本（头部回答主线，约 608 赞）</li>
+<li>指控时间跨度数月：篡改模型权重与 PyTorch 代码、参加故障排查会、把开源模型成果冒充自研</li>
+<li>受影响工作被点名：LlamaGen、Goku 等项目及后续紧急重建</li>
+<li>回答同时讨论：算力即实验室内部权力、争议人物为何仍可能被资本看重</li>
+<li>并列对照（约 285 赞）</li>
+<li>逐项对照两种叙事的时间线，指出当事人版本未回应 Goku 相关指控</li>
+<li>附带诉讼金额等公开信息；双方各执一词，案件与上诉仍在进行</li>
+<li>阅读提示</li>
+<li>这是争论样本而非定论：价值在训练权限治理、故障归因与组织激励，不在站队</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[事件 两年前字节大模型训练被指投毒] --&gt; B[当事人播客自述 算力冲突与干预]
+A --&gt; C[受害方指控 数月篡改权重与框架代码]
+C --&gt; D[后果 训练故障难复现 项目受波及]
+B --&gt; E[对照 两种时间线多处不一致]
+C --&gt; E
+E --&gt; F[状态 双方对立 诉讼仍在进行]
+F --&gt; G[落点 训练权限治理与算力权力是真问题]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">训练安全</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-14</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

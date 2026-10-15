@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>怎么看 OpenAI 的 NS 数学证明被发现其实没遵循 Spanish program？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>怎么看 OpenAI 的 NS 数学证明被发现其实没遵循 Spanish program？</h1>
+<p class="sub">知乎热榜条目（约152万热度，43个回答，262关注，浏览约42.1万）。九月轰动的 Navier-Stokes 证明最初被叙述为沿 Spanish program 推进，一个月后多组专家精读论文与 Lean 代码后认为只是表面相似，实际是完全不同的路线，连 OpenAI 发布时都误判了自家模型的产物。头部回答（525/413/115赞）还举出论文与 Lean 估计不一致的细节——对他正对口：千禧年难题级别的硬数学，加上 AI 证明的可验证与可审计问题。</p>
+<p class="meta">2026-10-14</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2093654423369152454">https://www.zhihu.com/question/2093654423369152454</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据默认排序前 3 答整理）</h2>
+<ul>
+<li>事件本体</li>
+<li>九月轰动的 Navier-Stokes 证明最初被认为沿用了西班牙数学家的方法，问题页 43 个回答、262 关注、浏览约 42.1 万，热榜约 152 万热度</li>
+<li>头部回答一（约 525 赞）</li>
+<li>认为这是一条全新路线，核心构造与 Spanish program 不同</li>
+<li>举出论文与 Lean 代码之间的技术不一致，提醒形式化命题可能与原问题不完全对应</li>
+<li>头部回答二（约 413 赞）</li>
+<li>要点是发布方只知道拿到了结果，却说不清证明是怎样产生的</li>
+<li>头部回答三（约 115 赞）</li>
+<li>两种路线都利用了问题表述中的构造空间，但外力的构造方式完全不同</li>
+<li>最终证明据称由大量 agent 自主探索新路径产生</li>
+<li>落点</li>
+<li>争议不在证明真假一句话，而在 AI 产出的可审计性：开发者对自家模型的证明路线理解滞后</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[九月 NS证明轰动 初叙事称沿Spanish program] --&gt; B[一个月后多组专家精读论文与Lean代码]
+B --&gt; C[发现只是表面相似 核心构造完全不同]
+C --&gt; D[证据 涡旋加高频振荡构造与技术估计不一致]
+C --&gt; E[共识 OpenAI发布时并未理解自家模型产物]
+E --&gt; F[落点 形式验证通过不等于命题与原问题一致 AI产出审计滞后]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-14</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

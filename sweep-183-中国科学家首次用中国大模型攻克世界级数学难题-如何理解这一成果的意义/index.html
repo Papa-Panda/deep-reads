@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中国科学家首次用中国大模型攻克世界级数学难题，如何理解这一成果的意义？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>中国科学家首次用中国大模型攻克世界级数学难题，如何理解这一成果的意义？</h1>
+<p class="sub">知乎热榜条目（约145万热度，77个回答）。据上海人工智能实验室10月15日消息，许地生团队依托书生科学多模态大模型S2、以人机协同完成困扰数学界30余年的三维Ghys猜想证明，北大团队再用SHEAF框架做形式化验证。对他正对口：数学开放难题、大模型参与证明、以及形式化验证闭环——与上月NS证明争议正好是一组对照。注：据热榜摘要整理，问题页全文未逐条核验。</p>
+<p class="meta">2026-10-15</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2094035039738488688">https://www.zhihu.com/question/2094035039738488688</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据知乎热榜摘要整理；问题页全文未逐条核验）</h2>
+<ul>
+<li>事件本体</li>
+<li>上海人工智能实验室 10 月 15 日消息：访问学者许地生团队依托书生科学多模态大模型 S2，以人机协同方式完成了三维 Ghys 猜想的证明</li>
+<li>该猜想困扰数学界 30 余年，属动力系统方向的世界级开放难题</li>
+<li>方法路径</li>
+<li>路径被称为「通专融合」：通用大模型能力与专业数学推理结合，而非单纯让模型自由发挥</li>
+<li>人机协同是关键词：人类数学家定方向与审证明，模型参与构造与搜索</li>
+<li>验证环节（最值得看的部分）</li>
+<li>北京大学董彬、刘若川团队用其 SHEAF 框架对证明做了形式化验证</li>
+<li>这一步把「模型说证出来了」变成「机器可核查的证明」，与上月 NS 证明争议形成对照</li>
+<li>待追问</li>
+<li>形式化验证覆盖的是完整证明还是关键引理，社区精读后是否会出现命题对应性质疑</li>
+<li>同类路径能否迁移到其他开放猜想，还是高度依赖个案构造</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[开放难题 三维Ghys猜想悬置30余年] --&gt; B[人机协同 书生S2参与证明构造]
+B --&gt; C[团队完成证明 许地生团队主导]
+C --&gt; D[独立验证 北大团队用SHEAF框架形式化核验]
+D --&gt; E[关键问题 证明每一步是否真对应原命题]
+E --&gt; F[落点 AI数学从解题走向开放问题加可验证闭环]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-15</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

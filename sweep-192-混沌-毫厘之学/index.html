@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>《混沌：毫厘之学》</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>《混沌：毫厘之学》</h1>
+<p class="sub">B站游客推荐流条目（嘿这里是江离，22.8万播放，1.2万收藏，2026-09-30发布）。以双摆实验切入混沌理论：出发角度只差千分之一度的摆组，数秒后便完全发散；再回溯洛伦兹在数值天气预报中撞见的同一现象——确定性系统同样可以长期不可预测，于是有了两周期限的由来。对他是动力系统的母题科普：敏感依赖、非线性与可预测性边界，正是他数学老本行的地盘。注：已读视频页与简介，未读到完整口播。</p>
+<p class="meta">2026-10-17</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1YYaf6qEzD">https://www.bilibili.com/video/BV1YYaf6qEzD</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据视频页与简介整理；未读到完整口播）</h2>
+<ul>
+<li>实验切入：双摆的微差发散</li>
+<li>200 个摆出发时只差 0.001°，数秒后轨迹完全分家</li>
+<li>同一规则、近乎同一出发点，结果却不可重复</li>
+<li>历史现场：洛伦兹与天气预报</li>
+<li>数值积分中舍入到三位小数的再算，得到完全不同的天气</li>
+<li>由此提出天气预报存在约两周的可预测上限</li>
+<li>机制：对初始条件的敏感依赖</li>
+<li>误差在非线性系统中指数放大，微差最终主导轨迹</li>
+<li>确定性不等于可预测性</li>
+<li>外延</li>
+<li>从蝴蝶效应到三体问题：同一结构在不同尺度上重现</li>
+<li>落点</li>
+<li>混沌不是随机，而是规则系统内在的可预测性边界</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[双摆实验 初始差0.001度] --&gt; B[数秒后轨迹完全发散]
+B --&gt; C[问题 微差为何被放大]
+C --&gt; D[洛伦兹数值天气实验重现同一现象]
+D --&gt; E[机制 对初始条件的敏感依赖]
+E --&gt; F[结论 确定性不等于可预测]
+F --&gt; G[外延 三体与两周期限]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">物理</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-17</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

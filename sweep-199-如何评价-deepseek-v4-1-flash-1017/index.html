@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何评价 DeepSeek V4.1 Flash 1017？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何评价 DeepSeek V4.1 Flash 1017？</h1>
+<p class="sub">知乎热榜第1条目（约1796万热度，337个回答、约382万浏览）。1017是DeepSeek今年第三个Flash checkpoint（约五周一版）：官网、APP与API同步切换，权重开源（HuggingFace/ModelScope）、1M上下文、价格不涨（输出价约1.2美元/百万token、闲时半价，对比Opus约20美元）。高赞实测的版本间增量集中在Agent与编码：Terminal-Bench 4.0从31.2升到42.3、HLE从36.8升到42.6、DeepSWE升到77.0；最高赞回答指出这轮是在全国产卡上实践后训练（此前已放出后训练infra与昇腾算子库）。保留意见同样具体：复杂推理无本质提升、探索型任务多耗30%–40%的量而不涨分，Terminal-Bench与Opus仍差约14–24分。对他是模型格局＋后训练＋Agent harness三线合一的一手讨论。注：已通读问题页与前5个高赞回答；高赞回答未给出参数量与架构名，问题描述为图片、无可读文字。</p>
+<p class="meta">2026-10-17</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2094773240036061683">https://www.zhihu.com/question/2094773240036061683</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据问题页与前5个高赞回答整理）</h2>
+<ul>
+<li>事件本体</li>
+<li>1017 为 2026-10-17 发布的新 checkpoint，官网、APP、API 同步切换到 V4.1-Flash-1017</li>
+<li>今年 Flash 三连发：7 月下旬 V4 Flash、9 月 10 日 V4.1 Flash（换新架构）、1017，约五周一个版本</li>
+<li>页面数据：约 382 万浏览、337 个回答、1300+ 关注，热榜热度约 1796 万居首</li>
+<li>规格与开放（高赞可确认部分）</li>
+<li>1M 上下文，权重开源（HuggingFace 与 ModelScope），价格不涨</li>
+<li>输出价约 1.2 美元（闲时半价约 0.6），约为 Opus 输出价的 1/17 到 1/33</li>
+<li>高赞回答未给出参数量与架构名，问题描述本身是图片、无可读文字</li>
+<li>跑分增量（0910 → 1017，自报口径）</li>
+<li>Terminal-Bench 4.0：31.2 → 42.3；HLE：36.8 → 42.6；DeepSWE：74.2 → 77.0</li>
+<li>ProgramBench、Automation-Bench、Agents' Last Exam 均有 4–9 分提升</li>
+<li>但 Terminal-Bench 与 Opus（66.4）仍差约 24 分，厂商自报框架不可完全横比</li>
+<li>后训练与 Agent（最对口他的部分）</li>
+<li>最高赞：此前放出后训练 infra 与昇腾算子库，这轮在全国产卡上实践后训练，国产卡管线意在摆脱进口卡约束</li>
+<li>Agent 近代际跳升：DeepSeek Harness 0.2.1 下先集中写码再集中验证，某任务步数降到旧版的 20%，主要来自验证环节优化</li>
+<li>推理成本实测：一个 4000 万 token 的项目级任务缓存命中 99.6%，后端成本仅 2 元多</li>
+<li>保留意见</li>
+<li>复杂推理无本质提升，探索/反思型任务多耗 30%–40% 却不涨分</li>
+<li>编程产出小毛病多、质检注意力会浪费在不重要处，商用仍需大量修补</li>
+<li>策略被读作在国产算力约束下先保数据飞轮，而非追极限智能密度</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[1017 checkpoint 五周一版的第三发] --&gt; B[同步切换 官网APP与API]
+B --&gt; C[开放与定价 权重开源 1M上下文 价格不涨]
+A --&gt; D[跑分增量 Agent与编码领跑]
+D --&gt; E[Terminal-Bench 31.2到42.3 HLE 36.8到42.6]
+A --&gt; F[后训练线 全国产卡实践后训练]
+F --&gt; G[Agent跳升 验证优化 步数降到两成]
+E --&gt; H[差距仍在 与Opus差约14到24分]
+G --&gt; I[保留 复杂推理无本质提升]
+H --&gt; J[落点 性价比王座与国产算力管线]
+I --&gt; J</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">DeepSeek</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-17</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四色 RGB-Mini LED 有用吗？海信 UX2026 全球首拆实测！</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站热门</div>
+<h1>四色 RGB-Mini LED 有用吗？海信 UX2026 全球首拆实测！</h1>
+<p class="sub">B站热门条目（先看评测，2026-10-17发布，时长约12分钟，35.8万播放、2742收藏）。12万元的海信四色 RGB-Mini LED 电视多出的第4种颜色是不是噱头：UP主定制青色滤镜、拆开四色灯珠，再用一道几何题讲清为什么三色三角形永远盖不住人眼的马蹄形色域、第4个点为什么偏偏加在青色，最后与三色旗舰对比实拍。对他是显示技术与色度学第一性原理的一次硬核拆解——先讲清物理与几何，再谈产品值不值。注：已读视频页与简介，未读到完整口播。</p>
+<p class="meta">2026-10-17</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1rVJq6oEx8">https://www.bilibili.com/video/BV1rVJq6oEx8</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据视频页与简介整理；未读到完整口播）</h2>
+<ul>
+<li>问题设定</li>
+<li>12 万元海信 UX2026 四色 RGB-Mini LED：多出的第 4 种颜色是真提升还是营销噱头</li>
+<li>验证方法先行：定制青色滤镜 + 拆解四色灯珠 + 与三色旗舰对比实拍</li>
+<li>第一性原理：色域的几何</li>
+<li>人眼可见色域是马蹄形（CIE 色度图），三原色只能围出一个三角形</li>
+<li>三角形永远盖不住马蹄形，缺口最大的区域决定第 4 个点的落位</li>
+<li>为什么第 4 个点加在青色</li>
+<li>青色方向恰是三色三角形与马蹄形之间缺口显著的一段</li>
+<li>加青不是多一种颜色好看，而是把可达色域的边界往外推</li>
+<li>实测对照</li>
+<li>四色灯珠结构拆解与光谱层面的验证</li>
+<li>与三色旗舰的同场实拍对比，量化画质提升幅度</li>
+<li>落点</li>
+<li>判断一项显示技术，先回到色度学与几何约束，再看厂商话术</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[疑问 第4种颜色是不是噱头] --&gt; B[原理 人眼色域是马蹄形]
+B --&gt; C[约束 三原色只能围成三角形]
+C --&gt; D[推论 三角形盖不住马蹄形]
+D --&gt; E[落点 第4个点加在青色缺口]
+E --&gt; F[验证 定制青色滤镜加拆灯珠]
+F --&gt; G[对照 与三色旗舰实拍对比]
+G --&gt; H[结论 先几何与物理 再谈产品]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">科技</span><span class="tag">物理</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-17</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

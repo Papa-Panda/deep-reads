@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spiegel杂志对数学家Peter Scholze的采访</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>Spiegel杂志对数学家Peter Scholze的采访</h1>
+<p class="sub">知乎推荐流条目（蜜罐数学布道译介，2026-10-18发布，171赞、109收藏）。Spiegel 对菲尔兹奖得主 Peter Scholze 的完整访谈（26问，德文原文与中文译文对照）：AI 一夜解出大量长期悬而未决的数学问题后，他区分「被验证的结果」与「被理解的知识」，批评把千禧年问题当作软件跑分、私有化数学研究的做法，并谈奖项标准、无 AI 数学共同体与理解本身的代价。对他正对口：这是一个一线数学家对 AI 时代科研文化的一手判断，核心恰是他最看重的理解重于解题。注：访谈无定理与公式，深度在思想与制度层面，非技术数学。</p>
+<p class="meta">2026-10-18</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2095214855234008167">https://zhuanlan.zhihu.com/p/2095214855234008167</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>事件与立场</li>
+<li>AI 集中公布大量数学难题的解，其中不乏数学界多年未解的中心问题</li>
+<li>Scholze（菲尔兹奖得主、波恩马普所所长）的总判断：成果是真的，但现在就下结论还太早，且解出不等于理解</li>
+<li>解出 vs 理解</li>
+<li>个别方程问题被孤立解出，对数学理解的增量有限；他把其中一次高调发布称为公关行为</li>
+<li>知识只有被消化、被写成同行能读懂的形式才成立；验证通过不能替代这一步</li>
+<li>数学共同体的礼物经济：想法共享、引用干净，与把人类当障碍的私有化做法相对照</li>
+<li>能力跃升与风险</li>
+<li>模型水平在数月内从本科生跃到顶尖数学家量级，哪些问题算难的直觉正在失效</li>
+<li>远期风险被点名：若 AI 找到大数分解的快速算法，现有加密体系会被击穿</li>
+<li>更广的担忧是社会把一切智力问题先交给机器、交出控制权</li>
+<li>制度层：跑分、奖项与共同体</li>
+<li>主张用能造福社会的问题测试 AI，而不是拿千禧年问题做性能展示；千禧年问题在他眼中是 orienting 的高峰，探索路径比登顶更重要</li>
+<li>菲尔兹奖等奖项的评判标准必须重新校准：解出与否曾是理解的清晰代理指标，如今两者脱钩</li>
+<li>无 AI 的数学共同体被视为一条可行路线：慢速重新消化前沿，理解中长出新分支；数学是人类漫长的对话，吸收新思想的速度已有上限</li>
+<li>个人落点</li>
+<li>以 Grothendieck 为楷模谈技术批判与退隐的可能性；完美胚空间只作通俗一瞥</li>
+<li>即使 AI 全面胜出，他也不会失去对数学的兴趣，因为想理解的东西还有太多</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[AI集中解出大量悬置难题] --&gt; B[Scholze判断 成果真但评估尚早]
+B --&gt; C[核心区分 被验证的结果不等于被理解的知识]
+C --&gt; D[文化对照 礼物经济与干净引用 vs 私有化与跑分展示]
+C --&gt; E[制度冲击 奖项标准失效 千禧年问题被当性能测试]
+D --&gt; F[主张 测试应转向造福社会的问题]
+E --&gt; G[路线 无AI共同体慢速消化 理解中生新分支]
+F --&gt; H[落点 数学是人类漫长的对话 理解不可外包]
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-18</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

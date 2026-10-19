@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OSDI26论文--Weave:面向解耦式 RL 后训练的高效协同调度</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>OSDI26论文--Weave:面向解耦式 RL 后训练的高效协同调度</h1>
+<p class="sub">知乎推荐流条目（想飞的石头，2026-08-30编辑，23赞、约29收藏）。OSDI&#x27;26 论文精讲：解耦式 RL 后训练把 rollout 放便宜的 H20 池、训练放 H800 池，但 on-policy 严格同步造成依赖气泡、两池轮流闲置，朴素解耦的成本反而高于共置 veRL。WEAVE（港科大+阿里，基于 ROLL 实现）用协同执行组加两级调度把一个任务的气泡用另一个任务的活跃阶段填满——组间按最坏情况保守放置守 SLO，组内用可证明最优的轮转加长尾迁移，状态驻留主机内存实现热启动。在 328×H20 + 328×H800 测试床上成本效率达 1.84×（对朴素解耦）与 1.38×（对共置 veRL），100% SLO 达成。对他正对口：这是 RL 后训练集群调度的一线系统论文，讲透解耦架构的成本账。注：已通读知乎原文，并核对了论文原文。</p>
+<p class="meta">2026-10-18</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2072335633318671692">https://zhuanlan.zhihu.com/p/2072335633318671692</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>问题：解耦的代价是气泡</li>
+<li>rollout 访存受限放便宜 H20 池、训练算力受限放 H800 池，硬件匹配本应省钱</li>
+<li>但 on-policy 严格同步让两池轮流闲置；朴素解耦 Solo-D 约 0.94k 美元/小时，反而贵于共置 veRL 的约 0.71k 美元/小时</li>
+<li>AReaL、StreamRL、AsyncFlow 靠异步 off-policy 消气泡，代价是样本陈旧</li>
+<li>核心洞察：气泡互填</li>
+<li>一个任务的依赖气泡正好可被另一个任务的活跃阶段填满</li>
+<li>多个任务组成协同执行组，在两个资源池上紧密编织 rollout 与训练阶段</li>
+<li>两级调度</li>
+<li>组间：保守规划——按每条响应都跑满最大长度的最坏情况做放置，守 SLO（相对单独执行的减速容忍）与内存驻留约束</li>
+<li>组内：可证明最优的轮转调度；响应约 80% 完成时做长尾迁移，把拖尾请求挪到少数 GPU，释放大池给下一任务</li>
+<li>系统机制</li>
+<li>阶段中心控制模型把每个 RL 阶段暴露为一等可调度实体</li>
+<li>热启动：模型与优化器状态驻留在主机 DRAM，切换延迟较冷启动（最高 135 秒）大幅下降</li>
+<li>拓扑感知同步：权重只过一次慢速跨集群链路，再在集群内走 NVLink/InfiniBand 广播，同步速度数倍于 veRL</li>
+<li>评估（328×H20 + 328×H800 生产级测试床，基于 ROLL）</li>
+<li>成本效率 1.84× 对朴素解耦、1.38× 对共置 veRL，100% SLO 达成</li>
+<li>等成本下训练吞吐 1.82–1.99×；两周生产 trace 回放中气泡下降 24.4%（rollout 池）与 43.1%（训练池）</li>
+<li>调度质量距暴力搜索最优约 6% 以内；对负载漂移与单任务故障鲁棒</li>
+<li>适用边界</li>
+<li>适用于 PPO、GRPO、DAPO 等标准 on-policy 与仍保留气泡的单步 off-policy</li>
+<li>全异步 RL（AReaL、AsyncFlow）没有气泡可填，不在适用范围</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[解耦架构 rollout与训练分池] --&gt; B[on-policy严格同步产生依赖气泡]
+B --&gt; C[两池轮流闲置 朴素解耦反而更贵]
+C --&gt; D[洞察 一任务的气泡由另一任务活跃阶段填满]
+D --&gt; E[协同执行组 多任务紧密编织]
+E --&gt; F[组间调度 最坏情况保守放置守SLO]
+E --&gt; G[组内调度 轮转最优加长尾迁移]
+F --&gt; H[热启动 状态驻留主机内存]
+G --&gt; H
+H --&gt; I[拓扑感知同步 跨集群只传一份]
+I --&gt; J[结果 成本效率1.84倍与100% SLO]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-18</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

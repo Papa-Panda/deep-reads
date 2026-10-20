@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SGLang Custom AllReduce v1 与 v2 实现原理详解</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>SGLang Custom AllReduce v1 与 v2 实现原理详解</h1>
+<p class="sub">知乎推荐流条目（作者 BBuf，编辑于 2026-07-27，56 赞、87 收藏）。源码级拆解 SGLang 自研 Custom AllReduce：TP 下每层两次 all-reduce、decode 单条消息仅约 16KB，瓶颈是固定开销而非带宽，NCCL 的环形多步与协议选择太重。v1（源自 vLLM）用 IPC 共享缓冲区 + Signal 双相计数 barrier，含 1stage 全读归约与 2stage 分片两档；v2 是 SGLang 自研重写（存算分离、阈值改实测调优表），新增 1shot_push 用数据本身的 +0.0 位模式作到达哨兵、彻底去掉跨卡 barrier，并有 NVLS 交换机硬件归约与 PDL 重叠。正对他的推理优化与 CUDA 底层主线。注：已通读原文（更正：本条初版摘要的作者/日期/赞藏数与一处 bug 说法有误，已按原文核实修正）。</p>
+<p class="meta">2026-10-19</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2065205306540531895">https://zhuanlan.zhihu.com/p/2065205306540531895</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，已核实修正）</h2>
+<ul>
+<li>问题：小消息、高频次的固定开销</li>
+<li>TP 下每层至少两次 all-reduce，层数乘起来每步数百次；decode 消息极小（bs=1、hidden 8192、bf16 约 16KB）</li>
+<li>NCCL 为大消息设计：环形需 2(ws-1) 步、协议选择与 proxy 逻辑、CUDA graph 下参数块成本，累积到毫秒级</li>
+<li>前提收窄：单机全 NVLink P2P、world_size ≤ 8、消息不超过 workspace 上限；先经 cudaIpcOpenMemHandle 交换地址</li>
+<li>v1（移植自 vLLM）：共享缓冲 + 计数 barrier</li>
+<li>每 rank 预置 Signal 同步区、转运缓冲与预注册输入缓冲，图模式用 RankData 指针表延迟注册</li>
+<li>同步：Signal 的 self/peer 双相计数器，peer_counter 两相交替防覆盖；entry 只需到达语义（volatile），exit 需 release/acquire 内存序保证数据可见</li>
+<li>两档 kernel：1stage 每卡读全部副本本地归约（流量 ws×N，省一轮同步）；2stage 为 reduce-scatter + all-gather（流量约 2×N，多一次带 fence 的同步）；按 ws 与 512KB/256KB 阈值硬编码切换，上限 8MB、超出回退 NCCL</li>
+<li>v2（SGLang 自研重写）：存算分离与分级算法</li>
+<li>存储由 Python 侧对称内存 workspace 统一持有，C++ kernel 成纯函数；JIT 按 (dtype, ws, PDL) 编译，阈值全变 Python 侧可调数据</li>
+<li>1shot_push（v2 新增）：发送方把数据写进所有 rank 的 push 槽，接收方轮询本地槽；以 +0.0 位模式为「空槽」哨兵（真 +0.0 先改写为数值等价的 -0.0），无跨卡 barrier，延迟下限是一次 NVLink 写加一次轮询命中</li>
+<li>1shot_pull 与 2shot_pull：128B Semaphore 同步；2shot 第二阶段把归约结果原地写回所有 workspace，all-gather 融进写回</li>
+<li>NVLS multicast 变体：交换机做 ld_reduce 硬件归约；PDL 让后继 kernel 与前任尾部重叠</li>
+<li>选算法靠 per-(架构, ws) 实测调优表分 graph/eager 双轨；workspace 默认 16MB 上限，长尾大消息交回 symm-mem/NCCL</li>
+<li>正确性契约</li>
+<li>两代都固定按 rank 0..ws-1 顺序累加、指针不按距离重排，保证跨 rank 位一致，避免 ULP 差异逐层放大导致采样分叉</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[TP每层两次all-reduce decode消息约16KB] --&gt; B[瓶颈是固定开销 NCCL环形多步太重]
+B --&gt; C[v1 共享缓冲加Signal双相计数barrier]
+C --&gt; D[1stage全读归约 或 2stage分片归约]
+D --&gt; E[v2 存算分离 阈值改实测调优表]
+E --&gt; F[1shot_push 以正零位模式作哨兵 零barrier]
+E --&gt; G[1shot与2shot pull Semaphore同步]
+E --&gt; H[NVLS交换机硬件归约加PDL重叠]
+F --&gt; I[大消息回退 symm-mem或NCCL]
+G --&gt; I
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">CUDA</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-19</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

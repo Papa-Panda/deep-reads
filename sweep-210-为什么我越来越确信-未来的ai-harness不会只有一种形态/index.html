@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>为什么我越来越确信，未来的AI Harness不会只有一种形态？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>为什么我越来越确信，未来的AI Harness不会只有一种形态？</h1>
+<p class="sub">知乎推荐流条目（浅月落，2026-10-15 发布；热度很低，0 赞、2 收藏、约 208 阅读）。作者复盘自研轻量 Agent 框架 SIAH 的实践后提出一个判断：Harness 的形态应由任务的复杂度与不确定性决定，而不是追求单一通用框架——简单任务用单循环 ReAct，复杂任务用先规划后执行，多视角任务用多 Agent 协作，高风险任务保留 Human-in-the-loop；Skill 也应分临时经验、领域方法论、组织资产三层沉淀。对他的价值在 Agent infra/harness 这条主线：这是一篇把 harness 多样性讲成选型原则的一线实践随笔。注：全文为框架与观点论述，无 benchmark 与成本数据，深度在结构而非实测。</p>
+<p class="meta">2026-10-20</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2093721306090587929">https://zhuanlan.zhihu.com/p/2093721306090587929</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>核心判断</li>
+<li>Harness 不会收敛成单一通用形态；形态应随任务的复杂度与不确定性选型</li>
+<li>出发点是作者自研轻量 Agent 框架 SIAH 的实践复盘</li>
+<li>任务先拆三维</li>
+<li>目标是否清晰、路径是否确定、结果是否可验证</li>
+<li>三维组合决定该用哪种控制结构，而不是让一个框架硬套所有任务</li>
+<li>四种形态与适用面</li>
+<li>单循环 ReAct：简单、路径短的任务</li>
+<li>Plan-and-Execute：步骤多、需要先规划的复杂任务</li>
+<li>Multi-Agent 协作：需要多视角分工的任务</li>
+<li>Human-in-the-loop：高风险、不可逆的任务</li>
+<li>Skill 沉淀分三层</li>
+<li>临时经验：一次性的上下文技巧</li>
+<li>领域方法论：可复用的做事套路</li>
+<li>组织资产：团队级沉淀、可治理的能力库</li>
+<li>边界与落点</li>
+<li>全文为架构随笔，无 benchmark、无成本与延迟数据</li>
+<li>可迁移的结论：先判任务结构，再选 harness 形态与 Skill 层级</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[SIAH 轻量框架实践复盘] --&gt; B[先拆任务三维 目标清晰度 路径确定性 结果可验证性]
+B --&gt; C{按复杂度与不确定性选形态}
+C --&gt; D[单循环 ReAct 简单任务]
+C --&gt; E[Plan-and-Execute 复杂任务]
+C --&gt; F[Multi-Agent 多视角任务]
+C --&gt; G[Human-in-the-loop 高风险任务]
+D --&gt; H[Skill 沉淀三层]
+E --&gt; H
+F --&gt; H
+G --&gt; H
+H --&gt; I[临时经验 到 领域方法论 到 组织资产]
+I --&gt; J[落点 形态多样是选型原则 不是框架之争]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-20</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

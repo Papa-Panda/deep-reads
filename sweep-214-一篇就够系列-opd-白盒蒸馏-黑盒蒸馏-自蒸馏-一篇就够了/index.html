@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一篇就够系列：OPD（白盒蒸馏／黑盒蒸馏／自蒸馏），一篇就够了</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>一篇就够系列：OPD（白盒蒸馏／黑盒蒸馏／自蒸馏），一篇就够了</h1>
+<p class="sub">知乎推荐流条目（周星星，2026-10-20 发布，原文已通读）。一篇 OPD（在策略蒸馏）全景综述：广义定义是学生先用自身策略生成、再由教师信号更新，并按信号来源分三章——白盒（教师逐 token 概率，reverse KL 推导、token 级近似的偏差、MiniLLM/GKD 取舍，及 MiMo 多教师合版、DeepSeek-V4、Qwen3 工业实践；Qwen3 同起点下 OPD 以 1,800 额外 GPU 时对 RL 的 17,920、约 1/10 成本反超分数）、自蒸馏（同模型多看特权上下文：OPSD/SDPO/Cursor/OPCD/OEL/RLSD）、黑盒（GAD 判别器与 Rubric 量规把教师文本变成奖励再 GRPO）；末章讲边界：强教师教不好学生的三类失效与单题泛化（单题轨迹覆盖全数据 71.5% 状态簇）。正对他后训练数据/蒸馏主线，是本轮深度最高的一条。</p>
+<p class="meta">2026-10-20</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2095992561735315694">https://zhuanlan.zhihu.com/p/2095992561735315694</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>作者周星星（专栏「AI 煎饼摊」），发布于 2026-10-20 07:08；读时 6 赞、11 收藏、1 评论</li>
+<li>广义 OPD 定义：当前学生自己生成回答（on-policy），再由某种教师信号更新——教师是谁、信号是概率还是文本都不限定</li>
+<li>前言：为什么是 OPD</li>
+<li>对 SFT 蒸馏：消除训练/推理分布错位（SFT 学续写教师文本，部署要续写自己的文本）</li>
+<li>对只看结果的 RLVR：白盒 OPD 给出稠密的逐 token 监督</li>
+<li>证据：Thinking Machines Lab（2025-10）；Qwen3 同起点下 OPD 以约 1/10 的额外 GPU 时长在数学/代码上超过 RL；DeepSeek-V4、MiMo-V2-Flash 用 OPD 合并领域专家</li>
+<li>01 白盒 OPD：原理到工业实践</li>
+<li>目标：整句 reverse KL（学生加权、罚学生常生成而教师罕见的 token）；逐 token 信号 r_t 为师生 log 概率差，序列目标等于负的 r_t 期望和</li>
+<li>序列级更新：策略梯度用未来回报 R_t（MiniLLM 路线）；token 级近似只用当前 r_t——降方差但丢长程项、一般有偏</li>
+<li>局部梯度三算：sampled-token（每位只需 1 个教师 logprob、无偏但噪声大）、全词表（精确、零方差但存储/传输贵）、Top-K 截断（重归一化会改目标：集外质量 10% 对 90% 也能算出 KL=0）</li>
+<li>两种实现：PPO 风格（复用 verl 等 RL 设施，优势取 r_t 或 R_t）与直接分布优化（固定前缀上做散度；单独用只有局部梯度）</li>
+<li>MiniLLM 与 GKD 取舍：前者保留长程项＋教师混合采样/长度归一化控波动；后者选前缀来源 λ 与广义 JSD 的 β，不加未来回报项</li>
+<li>工业：MiMo-V2-Flash 多教师合版（教师信号与结果优势相加、可翻 token 符号）；DeepSeek-V4 全词表 reverse KL＋只缓存末层隐状态重构 logits；Qwen3 两段（先 off-policy 再 on-policy），同起点 OPD 74.4/65.5/60.3 对 RL 67.6/55.5/52.9，额外 GPU 时 1,800 对 17,920（教师先前训练成本未计）</li>
+<li>02 自蒸馏：多看信息的自己当老师</li>
+<li>通法：教师是同模型（或冻结副本）但多看训练期特权上下文 c（学生只看 x 生成、教师看 x+c 在同轨迹上重打分、梯度只走学生支）</li>
+<li>OPSD 参考解法入上下文；SDPO 成功尝试/环境反馈（报错、挂掉的测试）变逐 token 监督；Cursor 只对选定一轮加纠偏提示；OPCD 把系统提示/经验总结蒸进参数；OEL 从部署交互持续提经验再更新</li>
+<li>RLSD：结果优势定符号、教师比值只调幅度（权重裁剪如 0.8–1.2），乘法不翻符号以限特权信息泄漏</li>
+<li>03 黑盒蒸馏：拿不到概率怎么做 OPD</li>
+<li>学生生成 → 从教师文本构造回答级奖励 → GRPO 更新；优化的是构造奖励而非分布匹配，无需 tokenizer 对齐</li>
+<li>GAD：训判别器分师生回答（Bradley–Terry），其分数作奖励与学生交替更新；风险是奖励作弊与标签≠更优</li>
+<li>Rubric OPD：Rubricator 对照师生回答定加权量规、Verifier 盲评逐项通过率作奖励；量规可审计，但可被空话套利、判定可错</li>
+<li>04 本质与边界</li>
+<li>强教师教不好学生的三类原因（须分别诊断）：接不住学生已写错的半成品轨迹；局部信号奖励无任务进展的行为（如重复填充 token、错误前缀下末 token 本就可预测）；学生还不会执行教师的正确方法</li>
+<li>诊断法：把逐 token 信号叠在学生生成上看；对策按因选（换/喂教师、加结果奖励、先 SFT 冷启补基础）；成败以留出真实任务为准、不看 KL</li>
+<li>单题泛化：一道题每轮仍采样出大量不同前缀；Rethinking OPD II 测得单题轨迹覆盖全数据训练 71.5% 的状态簇、1,000 步拿到全数据增益的约 72%；16 道语义不同的题覆盖 98.9%——补数据的价值在补未覆盖的生成过程</li>
+<li>写在最后</li>
+<li>先在少数代表性输入上验证增益、再按真实失败补数据；自蒸馏＋环境反馈被作者看好（甚至问是否通向 RSI）</li>
+<li>边界：训得越像学生自己的分布，不等于教师在错误轨迹上的指导越可靠；像教师 ≠ 做对任务，没有免费午餐</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[广义OPD 学生先用自身策略生成回答] --&gt; B{教师信号从哪来}
+B --&gt; C[白盒 教师逐token概率 在学生前缀上算r_t]
+B --&gt; D[自蒸馏 同模型加特权上下文c 解答或反馈或经验]
+B --&gt; E[黑盒 只有教师文本 把文本变造成绩级奖励]
+C --&gt; F[更新方式 PPO风格 或 直接分布优化]
+D --&gt; G[分布对齐 或 RLSD只调优势权重不翻符号]
+E --&gt; H[GAD判别器打分 或 Rubric逐项评分 再GRPO]
+F --&gt; I[用留出真实任务验收 不看KL下降]
+G --&gt; I
+H --&gt; I
+I --&gt; J[按失败类型补数据 下一轮]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">蒸馏</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-20</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

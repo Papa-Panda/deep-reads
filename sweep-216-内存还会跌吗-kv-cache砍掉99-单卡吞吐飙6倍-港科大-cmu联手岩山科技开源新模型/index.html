@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>内存还会跌吗？KV Cache砍掉99%，单卡吞吐飙6倍，港科大、CMU联手岩山科技开源新模型</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>内存还会跌吗？KV Cache砍掉99%，单卡吞吐飙6倍，港科大、CMU联手岩山科技开源新模型</h1>
+<p class="sub">知乎推荐流条目（量子位，2026-10-20 发布，原文已通读）。岩芯矩阵（岩山科技）与港科大、CMU 等联合开源 EdgeRock-4B：不用全量 KV，而是循环状态存大意、1024 token 局部窗口存近处、打分筛选的记忆岩锚库存远处关键细节，把每序列 attention KV 固定在 72 MiB（256K 时较源模型 Qwen3.5-4B 降 99.1%），单张 Hopper 80GB 可 512 路 32K+32K 并发、12,124 tok/s，为源模型 6.42 倍；关掉岩锚的消融里长上下文问答从 94.1% 跌到 0.4%。对他有用：上下文压缩路线从逐 token 瘦身转向固定状态加选择性锚点的一手架构样本。注：数字均为厂商技术报告自报（无 arXiv 编号），按待独立复现处理。</p>
+<p class="meta">2026-10-21</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2096187577539753745">https://zhuanlan.zhihu.com/p/2096187577539753745</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>量子位（允中），发布于 2026-10-20 19:40；读时 12 赞、20 收藏</li>
+<li>对象：岩芯矩阵（岩山科技）与港科大、CMU 等联合开源的 EdgeRock-4B；权重与推理代码在 GitHub / Hugging Face 的 rockmatrix-ai/EdgeRock，技术报告为厂商 PDF，文中未给 arXiv 编号</li>
+<li>问题：推理越长为什么越贵</li>
+<li>标准注意力每生成一个 token 就新增一份 KV：源模型 Qwen3.5-4B 每 token 约 32 KiB，单序列 64K 时约 2 GiB、256K 时约 8 GiB</li>
+<li>路线一是逐 token 瘦身（MLA 压缩、KV 量化、TurboQuant 一类）：单份变小，总量仍随长度增长</li>
+<li>路线二是 有界状态模型（循环、状态空间、滑窗）：内存固定，但远处细节容易丢，后面要用时找不回</li>
+<li>方法：记忆岩锚 Rock Memory Anchors</li>
+<li>历史拆成三件固定的事：循环状态记大意，局部窗口留最近 1024 个 token，锚库存被选中的旧细节</li>
+<li>写入要竞争：每个 token 先生成一条候选记录并打分，每攒满 256 条就和库里已有的比，只留总分最高的 1024 条；4 个 KV 组各比各的</li>
+<li>锚记录一旦入选就不再改，且带着原来的位置，滑出局部窗口后仍能被直接读到</li>
+<li>改造路径：从 Qwen3.5-4B 分阶段转换、不从头预训练；保留 24 层 Gated DeltaNet，8 层全注意力换成滑窗注意力加独立的岩锚模块</li>
+<li>结果：内存、吞吐与成本（厂商自报）</li>
+<li>每序列 attention KV 固定 72 MiB，与 4K 到 256K 的长度无关，256K 时较源模型降 99.1%；连全部历史状态共 97.76 MiB</li>
+<li>单卡 Hopper 80GB、32K 输入加 32K 输出：512 路并发跑出 12,124 输出 tok/s，是源模型（最大 batch 64、1,889 tok/s）的 6.42 倍；整卡峰值显存 61.26 GiB</li>
+<li>按 GPU 时长折算，4K 输入时单 token 成本约为源模型的 24.9%，32K 输入时约 15.6%；且每请求内存事先可知，利于容量规划和 Agent 长历史</li>
+<li>能力保持与证据强度</li>
+<li>对源模型：AIME pass@1 保留 96.3%，MATH-500 保留 97.5%，29 项文本基准里 8 项反超</li>
+<li>关键消融：推理时关掉全部 8 个岩锚模块，长上下文问答准确率从 94.1%（964/1024）跌到 0.4%（4/1024），说明锚库是能力来源而非摆设</li>
+<li>边界：以上数字全部来自厂商技术报告，暂无同行评审与独立复现；文中还点了机器人与边缘部署（数小时运行、历史状态可预先算清）作为落点</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[长推理变贵 每token新增KV 256K时单序列约8GiB] --&gt; B{既有两条路线}
+B --&gt; C[逐token瘦身 压缩或量化 总量仍随长度涨]
+B --&gt; D[有界状态 内存固定 但远处细节丢失]
+A --&gt; E[EdgeRock三件套 循环状态记大意]
+E --&gt; F[局部窗口 留最近1024个token]
+E --&gt; G[候选记录 逐token生成并打分]
+G --&gt; H[每满256条竞争 只留最高分1024条入锚库]
+F --&gt; I[每序列KV固定72MiB 256K时降99.1%]
+H --&gt; I
+I --&gt; J[单卡80GB可512路并发 吞吐12124tok每s 约源模型6.42倍]
+I --&gt; K[消融验证 关锚库后长上下文准确率从94.1%跌到0.4%]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">KV Cache</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-21</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

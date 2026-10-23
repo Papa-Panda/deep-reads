@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>veRL 为什么删除了 SPMD Rollout，却仍然依赖 SPMD？——从并行计算、HybridFlow、Ray WorkerGroup，到Server Mode 的技术思想史</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>veRL 为什么删除了 SPMD Rollout，却仍然依赖 SPMD？——从并行计算、HybridFlow、Ray WorkerGroup，到Server Mode 的技术思想史</h1>
+<p class="sub">知乎推荐流条目（万理的探求者，发布于 2026-10-15，专栏「AI技术思想史」；读时 9 赞同、21 收藏、0 评论；已通读原文，更正版——先前版本作者与数据有误）。一篇 16 部分、58 节的 veRL 架构思想史：起点是 v0.7.0 的一处表面矛盾——release notes 删掉 SPMD Rollout，架构文档却说 Model Engine 仍以 SPMD 运行。文章从 SPMD 的历史与 rank/集合通信讲起，经 HybridFlow 的双层数据流、WorkerGroup 如何把 SPMD 藏进 Worker 抽象，再到多轮 Agent 的长尾如何冲击旧 Rollout、Server Mode 如何按请求调度，并专门辟一节摆四个反例（单轮大 batch 未必受益、Server Mode 不自动消除 GPU 空闲等）。结论：SPMD 没有被淘汰，只是被放回适合它的位置。</p>
+<p class="meta">2026-10-23</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2094203587006051708">https://zhuanlan.zhihu.com/p/2094203587006051708</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，2026-10-22 更正版）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流专栏，作者万理的探求者，发布于 2026-10-15（北京），所属专栏「AI技术思想史」2026-10-17 更新；读时 9 赞同、21 收藏、0 评论</li>
+<li>全文 16 个部分、58 个编号小节，文末附 20 项原始史料与源码出处</li>
+<li>起点：一处表面矛盾</li>
+<li>veRL v0.7.0（2026-01-05）的 release notes 写明删除 SPMD Rollout 模式</li>
+<li>同一版本的架构文档却说 Model Engine 以 SPMD 模式运行——删与留为何并存</li>
+<li>易混概念先分清：SPMD 不等于同步 RL，Server Mode 不等于 Off-Policy，rollout.mode: async 也不等于完全异步 RL</li>
+<li>SPMD 的来历与根基（第一至三部分）</li>
+<li>从 1980 年代并行计算讲起：SPMD 是同一程序跑多份数据，rank 是进程身份而非 GPU 编号，按 rank 分支仍是 SPMD</li>
+<li>真正的硬约束在集合通信：组内所有 rank 必须共同调用，否则死锁——许多超时与卡死的根源</li>
+<li>分布式训练天然适合 SPMD：DDP 靠 AllReduce 平均梯度，FSDP 分片后靠 AllGather/ReduceScatter，Megatron 的 TP/PP/EP 同样运行在 SPMD 编程模型下</li>
+<li>HybridFlow 与 WorkerGroup（第四、五部分）</li>
+<li>RLHF 不是一张计算图，而是由多个大型分布式组件构成的高层数据流：生成、算奖励、算优势、更新，构成控制流；模型内部是计算流</li>
+<li>纯单控制器粒度太细、纯多控制器与后端耦合太深；HybridFlow 的答案是高层单控制器编排、低层多控制器 SPMD 执行，另有 3D-HybridEngine 优化训练/生成两种并行布局间的参数重排</li>
+<li>WorkerGroup 把一组 Ray Actor 包装成一个逻辑 Worker：trainer 代码近似本地调用，背后是 Dispatch→Execute→Collect；@register 记录分发语义，ONE_TO_ALL 广播、DP_COMPUTE_PROTO 按 DP 组切分 batch，后期又加入理解 TP/DP 拓扑的 mesh-aware 分发</li>
+<li>小结：WorkerGroup 没有替代 SPMD，它是 SPMD 之上的控制入口——它负责分发，SPMD 负责计算</li>
+<li>旧 SPMD Rollout 与 Agent 的冲击（第六、七部分）</li>
+<li>旧式 Rollout 是 trainer 对 WorkerGroup 的整批调用：生成完一整批再返回，引擎内部虽有连续批处理，瓶颈在外层批调用接口与生命周期</li>
+<li>多轮 Agent 把生成变成「生成—调工具—再生成」的循环：工具调用走 CPU/IO/网络、时长参差，长尾被放大（一个 agent 等测试 20 秒，其余早已空转）</li>
+<li>文章强调这不是 SPMD 的数学必然：问题在旧接口把请求调度与环境交互攥在自己手里</li>
+<li>2025 年的源码与 Issue 实录（第八部分）</li>
+<li>AgentLoop 先行改变边界；随后有人公开质疑 Server Mode 是否真的更快（均匀请求下按数量分发近似预先均分）</li>
+<li>旧 SGLang 驱动的三个具体瓶颈：数据先汇聚到 TP rank 0 再经中间层转交调度器、驱动对象难以独立进程调度、barrier 等待造成长卡顿</li>
+<li>迁移并非一个 PR 完成：有提案被关闭未合并，原生 HTTP server 集成与默认模式切换分步落地，最终由后续 PR 把默认 Rollout 切到 Server Mode，删除记录落在 v0.7.0</li>
+<li>Server Mode 怎么运行（第九部分）</li>
+<li>以一个 Coding Agent 的完整调用链为例：Trainer 取 Prompt Batch → AgentLoop 管理器/Worker → 多个 run() 协程 → 客户端把请求交给生成 server → 返回 token 后 agent 调工具并循环 → 输出汇总回 trainer 算奖励与优势、更新 Actor</li>
+<li>协程的价值在等待工具时让出 GPU 服务别人，前提是工具调用本身真正非阻塞</li>
+<li>负载均衡与粘性会话是一对权衡：首次按负载选 server、后续粘住同一 server 复用前缀缓存，缓存局部性与全局均衡不可兼得</li>
+<li>输出必须带 token mask：模型生成的 token 记 1、工具返回的观测记 0，PPO/GRPO 不能把工具文本当作策略自己的动作来训练</li>
+<li>为什么替代不了 Model Engine（第十、十一部分）</li>
+<li>Server 解决的是请求调度，不是分布式梯度计算：把每个 GPU 包成 HTTP server，等于让 RPC 站上每一层 AllGather/AllReduce 的热路径</li>
+<li>一个生成 server 的内部同样可以跑 SPMD——「Rollout 接口是 Server Mode」与「模型执行是 SPMD」同时成立</li>
+<li>模式不等于独占 GPU：训练与生成可同组 GPU 共置（靠休眠/唤醒管理显存）也可分开部署；进程分离、资源分离、训练—生成异步是三个独立维度；权重布局不同（训练分片 vs 生成分片）使权重传输与重排成为独立问题</li>
+<li>四种「同步/异步」别混（第十二部分）</li>
+<li>① SPMD 内部的集合通信同步；② Agent 请求层面的异步执行；③ 一轮迭代里 Rollout 与训练是否同步等待（请求并发不改变迭代仍在策略同步）；④ 完全异步 RL——采样与训练真正重叠，代价是策略陈旧度、重要性采样与回放队列等一整套新问题</li>
+<li>v0.7 为何终于删（第十三部分）与四个反例（第十四部分）</li>
+<li>官方理由指向任务形态：从单轮静态任务转向多轮、动态、交互式 Agent 任务后，旧接口不应再 owns 请求调度与环境交互；配套出现权重传输与数据传输的新组件</li>
+<li>反例一：单轮、大 batch、无工具的规则任务，旧批接口未必低效，Server Mode 的收益主要是控制边界更灵活而非速度</li>
+<li>反例二：SPMD 理论上也能实现队列与事件循环，迁移的实质是不再维护旧包装层、转而复用成熟的推理引擎 server</li>
+<li>反例三：有 Issue 记录 Server Mode 下 GPU 长时间 0% 利用——它不自动消除空闲</li>
+<li>反例四：同步 PPO 的长尾还在——99 个 agent 完成、1 个慢，trainer 仍要在 batch 边界等待；根治要走向一步偏策略或完全异步，并引入陈旧度问题</li>
+<li>结论（第十五、十六部分，四层回答）</li>
+<li>SPMD 作为编程模型没有被淘汰，仍活在 PyTorch Distributed、FSDP、Megatron 里</li>
+<li>HybridFlow 从 2024 年起就不是纯 SPMD：历史是高层控制与低层执行早早分家</li>
+<li>真正被淘汰的是与整批生成和 WorkerGroup 执行紧耦合的旧 Rollout 接口</li>
+<li>Server 内部仍可运行 SPMD——SPMD 被放回了更适合它的位置</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题 veRL删了SPMD Rollout为何仍依赖SPMD] --&gt; B[分清 SPMD是范式不是某个实现]
+B --&gt; C[根基 集合通信与并行组预设参与者同构]
+C --&gt; D[训练侧 同构计算 Worker内部保留SPMD]
+C --&gt; E[生成侧 请求独立 长度参差 动态批处理]
+E --&gt; F[SPMD版Rollout被删 同步阻塞放大尾延迟]
+D --&gt; G[WorkerGroup把SPMD包进Worker抽象 rank与广播]
+F --&gt; H[Server Mode 生成引擎按请求级调度接入]
+G --&gt; I[结论 SPMD上移一层 层内同步 层间异步]
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

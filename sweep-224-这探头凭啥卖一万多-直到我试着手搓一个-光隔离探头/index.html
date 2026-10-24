@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>这探头凭啥卖一万多？直到我试着手搓一个【光隔离探头】</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>这探头凭啥卖一万多？直到我试着手搓一个【光隔离探头】</h1>
+<p class="sub">B站推荐流条目（UP主「超冷冻农家乐」，2026-10-22 发布，原创；公开接口数据：播放 7.45 万、点赞 4373、收藏 3588、投币 3935、评论 518；时长 45 分 42 秒。正片未逐段核验，以下据官方简介与公开数据整理）。UP主花了很长时间（自述断更就因为它「实在太难做」）手搓一台光隔离探头：浮地测量时普通探头一夹就短路，光隔离是切断地环路的标准解，而难的是把隔离和信号保真同时做出来——看完能把「凭啥卖一万多」拆成一张可验证的工程清单；成品项目将开源，发布在简介/评论区。</p>
+<p class="meta">2026-10-23</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1Mxn26eEam">https://www.bilibili.com/video/BV1Mxn26eEam</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据官方简介与公开接口数据整理；正片未逐段核验）</h2>
+<ul>
+<li>条目信息</li>
+<li>B站推荐流视频，UP主「超冷冻农家乐」，2026-10-22 发布，原创，时长 45 分 42 秒</li>
+<li>公开数据：播放 7.45 万、点赞 4373、收藏 3588、投币 3935、评论 518；收藏/播放比很高，是技术向观众用收藏投的票</li>
+<li>问题：浮地测量为什么难（观看抓手）</li>
+<li>普通示波器探头的地夹与大地相连，被测电路与仪器不共地时直接夹上去等于把信号短路到地</li>
+<li>光隔离探头在信号链中段用光传递信号、切断电气连接，测量端与仪器端不再共地</li>
+<li>手搓路线（简介确认的事实）</li>
+<li>UP主自述：很长时间没更新，原因就是这个光隔离探头实在太难做</li>
+<li>定位：想搞定浮地测量，这种探头是最实用的工具形态</li>
+<li>后续：开源项目整理好后会在简介/评论区发布</li>
+<li>价值判断：一万多的价格买什么</li>
+<li>原理一句话能说清，卖价买的是带宽、线性、噪声、隔离耐压同时达标的指标与可靠性</li>
+<li>手搓一遍的意义：把「凭啥这么贵」从情绪问题变成逐项可验证的工程清单</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题 浮地测量难在哪] --&gt; B[普通探头地夹接大地 不共地一夹就短路]
+B --&gt; C[解法 信号链中段用光传递 切断地环路]
+C --&gt; D[手搓实现 UP主自述实在太难做 为它断更很久]
+D --&gt; E[真难点 隔离与信号保真要同时成立]
+E --&gt; F[对照商用产品 一万多买的是指标与可靠性]
+F --&gt; G[后续 成品开源 项目将发布在简介与评论区]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">物理</span><span class="tag">电子测量</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

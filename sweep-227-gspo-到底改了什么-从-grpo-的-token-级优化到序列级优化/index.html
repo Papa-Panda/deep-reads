@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GSPO 到底改了什么？从 GRPO 的 token 级优化到序列级优化</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>GSPO 到底改了什么？从 GRPO 的 token 级优化到序列级优化</h1>
+<p class="sub">知乎推荐流专栏（作者「心灵的灯」，2026-10-23 07:26 发布于北京；读时 2 赞同、5 收藏、0 评论。已通读原文的更正版——本轮早先曾以未读原文兜底写入）。一篇纯公式与机制层面的 GSPO 拆解（全文无实验数据）：先并列 GRPO 与 GSPO 两个目标函数，指出差别只在『优化粒度』——GRPO 的重要性权重与 clip 都在 token 级、优势是 Â_{i,t}；GSPO 把优势写成整条序列的 Â_i，比率 s_i(θ) 是整条序列似然比的 1/|y_i| 次方（长度归一化），clip 也在序列级。随后逐节论证：token 级比率单样本估计方差大、且与序列级奖励错位；负优势时 token clip 拦不住过大的比率（文中用 10^-6→0.001 得比率 1000 的示例说明），波动累积可拖崩 MoE；序列级单位对单个 token 的路由变化不敏感，故 MoE 训练不再需要 Routing Replay。本质区别一节最值得记：GRPO 逐 token 给梯度调权重，GSPO 只整句统一缩放、不改变句内 token 的相对变化。正对他的 RL 配方主线——看 GRPO 系变体，先盯优化单位与奖励单位是否对齐、以及梯度是否被逐 token 加权。</p>
+<p class="meta">2026-10-24</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2097088265329309415">https://zhuanlan.zhihu.com/p/2097088265329309415</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，2026-10-23 更正版）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流专栏，作者「心灵的灯」，2026-10-23 07:26 发布于北京；读时 2 赞同、5 收藏、0 评论</li>
+<li>全文九节，纯公式与机制论证，无任何实验、benchmark 或训练结果数据</li>
+<li>一、先看两个目标函数</li>
+<li>GRPO：组内 1/G、序列内 1/|o_i| 双重平均，逐 token 做 min(比率×Â_{i,t}, clip 后×Â_{i,t})，并带 −β·KL(π_θ‖π_ref) 项；权重、clip、优势都是 token 级</li>
+<li>GSPO：目标里只有 (1/G)Σ_i min(s_i(θ)Â_i, clip(s_i(θ))Â_i)——优势是整条序列的 Â_i，无逐 token 求和、无 KL 项（文中未给优势的计算公式）</li>
+<li>序列比率 s_i(θ)＝(π_θ(y_i|x)/π_{θ_old}(y_i|x))^{1/|y_i|}，长度归一化内嵌在比率定义里</li>
+<li>二、为什么 token 粒度不行</li>
+<li>高方差：重要性采样靠多样本纠偏，单样本时修正有限、方差不可避免，逐 token 算比率尤其抖</li>
+<li>错位：奖励通常是序列级的，优化却在 token 级；token 级奖励理论可行但难落地</li>
+<li>三、序列似然比的推导</li>
+<li>序列概率＝条件 token 概率之积 ⇒ 序列比率＝token 比率之积 ⇒ 取 1/|y_i| 次方并用 log/exp 化乘为加，得到 s_i(θ) 的 exp 形式</li>
+<li>四、长度归一化降方差</li>
+<li>统一不同长度序列的比率数值范围，避免长序列比率被连乘放大/缩小，使不同长度回复可同尺度比较</li>
+<li>五、Clip 粒度：从 token 到序列（关键节）</li>
+<li>GRPO 的不对称：A&gt;0 时比率有效范围 0~1+ε；A&lt;0 时是 1−ε~+∞——负优势时 clip 只拦过小、拦不住过大，比率取 min 后仍保留裁剪前的大值</li>
+<li>文中唯一数字示例（说明性、非实验）：旧策略某 token 概率 10^-6、新策略 0.001，比率即达 1000</li>
+<li>后果：波动随训练与序列变长累积，可最终拖崩 MoE 模型</li>
+<li>GSPO：整体偏离策略的整条样本直接整条裁剪，与序列级奖励完全对齐，避免 token 级 clip 的噪声与偏差</li>
+<li>六、消除 Routing Replay 依赖</li>
+<li>MoE 病灶：梯度更新后专家激活模式改变（同一批样本从激活专家 1、2 变成 1、3），同 token 换专家则计算结果大变，比率剧烈震荡、频繁触发 clip，被 clip 的 token 无梯度、留下的带噪声</li>
+<li>传统解 Routing Replay：记录旧策略采样时激活的专家，更新时强制同路由</li>
+<li>GSPO 以序列为单位、对单 token 波动不敏感，故不需要 Routing Replay</li>
+<li>七、本质区别：是否对 token 梯度加权</li>
+<li>GRPO：逐 token 用各自重要性权重调梯度（逐 token 调权重）</li>
+<li>GSPO：只把整句的比率统一缩放，不改变句内 token 之间的相对变化（整句统一缩放）——文中称这是其更稳、更适合长序列与 MoE 的根源</li>
+<li>八、一张表总结（七行对照）</li>
+<li>重要性权重粒度、clip 粒度、与奖励粒度对齐（弱 vs 强）、长度归一化（逐 token 平均 vs 序列似然比 1/|y_i| 归一化）、方差（高 vs 低）、Routing Replay（通常需要 vs 不需要）、token 梯度加权（是 vs 否）</li>
+<li>九、一句话总结</li>
+<li>GRPO 在 token 级做重要性采样与 clip：噪声大、与序列奖励错位、MoE 依赖 Routing Replay；GSPO 把权重与 clip 抬到序列级、用长度归一化的序列似然比优化：降方差、对齐奖励、去掉 Routing Replay</li>
+<li>阅读提示</li>
+<li>全文未给 ε、β、组大小 G 的取值，未给优势 Â 的计算公式，也无独立的局限/注意事项节；稳定性结论为机制论证、非数据支撑</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[起点 并列GRPO与GSPO两个目标函数] --&gt; B[差别只在优化粒度]
+B --&gt; C[GRPO 权重与clip在token级 优势是逐token的A_{i,t}]
+B --&gt; D[GSPO 优势是整条序列的A_i 比率与clip都在序列级]
+C --&gt; E[token比率单样本估计 方差大]
+C --&gt; F[与序列级奖励错位]
+C --&gt; G[负优势时clip拦不住过大比率 示例10^-6到0.001得1000]
+G --&gt; H[波动累积 MoE可被拖崩]
+H --&gt; I[传统补丁 Routing Replay 强制复用旧路由]
+D --&gt; J[序列比率 连乘取1除以长度次方做长度归一化]
+J --&gt; K[不同长度回复同尺度 方差降低]
+D --&gt; L[本质 整句统一缩放 不逐token给梯度调权重]
+L --&gt; M[对单token路由变化不敏感 MoE免Routing Replay]
+K --&gt; N[结论 奖励与优化单位对齐 更稳]
+M --&gt; N</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-24</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

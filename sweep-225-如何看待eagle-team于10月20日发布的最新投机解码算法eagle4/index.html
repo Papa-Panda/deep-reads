@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待Eagle team于10月20日发布的最新投机解码算法Eagle4？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>如何看待Eagle team于10月20日发布的最新投机解码算法Eagle4？</h1>
+<p class="sub">知乎推荐流条目（问题页唯一回答，作者「不归牛顿管的熊猫」，2026-10-23 00:21 发布于上海；读时 43 赞同、32–34 收藏、无评论，问题 14 人关注、约 1.4 千浏览。已通读原文的更正版——本轮早先曾以未读原文兜底写入）。作者读完 EAGLE-4 技术报告与博客后的判断：贡献主要在系统层，草稿模型本身变化不大（仍是单层 Transformer、沿用 EAGLE-3.1 结构）；真增量是两件套——EAGLE-Harness 把投机成本纳入决策（预热测时延建查表，在三个决策点用「多接受的 token ÷ 多花的时间」过阈值，轻载每节点扩 8 分支、重载 4 分支），Efficient LM Head 用低秩头先召回 Top-k、再用完整 LM Head 精算。但作者给论证留了保留：并发 1 时它用动态树验 16 个 token、对手是链式，树与自回归的贡献未拆分；T=1、并发 512 时对 Qwen3.8-27B 仅 1.03×。最值得带走的是标尺之变：从接受长度换成真实负载下单位成本推进的有效 token 数。</p>
+<p class="meta">2026-10-23</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2096979817400948633/answer/2096984629064503955">https://www.zhihu.com/question/2096979817400948633/answer/2096984629064503955</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，2026-10-23 更正版）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流问题页唯一回答，作者不归牛顿管的熊猫（AI Infra 与 LLM 推理加速方向），2026-10-23 00:21 发布于上海；读时 43 赞同、32–34 收藏、无评论；问题 14 人关注、约 1.4 千浏览</li>
+<li>作者自述读过 EAGLE-4 技术报告与博客；问题描述链接官方博客（一个 drafter 适配所有 batch 与硬件）</li>
+<li>总判断：新意在系统层，不在草稿模型</li>
+<li>草稿模型仍是单层 Transformer，沿用 EAGLE-3.1 的 FC Norm 与 Post-norm，没有新架构</li>
+<li>两条真增量：把投机成本纳入决策；降低 LM Head 的成本</li>
+<li>增量一：EAGLE-Harness（成本感知调度）</li>
+<li>预热阶段测不同 batch、上下文长度、token 数下的 draft 与 verify 时延，存成查表</li>
+<li>解码时同一判据用在三个决策点：预期多接受的 token ÷ 多花的时间，过阈值才做——是否再草稿一层、送验多少 token、每节点扩多少分支（轻载 8、重载 4）</li>
+<li>增量二：Efficient LM Head（召回＋精排）</li>
+<li>低秩头先对全词表打分，取 Top-k 候选</li>
+<li>完整 LM Head 只对候选计算精确 logits</li>
+<li>核心论证：变动负载下自回归草稿优于并行草稿</li>
+<li>batch 变大后最优投机长度缩到 1–2 个 token，并行一次出一整块的优势消失</li>
+<li>自回归可以随时停下；并行路线（如 DSpark）先生成整块再截断送验，已花的草稿算力收不回——作者认为此点最有说服力</li>
+<li>每条分支从各自已生成的前缀续写，动态树能用更多信息；成本上并行约正比于块长×层数，自回归正比于实际展开深度且只有一层、可早停</li>
+<li>作者附注：支撑这一论证的实验仍显不足</li>
+<li>路线收敛（与 DFlash / DSpark / DFlash 2 对照）</li>
+<li>词表维度成为新的优化焦点，各家都是先召回再精算（引 DFlash 2 数字：首位 top-1 准确率 85.4%，正确 token 落在 top-16 内的比例 99.5%）</li>
+<li>按成本调度投机成为标配，差别在粒度：DSpark 是 batch 级全局 verify 预算＋校准过的置信头，但只能裁 verify、不能省 draft；EAGLE-4 是请求级同时控 draft 与 verify，但置信度用草稿概率连乘、阈值靠启发式——作者建议把自回归早停、全局 verify 分配与校准三者组合</li>
+<li>自回归与并行互相靠拢：并行在补块内依赖，自回归靠低秩头与 SWA 提效</li>
+<li>「关于 Efficient LM Head」一节很短：作者推荐前 EAGLE Team 成员的同题回答作为这一点的细读</li>
+<li>总体评价</li>
+<li>优点：评价标尺从接受长度换成真实负载下单位成本推进的有效 token；在 NVIDIA GPU、AMD GPU、服务器 CPU 与手机上都有正收益；Harness 与 Efficient LM Head 都可迁移到 MTP，对 MTP 团队有直接参考价值</li>
+<li>保留：并发 1 时结构不对等（EAGLE-4 动态树可验 16 个 token，DFlash 2 与 MTP 是链式），树的贡献与自回归的贡献未拆分；T=1 或对手 MTP 配置得当时优势骤减（Qwen3.8-27B、T=1、并发 512 时仅 1.03× vanilla；Nemotron 上对 MTP 的优势仅 1%–14%）；缺两件套的端到端消融与主实验的逐轮 draft/verify 时延拆分</li>
+<li>下一代预测：轻量并行或半自回归骨干产出候选格 ＋ 约一层可早停的自回归精修 ＋ 召回精排式词表头 ＋ batch 级全局调度（校准置信、联合决定草稿深度与送验集合）</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题 变动负载下投机解码该投多少] --&gt; B[草稿模型没大改 单层Transformer沿用EAGLE-3.1]
+B --&gt; C[增量一 Harness 预热查表测draft与verify时延]
+C --&gt; D{三决策点 多接受token除多花时间 过阈值才做}
+D --&gt; E[再草稿一层 送验token数 每节点分支轻载8重载4]
+B --&gt; F[增量二 Efficient LM Head 低秩头先召回Top-k]
+F --&gt; G[完整LM Head只对候选精算logits]
+E --&gt; H[核心论证 自回归可早停 并行整块生成再截断收不回成本]
+G --&gt; H
+H --&gt; I{作者保留 结构不对等未拆分 T等于1并发512仅1.03倍}
+I --&gt; J[真价值 标尺换成单位成本的有效token 且两件套可迁移MTP]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

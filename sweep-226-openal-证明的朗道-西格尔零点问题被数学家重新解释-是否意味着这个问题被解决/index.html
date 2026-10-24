@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAl 证明的朗道-西格尔零点问题被数学家重新解释，是否意味着这个问题被解决？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>OpenAl 证明的朗道-西格尔零点问题被数学家重新解释，是否意味着这个问题被解决？</h1>
+<p class="sub">知乎推荐流条目（已通读原文的更正版——本轮早先曾以未读原文兜底写入）。问题页 290 人关注、约 59 万浏览、35 个回答；链接的回答为 lwangls 所写（2026-10-20 发布于上海，310 赞同、73 收藏），按赞同数排第 2（首位 VNVM 318 赞）。回答很短：先给结论——OpenAI 的证明已被三位数学家分别证实和简化、最新版本被简化到三页；再给时间线：10 月 11 日 Banks 重构论证、10 月 15 日 Kerr 给出更简洁版本、10 月 17 日 Green 再改写简化、随后 Barreto 整理为仅 3 页的初等证明、10 月 19 日陶哲轩发博客走 Green&#x27;s 路线。关键细节：Barreto 版并非另起炉灶，而是在 Green 证明上把原来的行列式论证换成用 Wronskian 证明一组函数的线性无关、替代结式计算，且他在文中明言这次简化得益于 GPT-6 Astra 的协助。对正在做 AI4Math 的他，这是「AI 产出证明、人类核验与简化」最硬的一个样本。</p>
+<p class="meta">2026-10-23</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2093787788684390525/answer/2095944390338519345">https://www.zhihu.com/question/2093787788684390525/answer/2095944390338519345</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，2026-10-23 更正版）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流问题页，290 人关注、约 59 万浏览、35 个回答；问题描述无文字、只有 5 张英文证明稿页面图（§1.3 证明大纲：β 为 L(s,χ) 的实零点，记 δ=(1−β)log q，目标是证 q 大时 δ 不能小；把一个非零整数从上下两边夹逼）</li>
+<li>链接回答：lwangls，2026-10-20 发布于上海（编辑于同日 06:13），310 赞同、42 评论、73 收藏；按赞同排第 2，首位是 VNVM（318 赞）</li>
+<li>链接回答的结论（原文两句）</li>
+<li>OpenAI 的证明已被三个数学家分别证实和简化，Banks 是其中之一</li>
+<li>最新进展：证明被简化到三页</li>
+<li>时间线（回答原文）</li>
+<li>10 月 6 日 OpenAI 公布证明；10 月 11 日 William Banks 重构论证；10 月 15 日 Bryce Kerr 发表更简洁的证明版本；10 月 17 日 Ben Green 发表改写版、进一步简化；随后 Kevin Barreto 整理为仅 3 页的初等证明；10 月 19 日陶哲轩发博客走 Green 的证明路线</li>
+<li>3 页版的真实做法（回答结尾段）</li>
+<li>不是独立新理论：建立在 Green 的证明之上</li>
+<li>把原来的行列式论证换成用 Wronskian（朗斯基行列式）证明一组函数线性无关，替代结式（resultant）计算</li>
+<li>Barreto 在文中明言：这次简化得益于 GPT-6 Astra 的协助</li>
+<li>最高赞回答 VNVM（318 赞）读 Kerr 版后的骨架转述</li>
+<li>几乎全是代数数论：设 Siegel 零点存在，鸽巢原理给出一个低次多项式、模 p 有许多根且取值小到必须是真根；而 Masser 的结果说根多则次数必须大，矛盾</li>
+<li>Green 的证明被陶哲轩形容为多项式方法的应用；各简化版主要差别在多项式的构造方式</li>
+<li>旁证与保留（其他高赞回答）</li>
+<li>连续对称守恒（281 赞）：Banks 是该领域全职教授、其核验文称逐行检查并负全责；但也指出 11/12 与 7/8 的拟黎曼稿仍只是梗概、具体计算待人工核查，且 Siegel 零点结果远弱于拟黎曼线、两者独立</li>
+<li>状态判断：多位独立数学家可重述可简化 = 论证骨架已被社区接住；但仍属预印本阶段，强度远弱于广义黎曼猜想本身</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[OpenAI公布证明 排除Siegel零点] --&gt; B[三位数学家分别证实与简化]
+B --&gt; C[Banks 10-11 重构论证]
+B --&gt; D[Kerr 10-15 更简洁版本 鸽巢加Masser]
+B --&gt; E[Green 10-17 改写 多项式方法]
+E --&gt; F[Barreto 在Green之上整理为3页初等证明]
+F --&gt; G[行列式论证换成Wronskian证线性无关 替代结式计算]
+G --&gt; H[陶哲轩 10-19 博客走Green路线]
+A --&gt; I[问题 是否意味着已解决]
+H --&gt; I
+I --&gt; J[骨架已被独立重述接住]
+I --&gt; K[仍属预印本 强度远弱于广义黎曼猜想]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

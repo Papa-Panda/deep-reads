@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从 16 卡到 512 卡：训练的吞吐优化</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从 16 卡到 512 卡：训练的吞吐优化</h1>
+<p class="sub">知乎推荐流专栏（作者 a&#x27;晨，编辑于 2026-10-12 上海；读时 20 赞同、37 收藏、0 评论。已通读原文的更正版——本轮早先因通读报告迟到曾以未读原文兜底写入）。文章基于 Aleph Alpha 的 scaling 实践报告、用 torchtitan 在 B200 上拆 30B-A3B MoE 的训练吞吐：16 卡 FSDP=16 时 28.4k tok/s/卡、MFU 37.5%；128 卡 28.0k、37.0%；512 卡改用 FSDP=128×外层 DP=4 的 HSDP 后 26.7k、35.3%——卡数 ×32、总吞吐 ×30.1，单卡保留约 94%，按此速率 20T tokens 约 17 天。关键手法是 selective recompute 与 LBS 的联合 sweep、通信与计算重叠、以及把跨副本 all_reduce 推迟到最后一个 microstep 的 backward 才做。</p>
+<p class="meta">2026-10-25</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2092999317804130662">https://zhuanlan.zhihu.com/p/2092999317804130662</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理，2026-10-24 更正版）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流专栏，作者 a'晨，编辑于 2026-10-12 04:47・上海；读时 20 赞同、37 收藏、1 喜欢、0 评论</li>
+<li>信源：结果与 profile 基于 Aleph Alpha《Scaling Pre-Training in Practice: A Hierarchical Approach》；机制讲解引 HF Ultra-Scale Playbook、PyTorch FSDP2、DeepSpeed ZeRO、Megatron Core 文档</li>
+<li>设置：30B-A3B MoE（总参约 30B、每 token 激活约 3B），B200，序列长度 4096，torchtitan；结果为 20 步平均，一步含全部 GA microstep 的前向+反向+优化器时间；不用 TP/PP/CP/EP</li>
+<li>全文八节</li>
+<li>训练效率的三个指标 → FSDP 与 HSDP → recompute 与 LBS → memory profile → LBS sweep → communication overlap → 128→512 GPUs → 参考</li>
+<li>三个指标先立规矩</li>
+<li>TPS = 总 tokens /（墙钟时间 × GPU 数）；MFU 的 F_peak 用 B200 稠密 BF16 峰值（不用稀疏峰值），且 recompute FLOPs 不计入 F_token</li>
+<li>作者明确警告：MFU 35.3% 不等于 GPU 空转 64.7%——时间口径要看 compute busy ratio；显存口径分 reserved（热力图）与 allocated（profile）两种，不可混用</li>
+<li>主线一：显存决定 LBS，LBS 决定吞吐</li>
+<li>常驻模型状态 + 保存的激活共同封顶 Local Batch Size；扩 FSDP 组与 recompute 都在腾显存换 LBS，代价分别是更多通信与额外计算</li>
+<li>16 卡 sweep（9×15 矩阵）：无 recompute 在 LBS=6 最快但可行域极窄；selective recompute 在 LBS=18 达峰值 TPS 28,414、MFU 37.47%、显存 92.2%；LBS=22 时显存 98.6%、TPS 跌至 23,179 并出现 allocator 重试；full recompute 峰值在 LBS=34、27,784，仍略低于 selective</li>
+<li>memory profile（16 卡、selective、LBS=18）：一轮前向+反向 0–3025 ms；激活在前向逐层累积、反向逆序释放，反向有 recompute/梯度/参数收集的短时峰</li>
+<li>主线二：通信重叠与它的边界</li>
+<li>前向中下一层的 all_gather 与当前层计算重叠，所示局部窗口 compute busy 约 98.8%，未被覆盖的通信约 0.756 ms（作者强调这只是局部区间长度，不是步时增量）；重叠的通信仍会争 SM 资源</li>
+<li>128 卡时前向 all_gather 已几乎填满可重叠的计算窗口——这是不再扩大 FSDP 组的判据</li>
+<li>主线三：512 卡 = HSDP + 推迟同步</li>
+<li>保持 FSDP=128，加外层 DP=4（四组各持一份完整分片副本，梯度分片跨组 all_reduce）；最终配置 selective recompute、LBS=22，得 26.7k tok/s/卡、MFU 35.3%、显存 94%</li>
+<li>跨副本 all_reduce 推迟到最后一个 microstep 的 backward：非最终步只做组内 reduce_scatter 并本地累积梯度分片，最终步才同步一次，随后做 clipping 与优化器更新；依据是同一归一化约定下 reduction 线性</li>
+<li>保留意见：512 卡 profile 中最终步 backward 出现 all_reduce 尾巴，但其采样层（0–5）与非最终步（25–30）不同，两窗口长度不可相减估算该成本；FSDP=256/512 未做对照测试，更大组是否划算仍需实测</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[基线 16卡 FSDP16 无重计算可行域窄] --&gt; B[selective recompute 腾显存]
+B --&gt; C[LBS sweep LBS18达峰 28.4k tok每卡 MFU37.5%]
+C --&gt; D[扩到128卡 常驻状态变小 LBS再升 28.0k]
+D --&gt; E[瓶颈转移 前向all_gather填满可重叠窗口]
+E --&gt; F[512卡改HSDP FSDP128乘外层DP4]
+F --&gt; G[跨副本all_reduce推迟到最终步backward]
+G --&gt; H[结果 26.7k tok每卡 MFU35.3% 单卡保留约94%]
+H --&gt; I[保留 FSDP256与512未对照实测]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">训练优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-25</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

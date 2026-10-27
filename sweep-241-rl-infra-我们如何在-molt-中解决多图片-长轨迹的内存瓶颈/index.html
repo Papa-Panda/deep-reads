@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RL Infra: 我们如何在 Molt 中解决多图片、长轨迹的内存瓶颈</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>RL Infra: 我们如何在 Molt 中解决多图片、长轨迹的内存瓶颈</h1>
+<p class="sub">知乎推荐流专栏（作者 初七9527，编辑于 2026-09-02；74 赞同、75 收藏。已由登录浏览器通读原文更正——本条先前据未读原文兜底写入）。一篇定位极准的 RL Infra 实战：OSWorld rollout 的 batch 从 128 提到 1024 时，GPU 还没吃饱，controller 的 CPU 内存先爆——根因不在 batch 本身，而在数据通路：所有轨迹都经 controller 中转，使只该做调度的它变成全集群的图片仓库。Molt v0.1.3 的解法是给 Experience 加 offload/reload：重字段（图片、多模态输入、attention mask、log_probs 等）在生产端经 Ray 对象存储卸载、只留 heavy_ref，controller 只收轻字段（reward、轨迹长度、group id）做过滤与调度，训练 rank 真正计算时再按引用取回。对他做 Agent RL / 长轨迹训练的人，这条『瓶颈常在数据通路、不在模型』的判断值得记。</p>
+<p class="meta">2026-10-26</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2078810043420504749">https://zhuanlan.zhihu.com/p/2078810043420504749</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流专栏，作者 初七9527，专栏「RLHF &amp; o1 碎碎念」，编辑于 2026-09-02；74 赞同、75 收藏</li>
+<li>对象：RL 框架 Molt v0.1.3，场景为 OSWorld 的 Agent RL rollout 扩展</li>
+<li>症状与根因：内存爆在 controller</li>
+<li>每步产生新截图，轨迹越长，图片、token、attention mask、log 概率与多模态张量一起膨胀</li>
+<li>旧通路：rollout worker 生成完整 Experience → controller 收集 → 再转发训练 worker</li>
+<li>batch 128 正常，提到 1024 时 controller 内存先于 GPU 饱和触顶；加 rollout 节点只会让它死得更快</li>
+<li>绕过的三条路（均被否）</li>
+<li>把 batch 退回 128：能跑但慢、不可扩展</li>
+<li>压缩图片、截断轨迹、少留截图：省内存，但等于为系统改训练数据</li>
+<li>另建专用存储服务：可行，但服务、协议与数据生命周期复杂度全涨</li>
+<li>关键 reframing：controller 不需要看见图片</li>
+<li>过滤、分组、负载均衡只需小字段：reward、轨迹长度、group id</li>
+<li>重张量只有训练 rank 真正前向时才需要 → 原则：重数据留在生产地，controller 只拿引用</li>
+<li>Molt 的机制：offload / reload</li>
+<li>Experience 增加 offload()/reload()；重字段经 ray.put 进 Ray 对象存储后从对象中清空，只留一个 heavy_ref</li>
+<li>controller 收轻量 Experience（轻字段＋heavy_ref）照常过滤调度；样本分到某训练 rank 后，该 rank 调 reload() 按引用取回重数据</li>
+<li>数据通路从「生产→controller→消费」变为生产直达消费，controller 只传句柄</li>
+<li>为什么对 OSWorld 有用与代价</li>
+<li>不减少图片数量，改变的是放置：重数据分散在各 rollout 节点的对象存储里，系统上限从单机内存变为集群总内存与网络</li>
+<li>提醒一：节点内是 Ray 共享内存对象存储，跨节点仍要传数据，并非全局共享内存</li>
+<li>提醒二：heavy_ref 只是运行时引用、非持久化数据库；runner 重启或热恢复时未消费样本需额外的落盘与恢复处理</li>
+<li>结论</li>
+<li>瓶颈既不在模型也不在环境，而在一条看起来很自然的数据通路</li>
+<li>扩展有时不是加机器，而是别让所有数据先过同一台机器</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[OSWorld rollout扩展 batch 128到1024] --&gt; B[旧通路 完整Experience经controller中转]
+B --&gt; C[controller变图片仓库 CPU内存先爆]
+C --&gt; D[否掉三条路 退batch 改数据 建存储服务]
+D --&gt; E[关键问题 controller其实只需轻字段]
+E --&gt; F[offload 重字段进Ray对象存储 只留heavy_ref]
+F --&gt; G[controller收轻量Experience 过滤与调度]
+G --&gt; H[训练rank消费时reload按引用取回]
+H --&gt; I[上限从单机内存变为集群总内存与网络]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-26</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

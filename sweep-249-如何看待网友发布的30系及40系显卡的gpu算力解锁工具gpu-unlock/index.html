@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待网友发布的30系及40系显卡的GPU算力解锁工具gpu-unlock？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何看待网友发布的30系及40系显卡的GPU算力解锁工具gpu-unlock？</h1>
+<p class="sub">知乎热榜问题（问题页经登录浏览器通读核验：58 人关注、43,638 次浏览、16 个回答）。开源工具 gpu-unlock（Zagitta）及 Ada 分叉声称解除英伟达对消费卡 Tensor Core 的指令发射限速：3090 Ti 的 BF16 吞吐 87.5→157.4 TFLOPS（+80%），4090 的 FP16/BF16 发射率约翻倍。但高赞回答给出了关键限定：只解锁 FP16/BF16 MMA + FP32 累加这一条路径，而现代 AI 负载多已转 int8/fp8/int4；LLM 推理瓶颈在显存带宽不在算力。机制据答主拆解涉及安全启动固件漏洞与驱动加载前注入，断电即恢复、漏洞大概率被修补。值得看的是限速本身：同芯片消费卡半速、专业卡全速的市场分割样本。</p>
+<p class="meta">2026-10-27</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2097550220158571365">https://www.zhihu.com/question/2097550220158571365</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据问题页通读与公开报道交叉核验整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎热榜问题；问题页核验：58 人关注、43,638 次浏览、16 个回答、好问题 1</li>
+<li>工具：GitHub 项目 gpu-unlock（作者 Zagitta，30 系）与分叉 gpu-unlock-ada（2026-10-24，40 系，当时仅支持 4090、4070 Ti Super、4060 Ti 16GB 等部分型号）</li>
+<li>被锁的是什么：一条指令路径的发射率</li>
+<li>FP16/BF16 矩阵乘 + FP32 累加在 GeForce 上被限为半速，同核心的 Quadro/专业卡全速</li>
+<li>高赞答主 Edison Chen 指出：被解锁的只有这一条 MMA 路径；他原以为 50 系已全速，自测后改口称 50 系同样有限速迹象</li>
+<li>工具原理（据高赞答主拆解）</li>
+<li>传承自 CMP 矿卡破解：工具编译为 Linux 内核模块、放入 initramfs，在官方驱动加载之前运行</li>
+<li>借 GPU 安全启动固件漏洞取得受保护寄存器的写权限，改掉速率寄存器，再触发 PCIe 复位；随后正常驱动以为显卡已正常初始化而加载</li>
+<li>不改驱动、不刷 vBIOS；断电后恢复原状；推论是固件漏洞大概率会被后续驱动/固件修补</li>
+<li>实测数字（问题页与媒体一致）</li>
+<li>RTX 4090：FP16→FP32 165.6→331.6 TFLOPS，BF16→FP32 165.5→330.6 TFLOPS，约翻倍</li>
+<li>RTX 3090 Ti（450W，稠密 8192³ GEMM、FP32 累加、五次采样中位数）：BF16 87.5→157.4（+80%），TF32 约 +94%</li>
+<li>真实负载的落差（高赞回答的共识）</li>
+<li>LLM 推理的 Attention 是显存带宽瓶颈，不是算力瓶颈，翻倍数字只是纯矩阵/指令基准</li>
+<li>llama.cpp / LM Studio 常用 q4 量化、根本不用 FP16，无收益；vLLM 能用但其用户很少用游戏卡</li>
+<li>现代负载优先 int8/fp8/int4/fp4，FP16/BF16/TF32 的适用面在收窄；少数真受益场景：老式 BF16 图像生成（如 Flux/SDXL）可能 +50–60%，改显存的 FP16 视频模型（如 Wan2.2 5B）较挑模型</li>
+<li>模型越大、越带宽受限，增益越缩水</li>
+<li>风险与判读</li>
+<li>Windows 路径每次冷启动都要重载模块 + 复位 PCIe，单卡黑屏风险高，答主明确劝谨慎</li>
+<li>支持范围限于具体型号与平台组合，属实验性工具；收益只落在计算受限、且恰好走 FP16/BF16+FP32 累加的负载上</li>
+<li>真正的看点：消费卡算力被寄存器限速这一事实本身，是观察英伟达产品分层与定价权的底层样本</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[现象 开源工具声称消费卡算力翻倍] --&gt; B[被锁对象 Tensor Core指令发射率]
+B --&gt; C[FP16 BF16乘法加FP32累加 GeForce半速 专业卡全速]
+C --&gt; D[原理 驱动绑定前改写speed selector寄存器加FLR复位]
+D --&gt; E[实测 3090Ti BF16加80% 4090发射率翻倍]
+E --&gt; F{真实负载验证}
+F --&gt;|稠密GEMM| G[增益约12到34%]
+F --&gt;|本地LLM解码| H[基本不变 瓶颈在显存带宽]
+G --&gt; I[落点 限速属市场分割 收益只落在计算受限负载]
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">GPU</span><span class="tag">AI Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-27</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

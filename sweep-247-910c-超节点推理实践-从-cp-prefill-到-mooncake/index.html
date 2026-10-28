@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>910C 超节点推理实践：从 CP Prefill 到 Mooncake</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>910C 超节点推理实践：从 CP Prefill 到 Mooncake</h1>
+<p class="sub">知乎推荐流首选（登录态核验为账号 971775；原文已经两份独立全文读数交叉核验，初稿误用的串稿版本已更正）。小红书基模 Infra 团队（作者署名「异构计算教父」）在华为计算与 Mooncake 社区 Meetup 上的实战整理：团队从零行 NPU 推理代码起步，在 CloudMatrix 384 超节点（384 颗 910C）上部署自研 Dots3 Note（280B 总参/16B 激活、DSA+SWA 混合注意力），目标同 SLO 下吞吐达 H800 的四分之一。核心链条：DSA 的逐 query Top-K 让 TP Prefill 失效、改用 CP16（单层算子链实测约 12.2 倍）；KV 随计算分片并做碎片治理（SDMA 带宽约 5.72 倍）；Mooncake Store 跨实例复用前缀；SWA checkpoint 启发式把前缀命中率从 47% 拉到 63%。注意：文中加速比均为算子级口径，非端到端，且未披露最终 TTFT/QPS。</p>
+<p class="meta">2026-10-27</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2098443602183693903">https://zhuanlan.zhihu.com/p/2098443602183693903</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据原文通读整理；已经两份独立全文读数交叉核验）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎推荐流专栏，作者署名「异构计算教父」（小红书基模 Infra 团队；作者主页自述与盘古大模型相关，但本文部署的不是盘古模型）；源自华为计算与 Mooncake 社区 Meetup 的技术分享，编辑于 2026-10-27 05:18（北京）；25 赞同、25 收藏、2 评论</li>
+<li>更正说明：本条初稿曾误用一份串稿读数（误作盘古 505B 等），已按两份一致的全文核验版重写；专家数原文未给出，勿臆补</li>
+<li>起点与阶段目标</li>
+<li>几个月前团队推理全在 8 卡 H800 服务器上，没有一行能在 NPU 上跑的推理代码</li>
+<li>目标（同 SLO、同等计算 Die 数）：平均输入 32K，TTFT &lt; 1.5s，ITL &lt; 15ms，910C 与 H800 吞吐比 1:4</li>
+<li>现状：已在多台 CM384 超节点稳定承载公司内外流量，单卡 QPS 比优于 1:4；但文中未披露最终端到端 TTFT/ITL/QPS 数字</li>
+<li>硬件：910C 与 CM384（表格口径）</li>
+<li>910C 双 Die：BF16 752 TFLOPS、HBM 128GB / 3.2 TB/s；对照 H800 SXM：989 TFLOPS、80GB / 3.35 TB/s</li>
+<li>CM384：48 节点、384 NPU + 192 CPU；HCCS 双平面、单向总带宽 392 GB/s（单平面 196）；SDMA 域内跨节点、RDMA 做 Scale-Out、VPC 控制面</li>
+<li>战略资产是互联：长上下文请求共享系统提示/工具定义/对话前缀，超节点内可跨实例共享前缀 KV、削减重复 Prefill</li>
+<li>模型：Dots3 Note（小红书自研）</li>
+<li>280B 总参、16B 激活，46 层 = 13 层 DSA + 33 层 SWA，MoE 结构（原文未给专家数）</li>
+<li>DSA：128 个 Q 头、KV 压缩维 512、Indexer 64 头选 Top-2048；SWA：64 头、窗口 512 token</li>
+<li>为什么用 CP Prefill 而不用 TP</li>
+<li>DSA 对每个 query 独立选 Top-K，不同 query 的 KV 集合不同，无法像 R1 时代那样把多 query 的分片头拼进矩阵乘 M 维</li>
+<li>TP16 时每 rank M=8、须补齐到 Cube 的 16 行基本块，MAC 利用率减半；且同一 KV 集合在 16 个 rank 重复加载（KV 访问量 16 倍）</li>
+<li>CP16 按 query token 分发、每 query 保留全部 128 头，M=128 无对齐浪费；Indexer 同步按 query 分片；实测（单层 DSA 算子链、16 rank）：32K 整链 115.23ms → 9.45ms（约 12.20 倍），16K Core Attention 43.49ms → 3.30ms（约 13.18 倍）——均为算子级、非端到端</li>
+<li>分布式 KV Cache 与碎片治理</li>
+<li>KV 随计算按 rank 分片：物理页 64 token、虚拟页 1024 token（16 rank 各一物理页），前缀命中长度按虚拟页对齐，存储成本降至 TP 副本式布局的 1/16</li>
+<li>分片后传输带宽一度掉到约 1/5：owner 页残留在 workspace 阻碍整批回收、产生碎片，PD 传输描述符暴增、由带宽受限变时延受限</li>
+<li>解法（OS 堆/栈类比）：workspace 栈式整批释放，owner 页堆式独立管理并迁出，整池 Buddy System 分配合并；32K 输入、16K 前缀命中时 HIXL SDMA 带宽 19.61 → 112.08 GB/s（约 5.72 倍）</li>
+<li>Mooncake Store 接入层</li>
+<li>本地 Radix Cache 容量有限、待复用前缀常在别的 Prefill 实例里：Mooncake Store 把全节点 Host DRAM 组织成共享池，key = 前缀哈希 + CP 分片，value 含 KV 与 Indexer Key</li>
+<li>分工：Store 管对象组织与发现，Transfer Engine 管跨节点搬运，与本地 CP Cache 边界清晰</li>
+<li>例：17,347 token 请求本地未命中、Store 命中前 16K，各 rank 取回自己的 KV 分片、All-gather 进 workspace 并补齐前缀末端 SWA 窗口，只需再 Prefill 963 token</li>
+<li>SWA checkpoint 启发式：补上最后一块命中率</li>
+<li>混合模型前缀命中须同时满足：Full KV 还在 + 前缀末端 SWA 窗口可用；但 SWA 按 LRU 随窗口滑动被逐出，常使贵价保留的 Full KV 白费</li>
+<li>启发式：某前缀被重复命中、被迫重建 SWA 窗口时，把重建状态保留到该请求结束（被动重算变主动投资下一次命中）；引 Marconi 为同类先行工作</li>
+<li>效果：前缀命中率 47% → 63%（相对 +34%）；该业务理论上限约 70%，63% 已约达上限的 90%</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[请求 平均输入32K] --&gt; B{本地 CP Radix Cache 命中}
+B --&gt;|命中| C[Gather owner页到请求workspace]
+B --&gt;|未命中| D{Mooncake Store 按前缀哈希加CP分片查}
+D --&gt;|远端命中| E[各rank经Transfer Engine取回KV分片 All-gather 只补算后缀]
+D --&gt;|无命中| F[CP16 全量 Prefill]
+C --&gt; G[Prefill补算与后续Decode]
+E --&gt; G
+F --&gt; G
+G --&gt; H[workspace栈式整批释放 owner页Buddy管理保留]
+H --&gt; I[Put 发布可复用前缀到 Mooncake Store]
+H --&gt; J[SWA窗口缺失时重建并checkpoint保留 命中率47到63]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-27</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

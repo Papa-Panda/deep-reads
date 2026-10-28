@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何评价 OpenAI 公布调和分析四大猜想的证明？这套证明的突破在哪里？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何评价 OpenAI 公布调和分析四大猜想的证明？这套证明的突破在哪里？</h1>
+<p class="sub">知乎热榜问题（103 万热度；问题页已经登录浏览器通读：205 人关注、273,564 次浏览、30 个回答）。OpenAI 10 月 26 日公布论文《Local smoothing for the Euclidean wave equation》，声称在所有空间维数下证明局部平滑，并由此推出 Sogge 局部平滑、Bochner–Riesz、Stein 傅里叶限制与 Kakeya 四大猜想。高赞回答（Cristy，基础数学博士，356 赞同）的拆解最值得看：59 页预印本、主证明仅约 20 页，完全绕开沿用三十多年的波包分解与多尺度归纳，改用 PDE 积分恒等式构造——虚时间延拓、四元数 Monge–Ampère 方程给出临界指数、路径积分修正消去符号不定项、再用极大值原理收尾。另一高赞回答给出严格蕴含链：局部平滑 ⇒ Bochner–Riesz ⇒ 限制 ⇒ Kakeya，所以一处突破等于四处落定。波动方程与色散正是他的博士老本行，这条是本轮质量最高的一条。</p>
+<p class="meta">2026-10-28</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2098323920147559381">https://www.zhihu.com/question/2098323920147559381</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据问题页通读整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎热榜问题，103 万热度；问题页核验：205 人关注、273,564 次浏览、30 个回答</li>
+<li>源头：OpenAI 2026-10-26 公布论文《Local smoothing for the Euclidean wave equation》，附 Lean 形式化证明入口</li>
+<li>要证明什么：一条蕴含链的源头</li>
+<li>局部平滑（所有维数 n≥2）⇒ Bochner–Riesz 猜想 ⇒ Stein 傅里叶限制猜想 ⇒ Kakeya（挂谷）猜想</li>
+<li>历史坐标：1917 挂谷针问题、1971 Fefferman 球乘子反例、1991 Sogge 提出局部平滑猜想、2025 王虹与 Zahl 的三维 Kakeya 百页证明</li>
+<li>突破点（Cristy，356 赞同）</li>
+<li>体量反差：59 页预印本、主证明约 20 页，对比旧路线动辄百页</li>
+<li>方法换轨：绕开三十多年的波包分解＋多尺度归纳，改走 PDE 积分恒等式</li>
+<li>四步机制：虚时间延拓出无散度波流张量；秩一背景的四元数 Monge–Ampère 方程产出临界指数；路径积分修正消去符号不定的行列式项；Laplace 极大值原理比较收尾</li>
+<li>判读</li>
+<li>走地鸡（268 赞同）：蕴含链严格成立，源头一通、四猜想同落</li>
+<li>仍属公布阶段：证明正确性待同行检验，热榜回答的机制拆解是理解入口而非定论</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[OpenAI公布论文 波动方程局部平滑] --&gt; B[新方法 PDE积分恒等式]
+B --&gt; C[虚时间延拓 无散度波流张量]
+C --&gt; D[四元数Monge-Ampere方程 给出临界指数]
+D --&gt; E[路径积分修正 消去符号不定项]
+E --&gt; F[极大值原理比较 收尾证明]
+F --&gt; G[局部平滑成立 任意维数]
+G --&gt; H[Bochner-Riesz猜想]
+H --&gt; I[Stein傅里叶限制猜想]
+I --&gt; J[Kakeya挂谷猜想]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">调和分析</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-28</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

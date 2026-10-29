@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RTX Spark性能实测：NVIDIA第一款PC SoC表现如何</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>RTX Spark性能实测：NVIDIA第一款PC SoC表现如何</h1>
+<p class="sub">B站推荐流视频（本轮 B站为登出态：空间页落到 passport 二维码登录页确认真登出，登出通用推荐流扫 70+ 条；此条已经公开接口核验：UP主极客湾Geekerwan，2026-10-28 发布，时长 17 分 00 秒、播放 196,302、点赞 10,921、收藏 2,027、评论 1,230。正片未逐段核验，以下据官方简介整理）。RTX Spark 是 NVIDIA 首次入局 PC SoC 的产品，官方定位直接瞄准本地 Agent 用户：极客湾实测它的实际性能强度，以及在 Windows on ARM 上的表现。对他判断本地 Agent 硬件与 ARM PC 生态的成熟度，是一手实测材料。</p>
+<p class="meta">2026-10-28</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1ikxE62EVP">https://www.bilibili.com/video/BV1ikxE62EVP</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据官方简介与公开接口数据整理；正片未逐段核验）</h2>
+<ul>
+<li>条目信息</li>
+<li>B站登出推荐流视频，UP主极客湾Geekerwan，2026-10-28 发布；本轮 B站登出态下推荐流中质量最高的 GPU/芯片深度内容</li>
+<li>公开数据：时长 17 分 00 秒，播放 196,302、点赞 10,921、收藏 2,027、投币 1,419、评论 1,230</li>
+<li>产品定位</li>
+<li>RTX Spark 是 NVIDIA 第一款 PC SoC，首次从独立显卡进入整机 SoC 领域</li>
+<li>官方瞄准的使用人群是本地 Agent 用户——本地跑 Agent 对算力、内存与能效的要求，正是这类 SoC 的卖点</li>
+<li>实测要回答的两个问题</li>
+<li>性能到底够不够强：与既有 x86 与 ARM PC 芯片相比处于什么位置</li>
+<li>Windows on ARM 上的实际表现：兼容性与生态成熟度如何</li>
+<li>值得他看的点</li>
+<li>NVIDIA 向 PC SoC 与本地 Agent 场景的扩张，是 GPU 竞争格局的一步新棋</li>
+<li>极客湾的同场实测口径（此前其旗舰手机芯片横评已入清单），便于横向对齐能效坐标</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[NVIDIA首款PC SoC RTX Spark] --&gt; B[定位 本地Agent用户]
+B --&gt; C[实测一 性能强度到底够不够]
+B --&gt; D[实测二 Windows on ARM表现与兼容性]
+C --&gt; E[横向坐标 与x86及ARM PC芯片对比]
+D --&gt; E
+E --&gt; F[判断 本地Agent硬件与ARM PC生态成熟度]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">GPU</span><span class="tag">芯片</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-28</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

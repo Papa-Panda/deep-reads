@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>当 KV Cache 步入 KB 级 IO 粒度 时代，我们用纯用户态重写了 GDS：uGDS 开源，吞吐提升 2.63 倍</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>当 KV Cache 步入 KB 级 IO 粒度 时代，我们用纯用户态重写了 GDS：uGDS 开源，吞吐提升 2.63 倍</h1>
+<p class="sub">讲推理瓶颈如何从算力转向 KV Cache 在存储层之间的搬运：单 token KV 已缩到 KB 级，历史缓存值得放进 NVMe，但现有 GPU 到 SSD 路径对细粒度访问不友好。作者给出纯用户态方案 uGDS，并附 arXiv 报告与开源链接。值得他看的是这条与推理缓存、LMCache 落地直接相关的存储层分析；注意 2.63 倍是异步/批量、计算掩盖传输场景下的峰值，并非所有传输都快这么多。</p>
+<p class="meta">2026-10-30</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2097033202187637385">https://zhuanlan.zhihu.com/p/2097033202187637385</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>瓶颈转移</li>
+<li>推理不再只受算力约束，显存与存储层之间的数据搬运成为关键</li>
+<li>单 token KV 从数百 KB 缩到 KB 级，长上下文的历史缓存变得碎片化</li>
+<li>为什么放 SSD</li>
+<li>会话级缓存规模可达 TB/PB，NVMe 成本上更适合做持久缓存层</li>
+<li>亚 GB 级历史缓存理论上可在 1 秒内量级载入</li>
+<li>现有路径的短板</li>
+<li>GDS 走文件系统与内核切换，细粒度读写带宽低、延迟高</li>
+<li>旧的用户态方案难维护，GPU 发起式方案则占用宝贵的 GPU 算力</li>
+<li>uGDS 的做法</li>
+<li>控制面放用户态：NVMe 命令组装、doorbell 与完成队列轮询由 CPU 做</li>
+<li>内核驱动只负责初始化，数据直通 GPU 显存与 SSD，不经过主机内存</li>
+<li>三条路径分工：冷启动、热控制与数据路径分离</li>
+<li>队列按功能切分，同步与批量互不干扰；支持同步轮询、批量、GPU 流异步与中断四种模式</li>
+<li>效果与边界</li>
+<li>小 IO 场景优于 GDS，大 IO 下两者趋近带宽上限</li>
+<li>异步/批量端到端场景下 TTFT 降至约 37%，KV 吞吐峰值约 2.63 倍</li>
+<li>代价是目前需独占裸盘，适合自带块分配池的缓存系统</li>
+<li>未来方向</li>
+<li>SSD 既做高速交换空间，也做持久缓存</li>
+<li>更高层 AI 存储语义、条带化 SSD 与远程分布式存储</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[推理瓶颈转向存储搬运] --&gt; B[单 token KV 缩到 KB 级]
+B --&gt; C[历史缓存碎片化且规模大]
+C --&gt; D[现有路径 细粒度读写不友好]
+D --&gt; E[uGDS 控制面放用户态]
+E --&gt; F[GPU 与 SSD 直通  bypass 主机内存]
+F --&gt; G[小 IO 占优 大 IO 趋近上限]
+G --&gt; H[端到端峰值 吞吐约 2.63 倍]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-30</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

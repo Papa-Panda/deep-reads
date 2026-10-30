@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>【10-08】agentic 方式合成 / 清洗训练数据 (SFT・mid-training・RL)</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>【10-08】agentic 方式合成 / 清洗训练数据 (SFT・mid-training・RL)</h1>
+<p class="sub">知乎推荐流专栏（登录浏览器通读核验：作者 Lei Tian，2026-10-07 发布，49 赞同、77 收藏）。速读 7 篇 agentic 训练数据论文：SPADE 用提示遗憾差驱动环境自生成、Agent Error Dataset 把 5 万条失败诊断变成主资产、WorkForge 用真实工作区做可验证环境、ToolLoop 与 Data Turnstile 用闭环回炉代替生成再过滤、ToolRACER 补失败场景、Spotify 跑通合成数据加自改进的线上闭环。值得他看的是这条统一判断：Agent 后训练的数据管线本身已变成可验证、可回炉的闭环系统，失败轨迹与环境真实性是两个最实在的杠杆。</p>
+<p class="meta">2026-10-29 · 作者：Lei Tian</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2091488830314526515">https://zhuanlan.zhihu.com/p/2091488830314526515</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据登录浏览器通读整理）</h2>
+<ul>
+<li>条目信息</li>
+<li>知乎专栏「Agentic视角下的数据链路」速读，作者 Lei Tian（北京邮电大学电子科学与技术博士），2026-10-07 发布，49 赞同、77 收藏</li>
+<li>覆盖 7 篇论文，每篇分 Highlight 与实验 finding 两小节，文末有总结</li>
+<li>趋势总括：单轮生成再过滤已经过时</li>
+<li>主流变成多阶段生成-验证-精修或多角色闭环，因为生成成本高、只过滤不划算</li>
+<li>RL 侧出现真正可用的自博弈环境自生成方法</li>
+<li>产业界同期上线合成数据加自改进闭环的案例</li>
+<li>失败样本首次被规模化开采成主数据资产</li>
+<li>SPADE：自博弈自适应合成可执行环境</li>
+<li>同一 LLM 分饰环境设计师与推理 Agent：设计师生成带 reset/step 接口的可执行环境代码</li>
+<li>设计师奖励不是通过率，而是 Agent 有提示与无提示的奖励差（遗憾 gap），把环境钉在能力边界上</li>
+<li>设计师须以预训练语料文档为锚，否则会自嗨式出题；另有环境记忆做增量演化</li>
+<li>效果：Qwen3-30B-A3B 八项 held-out 均值 50.2→58.3，ACEBench-Agent 62.0→75.9，BFCL v4 多轮 49.0→54.7；收益随规模增大</li>
+<li>Agent Error Dataset：五万条错误诊断对</li>
+<li>首次把失败样本当主资产：错误-诊断配对用于失败分析与错误感知后训练</li>
+<li>诊断 SFT 后 Qwen3-8B 与教师标注的精确步骤一致率 47.19%→63.56%，高于文中列出的前沿模型参考值</li>
+<li>定位研究：带诊断的续写 31.3%，高于通用反思 26.0% 与纯重跑 18.6%</li>
+<li>警示：只做动作级事后修复训练在不同环境符号相反（WebShop-lite +6.67pp，TextQuest -8.33pp），不是免费午餐</li>
+<li>WorkForge：长程工作 Agent 的可验证环境规模化</li>
+<li>瓶颈不在模型而在环境：真实工作区与真实工作流，LLM 合成的工作区与真实差距达数量级</li>
+<li>直接从真实资源建工作区，从真实专家工作流派生任务、解法与程序加语义双验证器，产出 1.67 万个可验证环境、40 个专业领域、60 种文件类型</li>
+<li>真实工作区文件数 5.4 倍、平均大小约 13 倍；效果：Qwen3.5-35B-A3B GDPval 45.5→73.6，27B 稠密版 GDPval 82.4，超过约 15 倍参数的 397B 基座</li>
+<li>ToolLoop：工具调用数据的闭环合成</li>
+<li>针对生成再过滤三缺陷：单次采样难挑最优工具、静态过滤救不回错误、全程无反馈信号</li>
+<li>5281 个 API 聚成 26 组，逆向生成查询、正向生成调用，每阶段配验证器，出错带原因回炉而非整条丢弃</li>
+<li>效果：11K 样本的 ToolLoop-4B 在 BFCL 上 82.14%→86.40%，超过 60K 样本的 APIGen 与 55K 样本的 ToolMind</li>
+<li>最反直觉消融：去掉反馈的版本跌到 79.97%，低于未训练基座——无约束原始合成数据会污染模型</li>
+<li>Data Turnstile：小模型工具调用数据的角色 DAG</li>
+<li>同一痛点在小模型侧：直接用 xLAM/Glaive 等开放数据 SFT 会把 0.6B 的 BFCL 打到 55.1%，低于基座</li>
+<li>把多轮工具交互拆成角色 DAG（查询、推理、调用、执行结果、回复各为节点），各角色独立生成、独立验证、带错反馈重试，避免单次合成的级联错误</li>
+<li>效果：0.6B BFCL 75.9%，τ²-bench 电信域 pass^1 从 3.5 升至 23.0；但多轮任务关掉 CoT 会塌 11–22pp，CoT 在多轮里不可省</li>
+<li>ToolRACER：失败场景三分法</li>
+<li>现有评测偏重合作成功轨迹，忽略不合作用户、含糊请求、不可满足意图等真实失败场景</li>
+<li>三模拟器生成 Happy、Unhappy、Impossible 三类轨迹，失败轨迹回炉重生成，救回 65.4% 的初始失败轨迹，终得 5.6K 多轮对话、约 66% 为易失败场景</li>
+<li>效果与干扰：τ²-bench 提升且与 APIGen-MT 可叠加；但只训 Impossible 虽把 BFCL 无关检测推到 95.50%，却拖累 τ²-bench 零售分——不同失败类型会互相干扰，不能简单拼接</li>
+<li>Spotify：产业界端到端案例</li>
+<li>多轮对话推荐 Agent 冷启动：无真实用户交互，先用合成对话做评测替身，再用自改进闭环分流可靠性失败与能力缺口</li>
+<li>合成对话四维人工质检均 ≥90%，自改进后 pass@1 相对已手工优化过的提示再 +8%</li>
+<li>两周约 1500 万用户 A/B：收听时长 +14%，WAU +5%，跳过率 -5%；但 7 轮对话相对 2 轮 pass@1 掉 11.9pp，长对话仍难</li>
+<li>对他的启示</li>
+<li>做 Agent 后训练时，数据管线本身要当成可验证、可回炉的闭环系统来设计，而不是先大量生成再筛</li>
+<li>失败轨迹、真实工作区、环境自适应三条线，分别对应数据资产、环境真实性、训练课程三个杠杆</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[旧范式 单轮生成再过滤] --&gt; B[问题 生成成本高 过滤只能删错不能救错]
+B --&gt; C[新范式 生成-验证-精修闭环]
+C --&gt; D[SPADE 环境自生成]
+D --&gt; E[设计师奖励 = 有提示与无提示的遗憾差]
+E --&gt; F[环境卡在能力边界上]
+C --&gt; G[失败样本变主资产]
+G --&gt; H[AED 五万条错误诊断对]
+C --&gt; I[真实性规模化]
+I --&gt; J[WorkForge 真实工作区与双验证器]
+C --&gt; K[工具数据闭环]
+K --&gt; L[ToolLoop 分阶段验证回炉]
+K --&gt; M[Turnstile 角色 DAG 独立生成验证]
+K --&gt; N[ToolRACER 失败场景三分法]
+F --&gt; O[Agent RL 从静态环境走向自适应环境]
+H --&gt; O
+J --&gt; O
+L --&gt; O</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-29</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面向 Agent 时代的 「AI Infra」 到底该怎么做？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>面向 Agent 时代的 「AI Infra」 到底该怎么做？</h1>
+<p class="sub">知乎推荐流问答，作者卢冕为范式智能 AI Infra 负责人（HKUST 博士，团队在做大模型推理基础设施开源项目 ModelSphere）。他谈 Agent 时代底层 Infra 必须变的三个方向：负载越来越动态，静态配额与固定规则不再够用；Agent 长上下文、多轮调用使推理服务稳定性更关键，中断后应能续跑而非重算；模型与硬件迭代太快，性能调优应交给持续自动化的 Tuning Agent 闭环。值得他看的是这条来自一线推理 Infra 负责人的实践判断：长期稳定高效的运行比峰值跑分更重要。</p>
+<p class="meta">2026-10-30</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2098001185860843018/answer/2099528341158097739">https://www.zhihu.com/question/2098001185860843018/answer/2099528341158097739</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据浏览器通读整理，概括转述）</h2>
+<ul>
+<li>引子</li>
+<li>Agent 产品（编程、操作电脑、自主任务）普及后，底层 AI Infra 要跟着变</li>
+<li>作者背景：范式智能 AI Infra 负责人，团队在做 ModelSphere 推理基础设施</li>
+<li>一、负载越来越动态</li>
+<li>Agent 请求模式、上下文长度、token 量、时延需求差异大，同一 Agent 的实时负载也在变</li>
+<li>固定规则的资源管理与固定 RPM/TPM 限流不再贴合</li>
+<li>方向：按 TTFT、生成速度等实时服务质量信号调并发，按真实负载与服务质量动态扩缩 GPU</li>
+<li>二、推理服务稳定性更关键</li>
+<li>Agent 长上下文、多轮调用、长生成，中途失败会浪费昂贵重算并破坏体验</li>
+<li>方向：不追求绝对不出错的引擎，而是中断后迁移到健康实例续跑</li>
+<li>三、性能调优要自动化、持续化</li>
+<li>新模型、新 GPU、新推理框架来得太快，针对某一负载调好的配置未必一直最优</li>
+<li>方向：Tuning Agent 闭环——分析真实业务负载、生成测试负载、搜索配置组合、评估吞吐/时延/资源占用、验证后上线</li>
+<li>总结</li>
+<li>最重要的三个方向：动态资源管理、更可靠的推理服务、少人工干预的持续性能优化</li>
+<li>生产环境里长期稳定高效运行比峰值性能更重要</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Agent 时代 Infra 要变] --&gt; B[负载动态化]
+B --&gt; C[按实时服务质量调并发与扩缩]
+A --&gt; D[长任务稳定性更关键]
+D --&gt; E[中断后迁移续跑 不重算]
+A --&gt; F[调优跟不上迭代速度]
+F --&gt; G[Tuning Agent 持续自动化闭环]
+C --&gt; H[长期稳定高效运行重于峰值跑分]
+E --&gt; H
+G --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-30</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>理解 DeepInfer（二）：并行策略与负载均衡</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>理解 DeepInfer（二）：并行策略与负载均衡</h1>
+<p class="sub">知乎推荐流专栏（作者 mingming，AI-HPC 专栏，DeepInfer 理解系列第二篇，全文已通读）。中心论点：并行决定等待出现在哪里，负载均衡决定等待能否被消掉。文章拆解 DeepSeek 开源推理框架 DeepInfer 的并行与均衡：注意力按请求做数据并行、MoE 按专家做专家并行；decode 用 Wide-EP 开到 64～128 卡而 prefill 只用小规模并行；EPLB 靠重排加副本压峰值负载；DPLB 靠请求落点与 prefill 切块对齐注意力耗时；末节讲视觉编码按 patch 数估负载。值得他看的是这条把推理 infra 的等待结构讲透的分析：两类等待（注意力后等专家分发、专家后等结果汇聚）要由两套均衡机制分别处理。</p>
+<p class="meta">2026-10-30</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2098821657376845972">https://zhuanlan.zhihu.com/p/2098821657376845972</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据全文通读整理，概括转述）</h2>
+<ul>
+<li>中心论点</li>
+<li>并行决定等待出现在哪里，负载均衡决定等待能否被消掉</li>
+<li>同步推进的卡组里，最慢的一张卡决定整组速度</li>
+<li>一、多卡并行：注意力按请求分，MoE 按专家分</li>
+<li>注意力用请求级数据并行：每张卡只存自己请求的 KV</li>
+<li>MoE 用专家并行：token 经路由送到持有对应专家的卡，算完加权汇聚</li>
+<li>不用头分片的原因：MLA 已把 KV 压成共享隐表示，头分片会重复存全量 KV</li>
+<li>每层 MoE 有两次跨卡交换，组内卡必须同步推进</li>
+<li>二、Wide-EP：decode 为什么开到 64～128 卡</li>
+<li>prefill 用小规模并行，decode 用 EP64～128 的超宽专家并行</li>
+<li>decode 步内 token 少、常受显存带宽约束，摊薄专家权重访问压力</li>
+<li>宽并行的收益随单卡请求数上升而收窄，因 KV 相关工作占比变大</li>
+<li>该部署不用 TP：切权重矩阵要 all-reduce，高负载下可能拖累吞吐</li>
+<li>三、EPLB：重排和副本各自解决什么</li>
+<li>目标是压单步峰值负载，不只是长期均值</li>
+<li>光重排不够：单个超热专家无论放哪都会超均值，必须靠副本分流</li>
+<li>在线 EPLB 五步：局部计数、轮询分流、贪心分配副本槽、大负载优先装进最空卡、权重迁移</li>
+<li>实测启示：重排是主收益，副本数要适度，过多反而增加权重访问成本</li>
+<li>四、DPLB：注意力阶段也会拖慢整组卡</li>
+<li>两类等待：注意力后等专家分发，专家后等结果汇聚</li>
+<li>最慢注意力卡往往不是最忙专家卡，移专家修不好注意力失衡</li>
+<li>因此要用请求落点让组内各卡注意力耗时尽量对齐</li>
+<li>五、prefill 与 decode 分别怎么均衡</li>
+<li>prefill 可调每步切块：按上下文长度分层、按算力配额拉取、按时间预算切块</li>
+<li>decode 的 KV 一旦落卡就跟随请求到结束，所以入组落点是决定性的</li>
+<li>decode 要同时看请求数与总 KV 长度，只看其一都会失衡</li>
+<li>六、DPLB 与 EPLB 怎么配合</li>
+<li>分工：DPLB 管注意力工作量，EPLB 管专家工作量；动作频率不同（每步 vs 每千/万步）</li>
+<li>计算分配上近似可分，但通信路径耦合，最终以端到端吞吐评判</li>
+<li>适用边界：无共享同步进程的独立实例是排队与容量路由问题，不适用这套组同步方案</li>
+<li>七、视觉编码：按 patch 数估计负载</li>
+<li>E/P/D 分离下图像先过视觉编码服务再进 prefill</li>
+<li>路由两级：机器间随机选，机内选待处理 patch 数最少的卡</li>
+<li>patch 数比图片张数更贴近真实工作量，但仍是受缩放、裁剪影响的估计</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[中心论点 并行定等待位置 均衡消等待] --&gt; B[注意力 请求级数据并行]
+A --&gt; C[MoE 专家并行]
+B --&gt; D[等待一 注意力后等专家分发]
+C --&gt; E[等待二 专家后等结果汇聚]
+D --&gt; F[DPLB 请求落点与切块对齐注意力耗时]
+E --&gt; G[EPLB 重排加副本压专家峰值负载]
+C --&gt; H[Wide-EP decode 宽并行摊薄权重访问]
+F --&gt; I[落点 两套机制分工 端到端吞吐评判]
+G --&gt; I
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-30</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

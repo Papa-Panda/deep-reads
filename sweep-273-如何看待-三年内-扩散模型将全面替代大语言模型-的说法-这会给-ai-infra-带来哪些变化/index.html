@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>如何看待「三年内，扩散模型将全面替代大语言模型」的说法？这会给 AI Infra 带来哪些变化？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎热榜</div>
+<h1>如何看待「三年内，扩散模型将全面替代大语言模型」的说法？这会给 AI Infra 带来哪些变化？</h1>
+<p class="sub">讨论扩散语言模型能否在三年内替代自回归 LLM，重点落在给 AI Infra 带来的变化：并行去噪与逐 token 生成的对比、KV Cache 与 PD 分离假设的失效、块大小调度与延迟定价问题。值得他看的是其中关于 Infra 的分析——把“速度快”拆成单用户延迟与云端吞吐两回事，并指出推理芯片重心可能从 HBM 带宽转向算力密度。</p>
+<p class="meta">2026-10-31</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/2098823323752690341">https://www.zhihu.com/question/2098823323752690341</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据浏览器通读该问题下高赞回答整理，概括转述）</h2>
+<ul>
+<li>断言：三年内扩散模型全面替代大语言模型？</li>
+<li>回答共识：全面替代难断言，共存与分工更可信</li>
+<li>一、扩散 LLM 的生成方式</li>
+<li>多位置并行预测掩码，而非逐 token 自回归</li>
+<li>代表模型：Dream-7B、LLaDA、DiffusionGemma、Mercury、Clover-35B-A3B</li>
+<li>二、支持替代的论据</li>
+<li>并行解码带来低延迟</li>
+<li>模板化、结构化与 Agent 工具调用类任务上表现强</li>
+<li>稠密模型上有 3.7–5 倍提速的说法</li>
+<li>三、反方</li>
+<li>训练更难，去噪步数多</li>
+<li>等算力下学习效率不如自回归</li>
+<li>大批量下输给自回归，更可能作为 speculative decoding 的草稿模型</li>
+<li>四、给 AI Infra 的核心变化</li>
+<li>速度声明主要是单用户延迟，不是云端吞吐：自回归解码受显存带宽约束、批量几乎免费；扩散去噪是整序列或块的算力约束，并发上来吞吐曲线先 flatten</li>
+<li>KV Cache 与 PagedAttention 假设失效：纯双向扩散下标准 KV Cache 不成立，Fast-dLLM 用块级近似 KV Cache</li>
+<li>PD 分离弱化：每步去噪都像 prefill</li>
+<li>块大小成为新调度参数：空闲时大块保延迟，高峰时小块保吞吐</li>
+<li>延迟更难预测：置信度提前结束使步数不定；按 token 计价变不公平</li>
+<li>五、落点</li>
+<li>端侧单用户场景可能先落地</li>
+<li>推理芯片重心或从 HBM 带宽转向算力密度</li>
+<li>框架可能把自回归看作块大小为 1 的特例</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[断言 三年内扩散全面替代LLM] --&gt; B[生成方式 并行去噪对逐token]
+B --&gt; C[支持 低延迟 结构化任务强]
+B --&gt; D[反方 训练难 大批量弱]
+C --&gt; E[Infra冲击 KV Cache失效 PD分离弱化]
+D --&gt; E
+E --&gt; F[调度新参数 块大小]
+F --&gt; G[延迟难预测 计价变难]
+E --&gt; H[芯片重心 带宽转向算力密度]
+F --&gt; I[判断 共存分工 草稿模型]
+G --&gt; I
+H --&gt; I</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">AI Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-31</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super-agent 设计探索：迈向更自主的 Agent 系统</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>Super-agent 设计探索：迈向更自主的 Agent 系统</h1>
+<p class="sub">DeepSeek 关于更自主 Agent 系统的设计探索：当单任务不再需要逐步督导，瓶颈从模型能力转向人的注意力与会话管理；由此提出持续在线、不绑定单次会话的 Super-agent，可跨渠道带上下文、多任务并行、感知环境并主动行动。值得他看的是它把 Agent 设计还原成系统工程问题：常驻协调层与并行执行层如何分工、事件如何驱动、计算与状态如何分离，以及一层独立的监控回路如何兜底。注：据浏览器通读该文整理，概括转述。</p>
+<p class="meta">2026-10-31</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2099987320443237060">https://zhuanlan.zhihu.com/p/2099987320443237060</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据浏览器通读该文整理，概括转述）</h2>
+<ul>
+<li>核心论点</li>
+<li>瓶颈转移：从模型能力转向人的注意力与会话管理</li>
+<li>Super-agent：持续在线、不绑定单次手动会话、跨渠道带上下文、多任务并行、主动感知环境</li>
+<li>定性：不是新理论，而是把成熟的系统工程思路用到 Agent 设计上</li>
+<li>一、起点问题：会话制的四处掣肘</li>
+<li>用户要在多个会话间切换，单会话会被长操作阻塞</li>
+<li>多任务上下文容易缠绕，本地 Agent 随设备离线而中断</li>
+<li>目标形态：持续、高效、主动、可持久</li>
+<li>二、双层架构：常驻协调与并行执行分开</li>
+<li>Router 层常驻：跨渠道连续性、全局协调与记忆</li>
+<li>Worker 会话隔离执行单任务，通过 Router 回报而不直接对用户回复</li>
+<li>连续性与吞吐量由此解耦；重负载下 Router 批量处理是扩缩机制</li>
+<li>三、事件驱动：不等用户打字，响应环境事件</li>
+<li>两级过滤：快而确定的规则先行，慢而语义的模型判断在后</li>
+<li>按订阅路由：同一线索的后续事件直达相关 Worker</li>
+<li>上下文组织：行内与溢出分流、凭 ID 与引用图链式回想</li>
+<li>推测行动：用户确认前先准备草稿或修复方案</li>
+<li>四、人机交互与部署分离</li>
+<li>全双工异步：长工具调用不阻塞新输入；按渠道调整输出密度</li>
+<li>计算无状态上云、会话状态另存、重型执行环境留在原地经轻量守护进程接入</li>
+<li>由此可换设备续跑、断网后恢复</li>
+<li>五、Watchdog 与实验、开放问题</li>
+<li>独立外部控制回路：定期消息驱动，监控 infra 故障与模型级失误（循环、目标漂移）</li>
+<li>初步实验：完成更快更稳，但缓存 token 成本更高，请求延迟随触发率与批量微升</li>
+<li>未解：单 Router 之上的扩缩与长期记忆、隐藏会话下的人为干预、跨 Agent 的上下文边界、安全与隐私</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[瓶颈转移 模型能力转向注意力与会话管理] --&gt; B[Super-agent 持续在线跨渠道多任务主动]
+B --&gt; C[双层架构 Router常驻协调 Worker隔离并行]
+C --&gt; D[事件驱动 过滤订阅路由上下文组织推测行动]
+D --&gt; E[全双工交互 长调用不阻塞新输入]
+E --&gt; F[部署分离 计算无状态 状态另存 环境原地接入]
+F --&gt; G[Watchdog 独立回路监控故障与目标漂移]
+G --&gt; H[落点 持续在场的协作者 人做高层决策与核验]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-10-31</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>逻辑折叠芯片，是怎么折叠的？麒麟韬定律芯片深度剖析</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>逻辑折叠芯片，是怎么折叠的？麒麟韬定律芯片深度剖析</h1>
+<p class="sub">谈三圈以麒麟 9050 Pro 为例，拆解逻辑折叠芯片如何把两颗 die 面对面翻转键合、缩短逻辑与存储之间的互连，并讨论散热与空间-时间-能耗的 trade-off。值得他看的是它把先进封装从堆叠讲到了逻辑本身的折叠，贴近 GPU/芯片底层兴趣。注：视频页无全文稿，大纲据页面介绍与采样字幕/画面整理，未读到原文细节。</p>
+<p class="meta">2026-11-02</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV17xsf6oEsF">https://www.bilibili.com/video/BV17xsf6oEsF</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（据视频页介绍与采样字幕/画面整理，非完整逐字稿）</h2>
+<ul>
+<li>开场三问</li>
+<li>逻辑折叠芯片里面长什么样、怎么折叠、会不会过热</li>
+<li>案例：麒麟 9050 Pro</li>
+<li>从堆叠到折叠</li>
+<li>堆叠是把多颗芯片叠在一起</li>
+<li>折叠是把 die 翻转、面对面键合，逻辑电路直接互连</li>
+<li>互连方式：铜柱/铜互连</li>
+<li>面积论证</li>
+<li>折叠后不扩大封装面积：示例中两颗 die 合计 241mm²，对照 141mm²</li>
+<li>同一 footprint内容纳更多逻辑</li>
+<li>互连论证</li>
+<li>线越长，RC 越大，延迟与功耗越高</li>
+<li>折叠缩短逻辑与存储之间的路径</li>
+<li>对照案例：AMD X3D / 3D 堆叠</li>
+<li>不只缓存可以堆叠，逻辑本身也可以</li>
+<li>堆叠的代价：热量被困住，需要双面散热路径</li>
+<li>可行性条件</li>
+<li>工艺、设计、应用场景三者共同决定</li>
+<li>成熟 7nm 级工艺下，面积翻倍带来的良率损失不是 binding 约束</li>
+<li>结论</li>
+<li>第一代折叠偏保守：折叠两颗较大的 die</li>
+<li>本质是设计范式：以空间与工艺换延迟与能耗，而非免费提速</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题 芯片里面怎么折叠 会不会过热] --&gt; B[折叠 两颗die面对面翻转键合]
+B --&gt; C[互连缩短 RC下降 延迟与功耗下降]
+B --&gt; D[面积不变 footprint内装更多逻辑]
+C --&gt; E[代价 热量被困 需双面散热]
+D --&gt; E
+E --&gt; F[权衡 空间时间能耗工艺互换]
+F --&gt; G[落点 新设计范式 不是免费提速]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">芯片</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-02</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

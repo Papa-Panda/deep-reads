@@ -59,6 +59,11 @@
 | sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-03 | 扫读 | [药片，集采与专利：一盒药的价格，究竟是谁说了算？](./sweep-288-药片-集采与专利-一盒药的价格-究竟是谁说了算/) | 从新药研发成本、仿制药为何也曾卖高价讲起，拆解专利、集采如何共同决定一盒药的价格，并追问药价降下来后新药的钱从哪里来。值 |
+| 2026-11-03 | 扫读 | [“推拉”之间：DeepGEMM、Mega MoE和DeepEP通信方案简析](./sweep-287-推拉-之间-deepgemm-mega-moe和deepep通信方案简析/) | 以 DeepSeek V4.1-Flash 的 MoE 专家并行为例，对照 DeepEP 与 DeepGEMM Mega |
+| 2026-11-02 | 扫读 | [当下 infra 的护城河还在吗？](./sweep-286-当下-infra-的护城河还在吗/) | 围绕 GPT-6 已能写出可用算子的前提，讨论 AI infra 的护城河是否还在：多位答主认为代码层面的算子与框架护城 |
+| 2026-11-02 | 扫读 | [【全网最全】DeepSeek Harness超详细教程！50分钟吃透DSH，让SuperAgent给你干活！](./sweep-285-全网最全-deepseek-harness超详细教程-50分钟吃透dsh-让superagent/) | 50 分钟的 DeepSeek Harness（DSH）超详细教程，讲从零上手 DSH 与 Agent SDK、让 Su |
+| 2026-11-02 | 扫读 | [登高望远所能看到的最远距离有多远？](./sweep-284-登高望远所能看到的最远距离有多远/) | 万物研究所的地理科普：站得越高，视野能伸多远？把地球曲率下的视线几何、大气折射与地形遮挡，落到全球可视域地图与超远距离拍 |
 | 2026-11-02 | 扫读 | [逻辑折叠芯片，是怎么折叠的？麒麟韬定律芯片深度剖析](./sweep-283-逻辑折叠芯片-是怎么折叠的-麒麟韬定律芯片深度剖析/) | 谈三圈以麒麟 9050 Pro 为例，拆解逻辑折叠芯片如何把两颗 die 面对面翻转键合、缩短逻辑与存储之间的互连，并讨 |
 | 2026-11-02 | 扫读 | [vLLM Agentic 推理｜面向 Agent 负载的推理优化](./sweep-282-vllm-agentic-推理-面向-agent-负载的推理优化/) | vLLM 维护者从 Agentic 工作负载出发，讲清多轮推理-工具调用循环如何改变推理瓶颈，并给出 prefill/d |
 | 2026-11-01 | 扫读 | [拥有无限Token的笔记本能干啥？](./sweep-281-拥有无限token的笔记本能干啥/) | 林亦LYi 用一台 128GB 统一内存的联想 YOGA Pro 15 RTX Spark，测试本地智能体与 AIGC  |

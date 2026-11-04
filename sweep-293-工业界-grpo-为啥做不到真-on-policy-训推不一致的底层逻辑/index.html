@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工业界 GRPO 为啥做不到真 on-policy？—— 训推不一致的底层逻辑</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>工业界 GRPO 为啥做不到真 on-policy？—— 训推不一致的底层逻辑</h1>
+<p class="sub">讲工业界 GRPO 做不到真正 on-policy 的原因：训练引擎与推理引擎即使权重相同也会算出不同的 logprob，MoE 路由放大了这种训推不一致，并给出 FP16、路由回放、GSPO 与一系列工程补丁等解法。值得他看的是它直击后训练 RL 的一个真实落地痛点——不是调参问题，而是 on-policy 假设本身在双引擎架构下就不成立。</p>
+<p class="meta">2026-11-04</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2024520001596454677">https://zhuanlan.zhihu.com/p/2024520001596454677</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>起点：一个面试追问</li>
+<li>采样策略与更新策略是否严格同一</li>
+<li>vLLM 采样 logprob 是否等于 FSDP 更新 logprob</li>
+<li>为什么工业界不把训推放进同一框架</li>
+<li>为什么必须双引擎</li>
+<li>训练引擎（Megatron/FSDP）：反向传播、大显存、参数同步、显存分片</li>
+<li>推理引擎（vLLM/SGLang）：高吞吐、低延迟、PagedAttention、动态批处理、KV Cache 管理</li>
+<li>两者硬件优化目标冲突，同一框架无法两头最优</li>
+<li>即使同一框架，generate 与训练前向在 mask 处理、KV Cache 使用上也不同</li>
+<li>训推不一致是什么</li>
+<li>同权重、同 token 序列，两引擎 logprob 仍不同</li>
+<li>用 K3 KL 量化训练策略与推理策略之差</li>
+<li>数值看着很小（1e-3 量级），却足以让训练实质上 off-policy</li>
+<li>为什么 MoE 更严重</li>
+<li>浮点非结合性与算子实现差异可能翻转 Top-K 路由</li>
+<li>路由一变，激活的参数完全不同，分布随之发散</li>
+<li>训练侧专家容量限制与负载均衡还会丢弃/重路由 token</li>
+<li>表现为 MoE GRPO 奖励在约 120 步附近突然崩塌，调学习率与 clip 修不好</li>
+<li>解法一：FP16 替代 BF16</li>
+<li>RL 微调阶段权重动态范围已基本固定，BF16 的范围冗余、精度不足</li>
+<li>FP16 尾数 10 位 vs BF16 尾数 7 位，精度约高 8 倍</li>
+<li>文中称可把训推不一致降低约 24 倍；仅 RL 阶段用 FP16，预训练仍用 BF16，需 loss scaling 防溢出</li>
+<li>解法二：路由回放 Routing Replay</li>
+<li>强制训练复现推理时路由决策，让两侧激活同一专家</li>
+<li>R2 回放训练引擎原 rollout 路由，主要解决策略陈旧带来的路由漂移</li>
+<li>R3 记录并回放推理引擎 rollout 路由，同时解决引擎差异与陈旧问题</li>
+<li>代价是隐式策略偏差：回放后的目标策略不再是原 pi_theta；离线程度大时 R3 表现更好</li>
+<li>解法三：GSPO，重要性比率从 token 级升到序列级</li>
+<li>GRPO 在 token 级做重要性采样，而奖励是序列级的，方差随长度累积</li>
+<li>GSPO 用序列级重要性比率加长度归一化，让优化单位与奖励单位对齐</li>
+<li>文中实验：Qwen3-30B-A3B-SFT 上 GSPO 在 120 步未崩塌，GSPO+R3 进一步提升</li>
+<li>兜底工程补丁（物理不一致消不掉时）</li>
+<li>TIS：截断 token 级概率比</li>
+<li>MIS：概率比超阈则剔除 token 或序列</li>
+<li>slime 的 Veto 机制：任一 token 有问题则丢弃整条序列</li>
+<li>自归一化/批归一化：强制批内平均权重为 1，抵消有效学习率抖动</li>
+<li>延伸方向</li>
+<li>训练侧：随机 token 选择 RTS、专家聚合 AoE、辅助负载均衡损失</li>
+<li>推理侧：专家剪枝、任务级路由、Matryoshka MoE、容量感知推理（文中称约 1.9 倍加速且精度几乎无损）</li>
+<li>提醒：文中评论区有人质疑 GSPO 的定位，认为它针对 off-policy 场景，未必解决非 MoE 的 on-policy 不一致</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[同一权重 双引擎训推] --&gt; B[推理引擎与训练引擎 logprob 不同]
+B --&gt; C{MoE 路由是否翻转}
+C --&gt;|否| D[小量不一致 仍近似 on-policy]
+C --&gt;|是| E[激活参数完全不同 分布发散]
+E --&gt; F[MoE GRPO 奖励约120步崩塌]
+F --&gt; G[FP16 提升精度 吸收舍入差]
+F --&gt; H[路由回放 R2/R3 强制同专家]
+F --&gt; I[GSPO 序列级重要性比率]
+G --&gt; J[兜底补丁 TIS/MIS/Veto/自归一化]
+H --&gt; J
+I --&gt; J
+J --&gt; K[落点 接受小间隙 换可运行可收敛的系统]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-04</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

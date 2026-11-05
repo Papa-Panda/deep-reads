@@ -59,6 +59,10 @@
 | sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-05 | 扫读 | [这张图，能让你看到人眼最大的Bug！](./sweep-298-这张图-能让你看到人眼最大的bug/) | 一支约 6 分钟的视觉科普短片，借一张图讲人眼的视觉盲点：为什么视野里有天然缺口、平时却注意不到。值得他看的是它把一个第 |
+| 2026-11-05 | 扫读 | [REINFORCE Zero：为什么内核对齐后，极简 IS 能让异步 RL 稳定训练 20,000 步？](./sweep-297-reinforce-zero-为什么内核对齐后-极简-is-能让异步-rl-稳定训练-20-00/) | 讲异步 LLM RL 为何不稳、又如何用内核对齐加最简单的 token 级重要性采样稳住 20,000 步：把对数比拆成 |
+| 2026-11-04 | 扫读 | [LLM 面试官笔记(1)：如何排查 GRPO 训练问题](./sweep-296-llm-面试官笔记-1-如何排查-grpo-训练问题/) | 讲 GRPO 训练出问题时怎么先分类再动手：区分策略坍缩与训练崩溃这两类表象相反、根因与修法都不同的故障，并给出四问信号 |
+| 2026-11-04 | 扫读 | [Trust Region in LLM RL: TRPO, DPPO and AReaL 数学原理](./sweep-295-trust-region-in-llm-rl-trpo-dppo-and-areal-数学原理/) | 从性能差引理出发，推导 LLM 有限时域下的信任域界，并对照 TRPO、PPO、DPPO 与 AReaL 在信任域中心、 |
 | 2026-11-04 | 扫读 | [大家好，这里是 DeepSeek Harness，正式入驻 B 站！](./sweep-294-大家好-这里是-deepseek-harness-正式入驻-b-站/) | DeepSeek Harness 官方账号的入驻短片，介绍 Harness 创造模式：通过对话把想法变成可直接用的插件， |
 | 2026-11-04 | 扫读 | [工业界 GRPO 为啥做不到真 on-policy？—— 训推不一致的底层逻辑](./sweep-293-工业界-grpo-为啥做不到真-on-policy-训推不一致的底层逻辑/) | 讲工业界 GRPO 做不到真正 on-policy 的原因：训练引擎与推理引擎即使权重相同也会算出不同的 logprob |
 | 2026-11-03 | 扫读 | [【漫士】AI时代，数学该何去何从？还能学吗？](./sweep-292-漫士-ai时代-数学该何去何从-还能学吗/) | 漫士沉思录（人工智能博士）讨论 AI 时代数学该何去何从、数学还能不能学：AI 冲击下数学学习与研究的价值如何重估。值得 |

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在研究编程Agent，Agent核心就几十行代码，那剩下的几万行到底在解决什么问题？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>在研究编程Agent，Agent核心就几十行代码，那剩下的几万行到底在解决什么问题？</h1>
+<p class="sub">编程 Agent 的核心循环只有几十行，但 OpenHands 等开源实现有数万行代码——三位高赞答主从行数审计、工程分类、失效模式三个角度汇合，讲清剩下的代码都在解决什么：沙箱安全、上下文管理、错误恢复、模型-工具协同训练。值得他看的是它把 Agent infra 的工程量从“几十行 demo”还原为“让概率系统在生产环境确定性运行”的可靠性系统，正对 Agent harness 这一优先方向。</p>
+<p class="meta">2026-11-05</p>
+</div>
+<div class="src">原文链接：<a href="https://www.zhihu.com/question/1994057559171167995">https://www.zhihu.com/question/1994057559171167995</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>提问：核心循环 vs 几万行代码</li>
+<li>Claude Code 逆向出的系统提示：uuid 线程、每次编辑快照、子 Agent 侧链</li>
+<li>追问：核心就几十行，剩下的几万行在解决什么问题</li>
+<li>回答一：行数审计（安小强，1272 赞）</li>
+<li>OpenHands 核心 Agent step() 仅 35 行，仓库约 8 万行 Python</li>
+<li>沙箱运行时 17400 行：Docker 生命周期、端口/卷/网络隔离、容器内 FastAPI 服务、1500 行 Windows 兼容层</li>
+<li>卡死检测 489 行：重复语法错误、同命令跑三次、IPython 报错循环、逐字重复的工具调用</li>
+<li>LLM 调用层 3282 行：980 行多模型格式转换、875 行 llm.py（视觉/缓存/计费/溢出）、108 行 429 重试</li>
+<li>结论：沙箱=安全，卡死检测=可靠，LLM 层=兼容；每行都是真实用户踩过的坑</li>
+<li>回答二：六块工程分类（笙囧同学，1247 赞）</li>
+<li>上下文管理与代码检索：AST 依赖图、embedding 语义搜索、文件摘要缓存；检索系统 alone 超核心循环 10 倍</li>
+<li>LLM 输出变可执行动作：畸形 JSON/XML 解析、十余种动作类型、模糊匹配编辑（Aider 最大模块）</li>
+<li>安全隔离：沙箱、白名单、文件权限、超时与资源限制、审计回滚</li>
+<li>错误恢复：重试、错误分类、循环检测、快照回滚、降级策略；错误路径代码远多于 happy path</li>
+<li>外部集成：多模型 API、git、IDE、测试框架</li>
+<li>隐性部分：历史压缩、成本控制、可观测性、配置系统、mock/录制回放测试</li>
+<li>结论：核心循环约占 2–3%，其余是让它在真实世界跑起来的工程</li>
+<li>回答三：失效模式与状态机（杞鋂，554 赞）</li>
+<li>极简核心真实存在：nanoagent 70 行、mini-swe-agent 100 行、46 行 Bash Codex</li>
+<li>两种失效：提前停工（500 文件任务 47 个后宣称完成）、无限循环（800+ 轮重读同一文件烧掉一周 token 预算）</li>
+<li>根因：LLM 是无状态概率机器，没有进度记忆</li>
+<li>修复：外部记忆（Claude Code TodoWrite/TodoRead）、模型-工具协同训练（system_reminder 部署-收集信号-再训练循环）、记忆/上下文系统（Rust/Tantivy 会话搜索）</li>
+<li>三家 CLI 对比：GPT-5-Codex 规划强但过度重构、Claude Code 执行忠实但 token  hungry、Gemini CLI 最快</li>
+<li>第四答补充：数据面 vs 控制面（旷野，210 赞）</li>
+<li>循环是数据面；权限、预算、超时、回滚、可观测性、评测是控制面</li>
+<li>可观测性是入场券，评测即 CI 才是护城河</li>
+<li>共识：循环是想法，剩下的 99% 是让概率系统确定、安全地跑在生产环境</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Agent 核心循环只有几十行] --&gt; B{剩下的几万行解决什么}
+B --&gt; C[沙箱与安全]
+B --&gt; D[上下文管理]
+B --&gt; E[错误恢复与自纠]
+B --&gt; F[模型-工具协同]
+C --&gt; G[Docker 沙箱隔离]
+C --&gt; H[命令白名单与权限]
+D --&gt; I[AST 依赖图 + 语义检索]
+D --&gt; J[上下文预算与压缩]
+E --&gt; K[卡死检测：重复命令/循环]
+E --&gt; L[快照回滚与降级]
+F --&gt; M[多模型格式转换]
+F --&gt; N[重试与限流]
+G --&gt; O[结论：核心循环是理想]
+H --&gt; O
+I --&gt; O
+K --&gt; O
+M --&gt; O
+O --&gt; P[几万行是让概率系统在生产中确定性运行]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-05</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

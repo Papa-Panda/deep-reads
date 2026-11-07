@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>论文解读：AI 就是编译器——让 LLM 直接写 PTX，绕开整个编译器后端</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>论文解读：AI 就是编译器——让 LLM 直接写 PTX，绕开整个编译器后端</h1>
+<p class="sub">讲论文 &quot;AI as a Compiler&quot;：LLM Agent（TAIC）直接把 Triton 内核翻译成 PTX，绕开整个编译器后端，在 L40S/H100/B200 上相对自调优 Triton 做到 0.83x–3.34x，FlashAttention 1.37x、BitDelta 3.34x；作者还用无 GPU 的 SASS 级复现验证了 wgmma n=64→256 等关键机制，并指出验证才是真正的瓶颈。值得他看的是它把 Agent infra、编译器后端与 GPU 指令级优化连成一条线，且批判性评估很克制——收益只集中在能重组计算与数据搬运的算子上。</p>
+<p class="meta">2026-11-06</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2089495666494011238">https://zhuanlan.zhihu.com/p/2089495666494011238</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>核心主张：AI lowering</li>
+<li>删掉整个编译器后端，让大模型把 Triton 内核直接译成 PTX</li>
+<li>性能不降，部分算子反超 Triton 自身编译器</li>
+<li>新范式设想：新芯片靠「生成 + 验证」快速带起来</li>
+<li>为什么选 Triton 到 PTX</li>
+<li>PyTorch 会混入图级优化，CUDA 暴露过多底层选择</li>
+<li>Triton 固定计算与接口，指令选择/线程映射/数据搬运/同步/调度全留给后端</li>
+<li>Triton→PTX 的距离，正好就是编译器后端的价值</li>
+<li>系统：TAIC 生成，TCENV 判定</li>
+<li>TAIC：LLM + 三项通用技能（读 NCU 指标、查 PTX ISA 文档、高层 GPU 优化原则）</li>
+<li>TCENV：抽象掉与 lowering 无关的配置，组装/启动/检查/画像</li>
+<li>正确性定义：固定契约（c, I, h），数值等价 ≈ε 而非逐位相等</li>
+<li>防奖励作弊：参考实现严格按官方教程最佳实践，并先在目标 GPU 上自调优</li>
+<li>迭代循环：诊断瓶颈 → 规划 → 子 Agent 并行出补丁 → 同契约评估 → 达标者成下一轮种子</li>
+<li>实验结果（GPT-6 Astra，PTX ISA 8.7，Triton 3.6.0，L40S/H100/B200）</li>
+<li>12 个常见核：0.83x–3.34x，收益极不均匀</li>
+<li>元素级/RMSNorm/RoPE 近 1.0x；卷积 2D 最稳定 1.17–2.23x</li>
+<li>GEMM FP16：H100 仅 0.83x（输）；GEMM FP8：H100 1.61x</li>
+<li>10 个已发表核：BitDelta 3.34x、FlashAttention 1.37x、FlashSinkhorn 1.55x</li>
+<li>成本：每次搜索约 $5–15 API 费，编译时间换成账单</li>
+<li>附录 A：最值钱的三处优化</li>
+<li>归约：用 Tensor Core 做行求和，替代 shuffle + 共享内存归约</li>
+<li>卷积：复用重叠 3×3 窗口输入，消除冗余 gather</li>
+<li>H100 FP8 GEMM：wgmma n=64→256，显式双缓冲 + 转置 stmatrix epilogue</li>
+<li>作者的 SASS 级复现（无 GPU，只用编译前端 + 汇编器）</li>
+<li>证实 Triton 的 wgmma n 等于分块 N，不探索指令 n 上限</li>
+<li>手写 PTX：m64n256k32 通过汇编并反汇编为真实 SASS，m64n512k32 失败</li>
+<li>Tensor Core 归约的精度代价：FP8 下最大相对误差约 3.3×10⁻³</li>
+<li>Blackwell TMEM 通路：tcgen05.ld/st 等指令真实存在，tcgen05.mma 六种写法全失败</li>
+<li>批判性评估</li>
+<li>打败的是 Triton，不是 CUDA/CUTLASS</li>
+<li>验证是真正瓶颈：可证明子集下 GEMM 1.03x→0.24x，Volta 可信基从 42k 增至 60k 行代码仍不完备</li>
+<li>精度代价未被当作权衡讨论；泛化证据有限；"AI 编译器"严格说并未取代 IR</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[传统编译器后端越来越贵] --&gt; B{AI lowering：LLM 直接写 PTX}
+B --&gt; C[TAIC 生成 Agent]
+B --&gt; D[TCENV 判定环境]
+C --&gt; E[读 NCU 指标 + 查 PTX ISA + 优化原则]
+D --&gt; F[随机差分测试：数值等价 ≈ε]
+D --&gt; G[可选符号验证 Volta]
+C --&gt; H[诊断瓶颈 → 规划优化 → 子 Agent 并行出补丁]
+H --&gt; I{通过组装/安全/正确性/性能门}
+I --&gt;|通过| J[成为下一轮种子，迭代至预算耗尽]
+I --&gt;|失败| H
+J --&gt; K[实验：12 常见核 0.83x–3.34x]
+K --&gt; L[收益只在能重组计算与数据搬运处]
+K --&gt; M[验证瓶颈：可证明子集下 GEMM 1.03x→0.24x]
+M --&gt; N[结论：验证，而非生成，是真正瓶颈]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">GPU编译</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-06</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -5,7 +5,10 @@
 | 日期 | 类型 | 标题 | 一句话 |
 |---|---|---|---|
 | sweep-98-待 | 深读 | [（待读）Agent CPU](./sweep-98-待读-agent-cpu/) |  |
+| sweep-96-万 | 深读 | [万字长文总结RL/on policy distillation的一些进展](./sweep-96-万字长文总结rl-on-policy-distillation的一些进展/) |  |
+| sweep-95-抄 | 深读 | [抄袭者如何把原创者熬成山寨？奥利奥：这事儿我熟](./sweep-95-抄袭者如何把原创者熬成山寨-奥利奥-这事儿我熟/) |  |
 | sweep-94-h | 深读 | [https://www.youtube.com/watch?si=fwNwPRcuvcL-41le&amp;v=JtomF4bGxHs&amp;feature=youtu.be](./sweep-94-https-www-youtube-com-watch-si-fwnwprcuvcl-41le/) |  |
+| sweep-92-漫 | 深读 | [【漫士】AI怎么让NS方程爆炸的？流体力学不存在了？](./sweep-92-漫士-ai怎么让ns方程爆炸的-流体力学不存在了/) |  |
 | sweep-9-知乎 | 深读 | [知乎回答 2052754000 - 抓取受限](./sweep-9-知乎回答-2052754000-抓取受限/) |  |
 | sweep-84-c | 深读 | [Context management](./sweep-84-context-management/) |  |
 | sweep-83-t | 深读 | [Tesla P100 硬核拆解：Pascal 架构如何凭 FP16+HBM+NVLink 突破性能天花板？](./sweep-83-tesla-p100-硬核拆解-pascal-架构如何凭-fp16-hbm-nvlink-突破性/) |  |
@@ -59,6 +62,11 @@
 | sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-07 | 扫读 | [「快手」echo：十万级长序列建模](./sweep-307-快手-echo-十万级长序列建模/) | 讲快手 ECHO 论文：用蒸馏教一个与候选无关的选择器，从 10 万条行为历史里挑出 Top-K 再精排，绕开检索式与压 |
+| 2026-11-06 | 扫读 | [Agentic RL 训练：它不是单一 RL 算法，而是一整套环境建模、学习信号、异步数据流、策略优化和基础设施的协同系统](./sweep-306-agentic-rl-训练-它不是单一-rl-算法-而是一整套环境建模-学习信号-异步数据流-策/) | 长文框架综述：Agentic RL 不是换个 PPO/GRPO 变体，而是长时程、调工具、部分可观测、异步执行的系统性策 |
+| 2026-11-06 | 扫读 | [Agent最佳实践之：Agent Context](./sweep-305-agent最佳实践之-agent-context/) | 一年多用 Claude Code、Codex 等编码 Agent 的实践提炼：把 Agent 的工作目录（agent c |
+| 2026-11-06 | 扫读 | [论文解读：AI 就是编译器——让 LLM 直接写 PTX，绕开整个编译器后端](./sweep-304-论文解读-ai-就是编译器-让-llm-直接写-ptx-绕开整个编译器后端/) | 讲论文 "AI as a Compiler"：LLM Agent（TAIC）直接把 Triton 内核翻译成 PTX，绕 |
+| 2026-11-06 | 扫读 | [你相信光吗：把几万个GPU用光连起来，到底有多难？\| 一期视频看懂光互连](./sweep-303-你相信光吗-把几万个gpu用光连起来-到底有多难-一期视频看懂光互连/) | 老石谈芯 53 分钟深度访谈四位从业者，从底层物理到工程量产拆解光互连如何走进服务器、封装到 GPU 身边，并对照中国硅 |
 | 2026-11-06 | 扫读 | [推理 INFRA 方法论（5）：MoE 推理：Batch、DeepEP、DeepGEMM 与负载均衡](./sweep-302-推理-infra-方法论-5-moe-推理-batch-deepep-deepgemm-与负载均/) | 推理 INFRA 方法论系列第 5 章，以 Batch 为主线讲 MoE 推理的三块硬骨头：专家越切越碎如何让 GEMM |
 | 2026-11-05 | 扫读 | [在研究编程Agent，Agent核心就几十行代码，那剩下的几万行到底在解决什么问题？](./sweep-301-在研究编程agent-agent核心就几十行代码-那剩下的几万行到底在解决什么问题/) | 编程 Agent 的核心循环只有几十行，但 OpenHands 等开源实现有数万行代码——三位高赞答主从行数审计、工程分 |
 | 2026-11-05 | 扫读 | [暴涨→大跌→倒闭 从行业周期看内存何时降价](./sweep-300-暴涨-大跌-倒闭-从行业周期看内存何时降价/) | 讲内存价格暴涨背后的行业周期：从内存行业发展简史看“暴涨→大跌→倒闭”的循环形态，并给出判断降价时点的信号框架。值得他看 |
@@ -257,6 +265,3 @@
 | 2026-09-29 | 想法 | [理解加强](./idea-5-理解加强/) | 把“理解复杂的东西”拆成可执行的训练系统：四层诊断（词/图/机/界）定位卡点，十分钟初接触协议避免一上来就陷进去，一周训 |
 | 2026-09-29 | 想法 | [Agent Forecast](./idea-4-agent-forecast/) | 研究 AI Agent 能否预测事件结果：梳理 ForecastBench、FutureSim、CivBench 三个预 |
 | 2026-09-28 | 扫读 | [双汇火腿肠销量连续下滑，传统火腿肠为何越来越卖不动？方便面触底反弹，火腿肠却持续下滑，问题出在哪里？](./sweep-97-双汇火腿肠销量连续下滑-传统火腿肠为何越来越卖不动-方便面触底反弹-火腿肠却持续下滑-问题出在哪/) | 知乎热榜提问（129 答、23.8 万浏览）：双汇包装肉制品销量从 2020 年 158.6 万吨峰值连降五年至 136 |
-| 2026-09-28 | 扫读 | [万字长文总结RL/on policy distillation的一些进展](./sweep-96-万字长文总结rl-on-policy-distillation的一些进展/) | 知乎收藏的万字长文（YiFan-Zhang，910 赞/1488 收藏），系统梳理 on-policy learning |
-| 2026-09-28 | 扫读 | [抄袭者如何把原创者熬成山寨？奥利奥：这事儿我熟](./sweep-95-抄袭者如何把原创者熬成山寨-奥利奥-这事儿我熟/) | 商业故事 UP 主「伯格慢」14 分钟讲 Hydrox（1908 年夹心饼干原创者）如何被 1912 年的模仿者奥利奥反 |
-| 2026-09-27 | 扫读 | [【漫士】AI怎么让NS方程爆炸的？流体力学不存在了？](./sweep-92-漫士-ai怎么让ns方程爆炸的-流体力学不存在了/) | AI 博士生 UP 主「漫士沉思录」41 分钟硬核拆解：OpenAI 团队 88 小时给出纳维-斯托克斯方程爆破反例的数 |

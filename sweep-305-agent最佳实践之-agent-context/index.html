@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent最佳实践之：Agent Context</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>Agent最佳实践之：Agent Context</h1>
+<p class="sub">一年多用 Claude Code、Codex 等编码 Agent 的实践提炼：把 Agent 的工作目录（agent context）与代码仓库分开——代码是输出，context 是记录与日志；用 git 管理，30 人部门共用一个 context、1500+ commits，交接工作就像交一个目录。值得他看的是它把「怎么用 Agent」变成可设计、可操作的协作协议，且附公开模板。</p>
+<p class="meta">2026-11-06 · 作者：Weiyu Xie</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2101773507134805612">https://zhuanlan.zhihu.com/p/2101773507134805612</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>核心主张：Agent Context 是独立对象</li>
+<li>Agent 的启动目录与代码仓库分开</li>
+<li>代码是输出，Context 是记录/日志</li>
+<li>仓库只有 doc/src/scripts/tests，没有项目记录、设计意图、失败与实验报告</li>
+<li>工作流：Context 跨机器积累经验</li>
+<li>在工作机上启动 Agent，跨服务器/仓库改代码、跑实验</li>
+<li>结果写回 Context，经验不断累积</li>
+<li>文本惯性约束后续 Agent 的行为</li>
+<li>管理方式：用 git 管 Context</li>
+<li>doc 放文档，ref 以链接/子模块挂其他仓库</li>
+<li>作者部门约 30 人自 4 月共用一个 Context，1500+ commits，每日提交</li>
+<li>交接工作 = 交一个目录，像网络协议一样对齐人与人</li>
+<li>落点：Agent Context 是基础层</li>
+<li>把「怎么用 Agent」变成可讨论、可设计、可操作的东西</li>
+<li>原则已开源：github.com/ErvinXie/meta-agent</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Agent 写代码，经验散落各处] --&gt; B[把 Agent 的工作目录独立出来]
+B --&gt; C[Agent Context ≠ 代码仓库]
+C --&gt; D[仓库：doc/src/scripts/tests]
+C --&gt; E[Context：项目记录、设计意图、失败、实验报告]
+B --&gt; F[Agent 全权读写自己的工作目录]
+F --&gt; G[跨服务器/仓库做实验，结果写回 Context]
+G --&gt; H[Context 用 git 管理：doc + ref 链接其他仓库]
+H --&gt; I[Context 积累经验，形成文本惯性]
+I --&gt; J[交接 = 交一个目录，无需开会]
+J --&gt; K[30 人部门共用，1500+ commits]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-06</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

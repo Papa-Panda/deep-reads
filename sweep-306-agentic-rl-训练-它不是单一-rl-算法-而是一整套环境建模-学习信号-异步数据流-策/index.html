@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic RL 训练：它不是单一 RL 算法，而是一整套环境建模、学习信号、异步数据流、策略优化和基础设施的协同系统</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎收藏</div>
+<h1>Agentic RL 训练：它不是单一 RL 算法，而是一整套环境建模、学习信号、异步数据流、策略优化和基础设施的协同系统</h1>
+<p class="sub">长文框架综述：Agentic RL 不是换个 PPO/GRPO 变体，而是长时程、调工具、部分可观测、异步执行的系统性策略学习；提出三个不变量（可探索策略空间不坍缩、学习信号不退化、分布偏移可控）与八个方面，贯通 Kimi、MiniMax、GLM 的技术报告与 DAPO、TITO、CISPO 等机制。值得他看的是它把 Agent RL 从算法选择还原为环境、信号、分布与系统的闭环，正对后训练主线。</p>
+<p class="meta">2026-11-06 · 作者：Snail</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2014843795380904030">https://zhuanlan.zhihu.com/p/2014843795380904030</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>立论：Agentic RL 已从单轮文本优化转向系统性策略学习</li>
+<li>关键信号不是更好的 PPO/GRPO 变体，而是长时程 Agent RL</li>
+<li>Kimi K1.5/K2/K2.5、MiniMax M1/Forge、GLM-5 的技术报告是证据基底</li>
+<li>核心问题：如何从真实在线交互轨迹中持续制造可用学习信号</li>
+<li>为什么与传统 RLHF/RLVR 不同</li>
+<li>训练对象是交互式策略，不是 prompt→答案映射</li>
+<li>状态由历史、工具返回、环境反馈、记忆与上下文构成</li>
+<li>动作含工具选择、参数、上下文压缩、子任务分派</li>
+<li>奖励延迟、稀疏、复合（正确性+效率+token 成本+单位时间训练效率）</li>
+<li>rollout 时长极不均匀，同步训练昂贵、异步训练引入分布漂移</li>
+<li>三个不变量（相互耦合、彼此张力）</li>
+<li>可探索策略空间不早坍缩：任务分解、工具顺序、记忆策略、停止条件、自我纠正路径都要存活，不只是 token 熵</li>
+<li>学习信号不退化：不同 rollout 可比较，优势不坍缩为零（全对/全错组即失效）</li>
+<li>分布偏移可控：rollout 分布、学习器更新分布、真实部署分布三者偏移受控</li>
+<li>八个方面</li>
+<li>环境与接口建模：结构保真重于表面真实；验证器薄弱导致奖励 hacking；下一代环境扩展是任务/验证器/脚手架三个「编译器」问题</li>
+<li>探索与多样性：探索是支撑集管理问题，不是温度；SFT 压缩分布，Pass@1 升而 Pass@k 塌</li>
+<li>算力分配与信号策展：均匀分配系统性制造全 0/全 1 退化组；RL-ADA、GVM-RAFT、VIP、Knapsack RL、Reinforce-Ada</li>
+<li>目标与策略优化：先诊断瓶颈（梯度噪声/漂移/目标失配）；ReMax、mirror descent、token 级裁剪、CISPO、TITO、双边重要性采样</li>
+<li>Rollout 采样与异步调度：调度是算法的一部分；partial rollout、Rollout Manager、Windowed FIFO、异步生成-训练解耦</li>
+<li>奖励、验证器与效率约束：奖励规定「怎么干」而不只是「对不对」；GRM 多 rubric、Toggle、GenRM 长度偏置、混合奖励、完成时间奖励</li>
+<li>记忆、层级与并行 Agent：被训对象是「操作系统策略」而非 token 策略；Context Rot、keep-recent-k、Agent Swarm/PARL</li>
+<li>基础设施：infra 塑造训练分布、决定配方在真实成本下是否可扩展、决定训推一致性</li>
+<li>结论：真正的竞争是环境、信号、分布、系统的闭环</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Agentic RL ≠ 换个 PPO/GRPO 变体] --&gt; B[训练对象：交互式策略]
+B --&gt; C[长上下文 + 调工具 + 部分可观测 + 异步执行]
+C --&gt; D{三个不变量}
+D --&gt; E[可探索策略空间不坍缩]
+D --&gt; F[学习信号不退化]
+D --&gt; G[分布偏移可控]
+E --&gt; H[八个方面]
+F --&gt; H
+G --&gt; H
+H --&gt; I[环境建模 / 探索多样性 / 算力分配]
+H --&gt; J[目标优化 / 异步调度 / 奖励与验证器]
+H --&gt; K[记忆与层级 / 基础设施]
+I --&gt; L[闭环：环境 × 信号 × 分布 × 系统]
+J --&gt; L
+K --&gt; L
+L --&gt; M[谁的闭环最强，谁最可能训出好 Agent]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-06</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -4,7 +4,9 @@
 
 | 日期 | 类型 | 标题 | 一句话 |
 |---|---|---|---|
+| sweep-99-闪 | 深读 | [闪存，涨价和三万个零件：为什么偏偏今年都在涨？](./sweep-99-闪存-涨价和三万个零件-为什么偏偏今年都在涨/) |  |
 | sweep-98-待 | 深读 | [（待读）Agent CPU](./sweep-98-待读-agent-cpu/) |  |
+| sweep-97-双 | 深读 | [双汇火腿肠销量连续下滑，传统火腿肠为何越来越卖不动？方便面触底反弹，火腿肠却持续下滑，问题出在哪里？](./sweep-97-双汇火腿肠销量连续下滑-传统火腿肠为何越来越卖不动-方便面触底反弹-火腿肠却持续下滑-问题出在哪/) |  |
 | sweep-96-万 | 深读 | [万字长文总结RL/on policy distillation的一些进展](./sweep-96-万字长文总结rl-on-policy-distillation的一些进展/) |  |
 | sweep-95-抄 | 深读 | [抄袭者如何把原创者熬成山寨？奥利奥：这事儿我熟](./sweep-95-抄袭者如何把原创者熬成山寨-奥利奥-这事儿我熟/) |  |
 | sweep-94-h | 深读 | [https://www.youtube.com/watch?si=fwNwPRcuvcL-41le&amp;v=JtomF4bGxHs&amp;feature=youtu.be](./sweep-94-https-www-youtube-com-watch-si-fwnwprcuvcl-41le/) |  |
@@ -60,8 +62,16 @@
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
 | sweep-12-c | 深读 | [Coinbase：币价 “退潮” 再探底，还能等到政策东风吗？](./sweep-12-coinbase-币价-退潮-再探底-还能等到政策东风吗/) |  |
 | sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
+| sweep-101- | 深读 | [LoRA 一作、OpenAI o1 核心成员的新工作：首次公开 397B 模型的 Agent RL 训练配方](./sweep-101-lora-一作-openai-o1-核心成员的新工作-首次公开-397b-模型的-agent-r/) |  |
+| sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-08 | 扫读 | [人民币升值，出口却还在增长：中国制造的底气，究竟藏在哪里？](./sweep-313-人民币升值-出口却还在增长-中国制造的底气-究竟藏在哪里/) | 人民币升值而出口仍增长的反常现象：UP 主尖峰苏打cfz用前三季度进出口 39.94 万亿、装备制造业贡献近九成出口增量 |
+| 2026-11-08 | 扫读 | [复盘 SGLang 这一个月：推理框架的瓶颈正在换位置](./sweep-312-复盘-sglang-这一个月-推理框架的瓶颈正在换位置/) | SGLang 42 天（2026-09-15—10-26）2693 次提交的逐 PR 复盘：缓存统一寻址、PD 状态控制 |
+| 2026-11-07 | 扫读 | [TMA学习：在 Blackwell B200 上手写 TMA Depthwise Conv2D](./sweep-311-tma学习-在-blackwell-b200-上手写-tma-depthwise-conv2d/) | 在 B200 上手写 TMA Depthwise Conv2D 的实战记录：从 naive 实现的性能下限，到共享内存复 |
+| 2026-11-07 | 扫读 | [学不如抄？Anthropic 为啥这么怕蒸馏！](./sweep-310-学不如抄-anthropic-为啥这么怕蒸馏/) | 从大模型训练讲起，聊蒸馏如何让学生模型“偷走”老师模型的能力，以及 Anthropic 为何对此高度警惕。值得他看的是蒸 |
+| 2026-11-07 | 扫读 | [从混合 Batch 到 GPU Kernel：读懂 vLLM 与 SGLang 的 Attention 执行](./sweep-309-从混合-batch-到-gpu-kernel-读懂-vllm-与-sglang-的-attent/) | 讲 vLLM 与 SGLang 如何执行一轮混合 batch 的 Attention：从 chunked prefill |
+| 2026-11-07 | 扫读 | [从 verl 与 slime 最近两个月的更新，看 RL 基础设施的演进，以及 DeepSeek V4.1 Flash 的支持现状](./sweep-308-从-verl-与-slime-最近两个月的更新-看-rl-基础设施的演进-以及-deepseek/) | 讲 verl 与 slime 近两个月更新的对照复盘：两大 RL 框架正收敛为“连续流训练系统”——异步调度、版本窗口、 |
 | 2026-11-07 | 扫读 | [「快手」echo：十万级长序列建模](./sweep-307-快手-echo-十万级长序列建模/) | 讲快手 ECHO 论文：用蒸馏教一个与候选无关的选择器，从 10 万条行为历史里挑出 Top-K 再精排，绕开检索式与压 |
 | 2026-11-06 | 扫读 | [Agentic RL 训练：它不是单一 RL 算法，而是一整套环境建模、学习信号、异步数据流、策略优化和基础设施的协同系统](./sweep-306-agentic-rl-训练-它不是单一-rl-算法-而是一整套环境建模-学习信号-异步数据流-策/) | 长文框架综述：Agentic RL 不是换个 PPO/GRPO 变体，而是长时程、调工具、部分可观测、异步执行的系统性策 |
 | 2026-11-06 | 扫读 | [Agent最佳实践之：Agent Context](./sweep-305-agent最佳实践之-agent-context/) | 一年多用 Claude Code、Codex 等编码 Agent 的实践提炼：把 Agent 的工作目录（agent c |
@@ -254,14 +264,10 @@
 | 2026-09-30 | 扫读 | [【青稞Talk 155期】SkyRL：模块化 RL 后训练框架设计，与 397B Office Work Agent 的 RL 训练实战](./sweep-107-青稞talk-155期-skyrl-模块化-rl-后训练框架设计-与-397b-office-w/) | SkyRL 作者亲自讲模块化 RL 后训练框架的设计思路，下半场是 397B Office Work Agent 的 A |
 | 2026-09-30 | 扫读 | [RL loss 是近似的一阶 Taylor 展开](./sweep-106-rl-loss-是近似的一阶-taylor-展开/) | 第一性原理重推 LLM 后训练 RL loss：想优化序列级 reward 却用 token 级加权似然训练，重要性比率 |
 | 2026-09-30 | 扫读 | [如何评价DeepSeek Harness桌面版正式发布？](./sweep-105-如何评价deepseek-harness桌面版正式发布/) | 知乎热榜讨论（18 答、13.4 万浏览）：DeepSeek Harness 桌面版 v0.2.0 正式发布——dsh  |
-| 2026-09-29 | 扫读 | [闪存，涨价和三万个零件：为什么偏偏今年都在涨？](./sweep-99-闪存-涨价和三万个零件-为什么偏偏今年都在涨/) | 《半径三百公里》第二期（UP主空山猎人，33分钟，财经商业区）：2026年9月手机/电脑/汽车同步涨价，根因是同一批存储 |
 | 2026-09-29 | 扫读 | [怎么看媒体曝 Anthropic 提交 IPO 招股书，25 年营收增长 12 倍，净亏损 420 亿美元？](./sweep-104-怎么看媒体曝-anthropic-提交-ipo-招股书-25-年营收增长-12-倍-净亏损-42/) | 知乎热榜讨论（22 答）：媒体披露 Anthropic IPO 招股书——2025 年营收 46 亿美元（同比约 12  |
 | 2026-09-29 | 扫读 | [如何看待 AMD 收购李飞飞创立的 World Labs，李飞飞将任 AMD 执行副总裁兼首席科学家？](./sweep-103-如何看待-amd-收购李飞飞创立的-world-labs-李飞飞将任-amd-执行副总裁兼首席科/) | 知乎热榜讨论（89 答、41.8 万浏览）：围绕 AMD 以 82 亿美元全股票收购 World Labs、李飞飞任执行 |
-| 2026-09-29 | 扫读 | [LoRA 一作、OpenAI o1 核心成员的新工作：首次公开 397B 模型的 Agent RL 训练配方](./sweep-101-lora-一作-openai-o1-核心成员的新工作-首次公开-397b-模型的-agent-r/) | LoRA 一作、OpenAI o1 核心成员 Edward Hu 加入 Mercor 后与 SkyRL 团队联合发布：Q |
-| 2026-09-29 | 扫读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) | 基于 1884 个 TypeScript 源文件的 Claude Code 架构级拆解（3.4 万播放、2144 收藏） |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |
 | 2026-09-29 | 想法 | [理解加强](./idea-5-理解加强/) | 把“理解复杂的东西”拆成可执行的训练系统：四层诊断（词/图/机/界）定位卡点，十分钟初接触协议避免一上来就陷进去，一周训 |
 | 2026-09-29 | 想法 | [Agent Forecast](./idea-4-agent-forecast/) | 研究 AI Agent 能否预测事件结果：梳理 ForecastBench、FutureSim、CivBench 三个预 |
-| 2026-09-28 | 扫读 | [双汇火腿肠销量连续下滑，传统火腿肠为何越来越卖不动？方便面触底反弹，火腿肠却持续下滑，问题出在哪里？](./sweep-97-双汇火腿肠销量连续下滑-传统火腿肠为何越来越卖不动-方便面触底反弹-火腿肠却持续下滑-问题出在哪/) | 知乎热榜提问（129 答、23.8 万浏览）：双汇包装肉制品销量从 2020 年 158.6 万吨峰值连降五年至 136 |

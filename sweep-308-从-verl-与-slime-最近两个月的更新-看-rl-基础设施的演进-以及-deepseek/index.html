@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从 verl 与 slime 最近两个月的更新，看 RL 基础设施的演进，以及 DeepSeek V4.1 Flash 的支持现状</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从 verl 与 slime 最近两个月的更新，看 RL 基础设施的演进，以及 DeepSeek V4.1 Flash 的支持现状</h1>
+<p class="sub">讲 verl 与 slime 近两个月更新的对照复盘：两大 RL 框架正收敛为“连续流训练系统”——异步调度、版本窗口、量化/路由一致性、token 级轨迹语义、权重快速切换与跨故障恢复成为标准组件；并分层核查了 DeepSeek V4.1 Flash 的支持现状，指出推理已支持但主线尚无稳定可验证的完整 RL 训练方案。值得他看的是它把 RL infra 的演进从功能清单还原为“控住偏差/故障成本与有效策略更新”的系统设计问题，且对 Miles 分叉报告的未核实点做了明确标注，正对后训练主线。</p>
+<p class="meta">2026-11-07</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2101471664965997651">https://zhuanlan.zhihu.com/p/2101471664965997651</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲</h2>
+<ul>
+<li>立论：verl 与 slime 的共同方向</li>
+<li>同时控住两类成本：可控的偏差/故障成本 与 有效策略更新</li>
+<li>样本→训练的边界从“生成”移到“策略版本控制”</li>
+<li>训练从静态批系统走向带故障恢复的连续流系统</li>
+<li>
+<ol>
+<li>版本对齐：五个共同问题</li>
+</ol>
+</li>
+<li>verl v0.9.1（2026-09-20）与 slime v0.4.0（2026-10-09）</li>
+<li>异步调度、数据新鲜度、训练一致性/量化、数据 token 语义、权重/缓存切换</li>
+<li>
+<ol>
+<li>异步调度与数据新鲜度</li>
+</ol>
+</li>
+<li>verl 异步 rollout（vLLM colocated 模式，长序列多轮场景 3–5×）</li>
+<li>slime 动态采样；陈旧度量：off-policy 版本漂移、stale step、stale sample rate</li>
+<li>解法：混合调度 + 版本窗口</li>
+<li>
+<ol>
+<li>训练/采样一致性作为系统接口</li>
+</ol>
+</li>
+<li>NVFP4 量化对齐；MoE R2 路由回放</li>
+<li>Score Centering：verl 标准化 advantage，slime 标准化 reward（baseline + 样本标准差，GAE λ=0.9），最终都落在标准化的 advantage 上——跨框架结果不可直接比</li>
+<li>top-p 回放保证采样一致性</li>
+<li>
+<ol>
+<li>Agent 训练的数据 token 语义</li>
+</ol>
+</li>
+<li>verl Continuous Token：agent 回合边界、token 级 loss、<eos> 标 episode 结束、多轮训练</li>
+<li>slime 流式 rollout：token 流、episode 截断、loss masking</li>
+<li>
+<ol>
+<li>权重/缓存/版本切换</li>
+</ol>
+</li>
+<li>分片增量同步、磁盘增量更新、PipelineRL 的 KV-cache flush</li>
+<li>
+<ol>
+<li>跨故障持久化</li>
+</ol>
+</li>
+<li>slime straw 框架：跨故障持久化、回滚、恢复服务；verl Q4 路线图</li>
+<li>
+<ol>
+<li>DeepSeek V4.1 Flash 分层判断</li>
+</ol>
+</li>
+<li>身份：V4.1-Flash vs V4-Flash、初始版 vs 1017 版</li>
+<li>架构：Causal Encoder-Decoder、跨层共享压缩 KV、分层稀疏索引、mHC、Engram、视觉能力</li>
+<li>支持现状：vLLM/SGLang 推理已支持；verl 主线有方向但无稳定可验证的完整 RL recipe；slime 主线证据不足；Miles 分叉报告（16×GB300 DAPO 多步 RL）但多处未核实</li>
+<li>
+<ol>
+<li>启示：五个方向与三类建议</li>
+</ol>
+</li>
+<li>调度、数值、轨迹、更新、恢复；给研究者、贡献者、用户的分别建议；三个待观察结果</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[RL 训练两类成本：偏差与故障成本和有效策略更新] --&gt; B{verl 与 slime 收敛到五个问题}
+B --&gt; C[异步调度加版本窗口控新鲜度]
+B --&gt; D[量化与路由一致性]
+B --&gt; E[Score Centering 各标不同对象]
+B --&gt; F[Token 语义：连续 Token 对流式 rollout]
+B --&gt; G[权重与缓存快速切换]
+C --&gt; H[连续流训练系统]
+D --&gt; H
+E --&gt; H
+F --&gt; H
+G --&gt; H
+H --&gt; I[跨故障持久化：回滚与恢复]
+I --&gt; J{DeepSeek 新版 Flash}
+J --&gt; K[推理已支持]
+J --&gt; L[RL 主线尚无稳定完整方案]
+L --&gt; M[分叉报告仍待核实]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL训练</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-07</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

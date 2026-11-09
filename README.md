@@ -61,11 +61,23 @@
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
 | sweep-12-c | 深读 | [Coinbase：币价 “退潮” 再探底，还能等到政策东风吗？](./sweep-12-coinbase-币价-退潮-再探底-还能等到政策东风吗/) |  |
+| sweep-108- | 深读 | [Dylan Patel: 扩展 AI 算力的头号瓶颈](./sweep-108-dylan-patel-扩展-ai-算力的头号瓶颈/) |  |
+| sweep-107- | 深读 | [【青稞Talk 155期】SkyRL：模块化 RL 后训练框架设计，与 397B Office Work Agent 的 RL 训练实战](./sweep-107-青稞talk-155期-skyrl-模块化-rl-后训练框架设计-与-397b-office-w/) |  |
+| sweep-106- | 深读 | [RL loss 是近似的一阶 Taylor 展开](./sweep-106-rl-loss-是近似的一阶-taylor-展开/) |  |
+| sweep-105- | 深读 | [如何评价DeepSeek Harness桌面版正式发布？](./sweep-105-如何评价deepseek-harness桌面版正式发布/) |  |
+| sweep-104- | 深读 | [怎么看媒体曝 Anthropic 提交 IPO 招股书，25 年营收增长 12 倍，净亏损 420 亿美元？](./sweep-104-怎么看媒体曝-anthropic-提交-ipo-招股书-25-年营收增长-12-倍-净亏损-42/) |  |
+| sweep-103- | 深读 | [如何看待 AMD 收购李飞飞创立的 World Labs，李飞飞将任 AMD 执行副总裁兼首席科学家？](./sweep-103-如何看待-amd-收购李飞飞创立的-world-labs-李飞飞将任-amd-执行副总裁兼首席科/) |  |
 | sweep-102- | 深读 | [AMD 宣布 82 亿美元收购李飞飞创办的 World Labs](./sweep-102-amd-宣布-82-亿美元收购李飞飞创办的-world-labs/) |  |
 | sweep-101- | 深读 | [LoRA 一作、OpenAI o1 核心成员的新工作：首次公开 397B 模型的 Agent RL 训练配方](./sweep-101-lora-一作-openai-o1-核心成员的新工作-首次公开-397b-模型的-agent-r/) |  |
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-09 | 扫读 | [数学逻辑，来自维特根斯坦的救赎之旅](./sweep-319-数学逻辑-来自维特根斯坦的救赎之旅/) | 科技3D视界 2026-11-07 的数学哲学视频：借维特根斯坦追问数学的本质——AI 凭“猜字符”就能攻克最难的数学题 |
+| 2026-11-09 | 扫读 | [AI Infra 软核教程（一）为什么我们需要 AI Infra](./sweep-318-ai-infra-软核教程-一-为什么我们需要-ai-infra/) | 锦恢为入行 Agentic RL 而写的 AI Infra 原理向开篇：从 2T 参数模型、FP16 权重 4TB、单卡 |
+| 2026-11-08 | 扫读 | [再探 CUDA Graph：核心机制、多图复用以及 Dual AR 模型的统一覆盖优化](./sweep-317-再探-cuda-graph-核心机制-多图复用以及-dual-ar-模型的统一覆盖优化/) | Chayenne Zhao 在 SGLang-Omni 为 Fish Audio S2-Pro（PR #153）把 Sl |
+| 2026-11-08 | 扫读 | [电鳗的电路是串联还是并联？](./sweep-316-电鳗的电路是串联还是并联/) | 无关茉莉星 2026-10-31 的物理科普：电鳗的放电细胞如何接线才能叠出数百伏高压、又不把自己电死——串联叠电压、并 |
+| 2026-11-08 | 扫读 | [全网最细！40分钟速通Codex！【GenJi深度教程】](./sweep-315-全网最细-40分钟速通codex-genji深度教程/) | GenJi 两个月打磨的 Codex 入门到精通免费课（37:32）：安装、核心功能介绍与可直接上手的实战案例，配全套文 |
+| 2026-11-08 | 扫读 | [SIMT 真的比 SIMD 更好编程吗？从 DeepSeek 量化算子到 Element-wise for/if](./sweep-314-simt-真的比-simd-更好编程吗-从-deepseek-量化算子到-element-wis/) | 以 DeepSeek TileKernels 量化算子为试验场，在 Ascend 950 上实测对比 SIMD 与 SI |
 | 2026-11-08 | 扫读 | [人民币升值，出口却还在增长：中国制造的底气，究竟藏在哪里？](./sweep-313-人民币升值-出口却还在增长-中国制造的底气-究竟藏在哪里/) | 人民币升值而出口仍增长的反常现象：UP 主尖峰苏打cfz用前三季度进出口 39.94 万亿、装备制造业贡献近九成出口增量 |
 | 2026-11-08 | 扫读 | [复盘 SGLang 这一个月：推理框架的瓶颈正在换位置](./sweep-312-复盘-sglang-这一个月-推理框架的瓶颈正在换位置/) | SGLang 42 天（2026-09-15—10-26）2693 次提交的逐 PR 复盘：缓存统一寻址、PD 状态控制 |
 | 2026-11-07 | 扫读 | [TMA学习：在 Blackwell B200 上手写 TMA Depthwise Conv2D](./sweep-311-tma学习-在-blackwell-b200-上手写-tma-depthwise-conv2d/) | 在 B200 上手写 TMA Depthwise Conv2D 的实战记录：从 naive 实现的性能下限，到共享内存复 |
@@ -260,12 +272,6 @@
 | 2026-09-30 | 扫读 | [一文读懂KVCache](./sweep-113-一文读懂kvcache/) | 2024 年经典硬核长文（1861 赞、3629 收藏）：从 GPT2 实测讲起——新增 token 时历史 embed |
 | 2026-09-30 | 扫读 | [面试官：SFT之后做RL，模型为啥先变差再变好？](./sweep-112-面试官-sft之后做rl-模型为啥先变差再变好/) | 7 分钟大模型面试题精讲：SFT 后做 RL 为何性能先降后升——SFT 优化已知文本分布，RL 在奖励空间优化，分布切 |
 | 2026-09-30 | 扫读 | [为什么 GPT-6 Astra 玩《我的世界》被炸毁进度后连续数小时种植土豆？这种异常行为怎么产生的？](./sweep-111-为什么-gpt-6-astra-玩-我的世界-被炸毁进度后连续数小时种植土豆-这种异常行为怎么产/) | 47 答、61 万浏览：GPT-6 Astra 在《我的世界》攒 50 小时的进度被苦力怕炸毁后，连续数小时只种土豆、不 |
-| 2026-09-30 | 扫读 | [Dylan Patel: 扩展 AI 算力的头号瓶颈](./sweep-108-dylan-patel-扩展-ai-算力的头号瓶颈/) | SemiAnalysis 创始人 Dylan Patel 在 Dwarkesh Podcast 深谈扩展 AI 算力的三 |
-| 2026-09-30 | 扫读 | [【青稞Talk 155期】SkyRL：模块化 RL 后训练框架设计，与 397B Office Work Agent 的 RL 训练实战](./sweep-107-青稞talk-155期-skyrl-模块化-rl-后训练框架设计-与-397b-office-w/) | SkyRL 作者亲自讲模块化 RL 后训练框架的设计思路，下半场是 397B Office Work Agent 的 A |
-| 2026-09-30 | 扫读 | [RL loss 是近似的一阶 Taylor 展开](./sweep-106-rl-loss-是近似的一阶-taylor-展开/) | 第一性原理重推 LLM 后训练 RL loss：想优化序列级 reward 却用 token 级加权似然训练，重要性比率 |
-| 2026-09-30 | 扫读 | [如何评价DeepSeek Harness桌面版正式发布？](./sweep-105-如何评价deepseek-harness桌面版正式发布/) | 知乎热榜讨论（18 答、13.4 万浏览）：DeepSeek Harness 桌面版 v0.2.0 正式发布——dsh  |
-| 2026-09-29 | 扫读 | [怎么看媒体曝 Anthropic 提交 IPO 招股书，25 年营收增长 12 倍，净亏损 420 亿美元？](./sweep-104-怎么看媒体曝-anthropic-提交-ipo-招股书-25-年营收增长-12-倍-净亏损-42/) | 知乎热榜讨论（22 答）：媒体披露 Anthropic IPO 招股书——2025 年营收 46 亿美元（同比约 12  |
-| 2026-09-29 | 扫读 | [如何看待 AMD 收购李飞飞创立的 World Labs，李飞飞将任 AMD 执行副总裁兼首席科学家？](./sweep-103-如何看待-amd-收购李飞飞创立的-world-labs-李飞飞将任-amd-执行副总裁兼首席科/) | 知乎热榜讨论（89 答、41.8 万浏览）：围绕 AMD 以 82 亿美元全股票收购 World Labs、李飞飞任执行 |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

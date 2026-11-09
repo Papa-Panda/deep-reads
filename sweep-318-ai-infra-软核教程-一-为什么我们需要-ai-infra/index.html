@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Infra 软核教程（一）为什么我们需要 AI Infra</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>AI Infra 软核教程（一）为什么我们需要 AI Infra</h1>
+<p class="sub">锦恢为入行 Agentic RL 而写的 AI Infra 原理向开篇：从 2T 参数模型、FP16 权重 4TB、单卡 B200 仅 180GB 的显存账出发，论证 Infra 的价值不在 GPU 数量而在调度效率；系统梳理训练/推理/数据/集群/Agent 五大板块与 slime、dressage、verl 等 RL 训练框架及 Sandbox 等 Agent Infra 组件，并预告后续 DP/PP/SP/CP/EP 与推理中台章节。值得他看的是它把 Infra 还原为“让成百上千张卡像一台机器”的系统问题，且直接对准 Agentic RL 的 infra 需求；本篇偏原理、无代码与实测。</p>
+<p class="meta">2026-11-09</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2063938554061967779">https://zhuanlan.zhihu.com/p/2063938554061967779</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读）</h2>
+<ul>
+<li>立论：Infra 的价值在调度效率，不在卡数与数据量</li>
+<li>主流模型约 2T 参数，FP16 权重约 4TB；单卡 B200 约 180GB，8 卡 DGX 仅 1.44TB，装不下</li>
+<li>训练还要约 8 倍模型体积的显存；分布是必然，Infra 的工作由此产生：通信、同步、一致性、调度</li>
+<li>目标：让成百上千张 GPU 像一台机器</li>
+<li>动因：作者时隔四年重回 Infra、开始做 Agentic RL；系列定位“软核”讲原理，不讲上手部署</li>
+<li>AI Infra 的五大板块</li>
+<li>算力集群：GPU/TPU 节点、NCCL、Slurm/Ray 调度，及机架、组网拓扑、散热、供电、存储</li>
+<li>数据与存储：向量库、数据集/benchmark 管理、权重管理、Agent 数据回流</li>
+<li>训练：把单机 16 卡能跑的代码，在千卡、万卡集群上跑对、跑快、跑稳；Megatron-LM、DeepSpeed、ColossalAI</li>
+<li>推理：高可用、高并发部署，算子融合、自研 CUDA kernel、压低服务成本；vLLM、SGLang</li>
+<li>Agent：Agent Infra（见下），多数公司尚未成为独立工种</li>
+<li>训练 Infra 的工程难点</li>
+<li>标准循环：数据、前向、loss、反向、更新参数；PyTorch autograd 与计算图</li>
+<li>每卡一个独立进程、内存隔离，跨进程通信不可避免</li>
+<li>集合通信 AllReduce vs 点对点 Send/Recv；NCCL（NVIDIA）与 HCCL（华为）</li>
+<li>每个进程只持有局部计算图，激活、梯度、参数状态要跨设备传递，显存占用随之上升</li>
+<li>核心解法是并行算法：2x2 切分示例（张量并行 + 流水线并行）；DP/PP/SP/CP/EP 留待后文</li>
+<li>Python 表面之下是 C++、CUDA、NCCL 在跑矩阵运算与设备通信</li>
+<li>推理 Infra 的工程难点</li>
+<li>自回归生成：一次一个 token，单条查询无法并行；EOS 结束</li>
+<li>优化思路（以提问形式引入）：KV Cache（免算共享前缀）、Draft Model/推测解码（一次多猜再验证）、量化、算子融合</li>
+<li>工业难题：数百至数千并发下保持 GPU 利用率、按量计费不亏本；批量与调度的平衡留待推理中台章节</li>
+<li>Agentic RL 与 Agent Infra</li>
+<li>RL 训练框架：slime（智谱）、dressage（阿里）、verl（字节）；与 Megatron-LM、DeepSpeed 等传统训练后端区分</li>
+<li>多数开源 Agentic RL 框架复用现有推理框架作推理后端</li>
+<li>Agent Infra 组件：高性能沙箱（阿里 OpenSandbox、腾讯 CubeSandbox）、在线 Agent 产品数据回流（字节 Coze）、Agent 框架（LangChain、AgentScope）、评测平台（LangSmith、LangFuse、Coze 罗盘）、公司内 MCP 发现服务</li>
+<li>为什么底层知识重要：DeepSeek 的例子</li>
+<li>DeepSeek 不停留在 CUDA 抽象层；DeepEP 通信库用未公开的 PTX 指令提升 MoE 通信与推理效率</li>
+<li>R1 在 2025 年初仍有约 30% 利润（作者说法），靠的是底层工程</li>
+<li>未回答的问题与后续路线图</li>
+<li>第 2 章：NCCL 原语与常见集群（NVIDIA、AWS）</li>
+<li>第 3–4 章：训练 Infra——PP、DP、SP、CP、EP</li>
+<li>第 5–6 章：推理——部署框架、Draft Model、量化、推理中台（作者坦言推理经验较浅）</li>
+<li>第 7 章起：Agent Infra——Sandbox 的技术壁垒、训练/推理/端侧 Sandbox 的差异</li>
+<li>悬而未决：单卡何时能到 1TB 显存（带宽、HBM 工艺、良率未知）；并发与利用率如何平衡</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[模型约 2T 参数 FP16 权重约 4TB] --&gt; B[单卡 B200 仅 180GB 八卡仅 1.44TB]
+B --&gt; C[显存不够 分布不可避免]
+C --&gt; D[Infra 的工作 通信 同步 一致性 调度]
+D --&gt; E[训练 并行算法 DP PP SP CP EP]
+D --&gt; F[推理 KV Cache 推测解码 量化 算子融合]
+E --&gt; G[目标 千卡像一台机器]
+F --&gt; G
+G --&gt; H[Agentic RL 新战场 Sandbox 数据回流 评测]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">AI Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-09</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>投机采样 ReaDy 论文：给 DSpark 增加循环状态读取，为什么还能提速？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>投机采样 ReaDy 论文：给 DSpark 增加循环状态读取，为什么还能提速？</h1>
+<p class="sub">willow 图解 ReaDy 论文（arXiv:2610.20503v2）：给 DSpark 草稿模型加一个只读 StateReader，让它直接读混合线性注意力目标模型已维护的循环状态，草稿候选更准、解码提速约 8%——单 B200 上 7 任务平均 302.78 tok/s，对原 DSpark +7.97%。值得他看的是它把“多一次读取为何反而更快”讲透了，且作者诚实区分了两种口径：对无状态微调对照仅 +5.68%，并注明自己未做 GPU 复现。注：文章标注含 AI 辅助创作。</p>
+<p class="meta">2026-11-10</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2096273850812068237">https://zhuanlan.zhihu.com/p/2096273850812068237</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读）</h2>
+<ul>
+<li>背景：DSpark 与投机采样</li>
+<li>混合线性注意力大模型解码慢，DSpark 用草稿模型并行猜测再由目标模型验证</li>
+<li>问题：草稿模型读不到目标模型已维护的循环状态，猜测精度受限</li>
+<li>方法：只读 StateReader</li>
+<li>每个草稿位置独立查询目标模型已提交的循环状态（取自第 30 与 62 层）</li>
+<li>以残差形式注入草稿模型最后一层（后注意力归一化之后、MLP 之前）</li>
+<li>低秩设计：仅增加约 0.264% 参数，不改动 DSpark 并行骨架与验证流程</li>
+<li>工程优化</li>
+<li>状态直接采集进稳定的 CUDA Graph 缓冲，融合归一化相关逐元计算与缩放打包</li>
+<li>局部算子耗时下降，但作者强调这是算子级计时、非端到端延迟</li>
+<li>实验：单卡 B200 上的 7 任务平均</li>
+<li>自回归 95.86、原 DSpark 280.42、ReaDy 302.78 tok/s，对 DSpark 提升 7.97%</li>
+<li>每轮推进 token 数从 4.17 升至 4.53，分任务提升以 Alpaca 与 MT-Bench 最高</li>
+<li>口径辨析：增益到底从哪来</li>
+<li>对无状态微调对照仅提升 5.68%，说明 7.97% 里一部分是模型适配的功劳，不能全归于状态读取</li>
+<li>局限与边界</li>
+<li>公开仓库以推理为主，无一键训练复现；状态须来自已提交前缀、被拒的推测后缀不能作后续历史</li>
+<li>结果不可外推到其他显卡、量化、高并发或更长上下文；作者本人未做 GPU 性能复现，仅做 FP32 数值代数核查</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[目标模型维护循环状态] --&gt; B[草稿模型读不到状态]
+B --&gt; C[只读 StateReader 介入]
+C --&gt; D[按位置查询已提交状态]
+D --&gt; E[残差注入最后一层]
+E --&gt; F[草稿候选更准]
+F --&gt; G[每轮推进更多 token]
+G --&gt; H[解码提速约百分之八]
+H --&gt; I[辨析 增益部分来自微调]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-10</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

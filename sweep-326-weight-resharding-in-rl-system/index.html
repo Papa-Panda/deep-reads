@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weight Resharding in RL System</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>Weight Resharding in RL System</h1>
+<p class="sub">NVIDIA 上海工程师讲 RL 系统里训练权重同步到推理侧的 resharding：训练（FSDP/TP/PP/EP）与推理并行布局不同，同步不是拷贝而是按元素重分片；按“全量张量在哪物化×发送方是否预筛”两轴比较各方案（NCCL vs NIXL、verl 路径），结论是按参数混用多条路径。值得他看的是它正撞 RL 训练 Infra 主线，把权重同步的通信量、临时显存、工程复杂度都算清楚了。</p>
+<p class="meta">2026-11-10</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2096895081047446225">https://zhuanlan.zhihu.com/p/2096895081047446225</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读）</h2>
+<ul>
+<li>问题：RL 系统里权重同步不是拷贝</li>
+<li>训练更新 policy 后，新权重要同步给生成 rollout 的推理 worker</li>
+<li>训练与推理并行布局不同：训练用 FSDP/TP/PP/EP，推理按模型规模、吞吐、延迟另选布局</li>
+<li>同步要改变每个参数元素的归属 rank，这一步叫 weight resharding；训练侧是 source，推理侧是 target</li>
+<li>三个基本概念：逻辑张量 / 局部分片 / 物化全量张量</li>
+<li>逻辑张量：完整的数学对象（如一个投影矩阵）</li>
+<li>局部分片：某个 rank 实际持有的一部分</li>
+<li>物化全量张量：一份进程 GPU/CPU 缓冲里的完整数据</li>
+<li>知道全局形状与分片位置 ≠ 手里有完整数据</li>
+<li>难在哪：分片方式与布局错位</li>
+<li>简单情形：行切 32 份 source 分片 → 8 份 target 分片</li>
+<li>难情形：行切 vs 列切、层从 PP stage 3 移到 stage 1、专家换 owner</li>
+<li>source 侧可能有 fused QKV、交错 gate/up、EP 分布专家、FSDP/DTensor 局部分片；target 侧可能要不同融合顺序、转置布局、量化权重+scale、kernel 专属布局</li>
+<li>方案比较：两条轴 + 统一算例</li>
+<li>轴一：全量张量在哪物化；轴二：发送方是否只发 target 需要的数据</li>
+<li>统一算例：4096×4096 张量 32 MiB，每 target rank 收 4 MiB；128 GiB 模型每 rank 4 GiB</li>
+<li>通信：NCCL（all-gather + broadcast）vs NIXL（all-gather + ring 点对点）</li>
+<li>框架路径：verl 的 FSDP full_tensor() 与 checkpoint-engine 路径</li>
+<li>提醒：target 收得少 ≠ source 的导出聚合消失了</li>
+<li>结论：没有唯一最优路径</li>
+<li>按参数混用多条路径（表中路径 D），权衡通信量、临时显存与维护成本</li>
+<li>连续性也影响成本：行切行主矩阵多为连续区，列切常得非连续 view，需打包或按更大 source view 读再本地转换</li>
+<li>范围限定：只讨论经 GPU/CPU 内存的全量权重同步；checkpoint、增量更新、版本切换、rollout 一致性只在影响 resharding 时间时提及</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[训练更新 policy 权重] --&gt; B[推理 worker 需新权重做 rollout]
+B --&gt; C[训练与推理并行布局不同]
+C --&gt; D[权重同步 = weight resharding]
+D --&gt; E[按元素重算归属 rank]
+E --&gt; F[方案按两轴比较]
+F --&gt; G[轴一 全量张量在哪物化]
+F --&gt; H[轴二 发送方是否预筛]
+G --&gt; I[比较 通信量 临时显存 工程复杂度]
+H --&gt; I
+I --&gt; J[结论 按参数混用多条路径]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-10</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

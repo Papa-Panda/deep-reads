@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meta FAIR 把 Transformer 循环了 32 次：循环哪里、要不要分化、能不能并行</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>Meta FAIR 把 Transformer 循环了 32 次：循环哪里、要不要分化、能不能并行</h1>
+<p class="sub">momo 全文解读 Meta FAIR 2026-10 论文《How to Loop Your Transformer》（arXiv:2610.40325）：同一组权重反复跑最多 32 次，不加参数就能加深模型；全栈循环在固定参数预算下质量最强、中段循环在训练算力受限时更划算、每轮加小 LoRA 适配器轮数越多越有用、并行循环要靠“保留当前 token embedding + 分别归一化 + 门控混合”才能保住质量。值得他看的是它把“深度换参数还是换算力”这笔账算清楚了，且数字都给到了可复核的程度（100M 上 BPB 1.115→1.075→L=32 回升超 1.2；1B 上移位 PLT 0.877 胜全栈 0.883），正撞他模型架构与推理效率的主线。全文已通读。</p>
+<p class="meta">2026-11-11</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2101136130968139533">https://zhuanlan.zhihu.com/p/2101136130968139533</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读，momo 2026-11-03）</h2>
+<ul>
+<li>问题：循环 Transformer——同一组权重反复用，深度换参数</li>
+<li>论文：Meta FAIR《How to Loop Your Transformer》（arXiv:2610.40325，2026-10）；作者 Ekbote 等，FAIR at Meta（一作兼 MIT）</li>
+<li>背景：标准 Transformer 有 B 个 block；循环是把其中一部分（整网 / 单层 / 中段）反馈回输入跑 L 次，参数共享，看起来像更深的网络</li>
+<li>代价：每多一轮，训练 FLOPs 线性增加；生成时每 token 的串行计算随 L 增长</li>
+<li>研究问题：循环哪里、循环多少次、每轮要不要分化、推理时能不能并行；此前工作各自用不同模型/数据/预算，结果不可比，本文统一到同一从头训练设定</li>
+<li>实验设计：从头训练的 dense decoder-only</li>
+<li>规模：70M / 100M / 200M / 300M / 500M / 1B（4–16 层，宽 512–2048）；1B 为 967M 非 embedding 参数</li>
+<li>配置：GQA、SwiGLU、RoPE、128256 词 Llama-3 兼容 tokenizer、8192 上下文；AdamW、峰值 lr 3e-4、bf16</li>
+<li>预算：10–160 TPP；总量 777M–154.8B token，最高 1.07×10²¹ FLOPs，最多 32 轮（大模型轮数上限更低，1B 只到 4）</li>
+<li>指标：DCLM 约 41M token 验证集 BPB 为主；另 C4、WikiText-103、Dolma、RedPajama、代码语料；下游 8 个选择题任务按 NLL 排序计分</li>
+<li>七种设计：全栈循环、逐层循环、中段整块循环、中段逐层循环；循环对象：整块 / 仅注意力 / 仅 MLP / 注意力与 MLP 各自循环</li>
+<li>发现一：循环哪里、循环几次</li>
+<li>L≤16 时几乎所有设计都胜过无循环，但边际增益递减，过大 L 会饱和、反转甚至不稳定；TPP 越高，增益越稳</li>
+<li>数字：100M、TPP 160，全栈 DCLM BPB 从 L=1 的约 1.115 降到 L=16 的约 1.075，L=32 又跳回 1.2 以上</li>
+<li>规模改变排序：100M/200M、L≤2 时逐层与中段可与全栈打平；300M 尤其 500M，全栈与中段最优，TPP 越高全栈越低</li>
+<li>按训练 FLOPs 看：小算力预算下中段循环单位 FLOPs 收益最高（只重复中间三分之一）；算力不限时全栈绝对 BPB 最低</li>
+<li>1B（TPP 10/40，L=2/4）：全栈、中段、逐层都胜无循环；同 L 下全栈最低，中段额外 FLOPs 最少</li>
+<li>反例：注意力与 MLP 各自循环最差，随 L 增大掉得最快；小模型数学/代码实验里 80 个配置中有 11 个不稳定</li>
+<li>发现二：要不要分化——每轮加小 LoRA 适配器</li>
+<li>动因：后几轮面对的是已被变换多次的表示，完全共享权重会限制收益；完全独立权重又丢掉参数节省</li>
+<li>方法：主权重共享，每轮一个 rank-8 低秩修正（三种形式：Loop LoRA、Loop Matrix、Loop Softmax；Loop Matrix 最优，为默认）</li>
+<li>效果（300M、全栈、TPP 100）：BPB 改进 L=2 时 0.0001、L=4 时 0.0028、L=8 时 0.0063——越深越有用</li>
+<li>成本：300M 上非 embedding 参数只多 1.1–4.3%（对比翻倍深度要 +51.4%）；训练 FLOPs 多 2.1%（L=2）到 9.3%（L=8）</li>
+<li>口径：分化省参数、不省算力——同等 FLOPs 下翻倍深度的对照仍更优；算力是瓶颈且能存更多参数时，加层比循环+分化更划算</li>
+<li>发现三：并行循环为什么掉分，怎么修</li>
+<li>痛点：自回归解码时每轮必须串行，延迟随轮数成比例涨</li>
+<li>PLT（Wu et al. 2025）：跨相邻 token 传隐藏状态（CLP），第 n 个 token 的各轮输入可成批并行算；原版还共享首轮 KV 缓存 + 滑窗缓存 G-SWA</li>
+<li>原版问题：200M、TPP 40/80 下原版 PLT 及其中间变体都追不上全栈；L≤2 时接近无循环基线，裸移位 CLP 随 L 增大更差</li>
+<li>根因：当前 token embedding 与上一 token 隐藏状态的 RMS 量级差 10–300 倍（100M、L=8；缓存对比里轴线到 600 倍），直接相加会淹没较小一方，且谁占优随 TPP 与 L 漂移</li>
+<li>修复（三件套）：两路分别 RMSNorm 到同一尺度；门控混合 b = g⊙ê + (1−g)⊙ĥ（固定 50/50 已够用，rank-8 线性门略优）；始终保留当前 token embedding</li>
+<li>门控成本：跨轮共享，仅 25d 参数，1B 上 51200 参数，不到非 embedding 参数的 0.015%</li>
+<li>去掉当前 embedding 的消融：比无循环更差，多次发散——上一 token 状态只是对当前位的“预测”，embedding 把每轮锚回真实 token</li>
+<li>最终设计 Normalized Shifted PLT：每轮独立 KV 缓存，不用 KV 共享与 G-SWA；同款归一化+门控也让非移位对照超过全栈</li>
+<li>1B 结果（TPP 80）：无循环约 0.898、全栈约 0.883、移位 PLT 约 0.877、非移位对照约 0.875；L=4 时移位 PLT 与全栈大体相当，但与非移位对照的差距拉大</li>
+<li>效率账：循环能替数据、也能替算力（在过训练区）</li>
+<li>数据效率：1B 上所有循环方法达到同一 BPB 用的 token 都更少；改进版 PLT 省得最多，154.8B token 处增益接近 3 倍</li>
+<li>算力效率：100M–1B、TPP 80 的双轮模型，比 TPP 160 的无循环模型用更少 FLOPs 达到同一 BPB，增益 1.06–1.37 倍；L=4 绝对质量更好，但单位 FLOPs 收益弱于 L=2</li>
+<li>下游：1B 上 8 个选择题任务平均分随 TPP 上升，三种循环方法都达到或超过无循环；TPP 160 时 6/8 任务胜出，ARC-Challenge 与 HellaSwag 最明显；MMLU 与 MMLU-Pro 在此规模接近随机，单独报告</li>
+<li>保留意见</li>
+<li>最大 1B、纯 dense，无 MoE 与后训练模型；评估几乎全是似然（BPB）与选择题计分，无自由生成评估</li>
+<li>多数设定单随机种子；门控间 0.001 量级的差异只是方向性结果</li>
+<li>效率结论基于训练 FLOPs 核算，未实测解码延迟与吞吐；PLT 推理加速仍是理论上的</li>
+<li>移位 PLT 在 L=2 最好，L=4 已有差距，更大 L 与更大模型未经验证</li>
+<li>对实际使用的启发</li>
+<li>参数受限（如端侧）：全栈循环为默认；4 轮以上加 Loop Matrix 式低秩适配器，只多几个百分点参数</li>
+<li>训练算力受限：只循环中段、2 轮，性价比最高；能存更多参数时加层更划算</li>
+<li>延迟敏感：Normalized Shifted PLT、2 轮，两路分别 RMSNorm、门控混合（固定 50/50 够用）、保留当前 embedding、每轮独立 KV 缓存，显存紧时可换 G-SWA</li>
+<li>不要把注意力与 MLP 各自循环；不要指望 32 轮一直变好；数据充足的过训练区，“多一轮、少一半数据”是值得算的 trade-off</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[目标 不加参数加深模型] --&gt; B[方法 同一组权重反复跑]
+B --&gt; C[问题一 循环哪里]
+B --&gt; D[问题二 每轮要不要分化]
+B --&gt; E[问题三 推理能不能并行]
+C --&gt; F[参数受限 全栈循环最强]
+C --&gt; G[算力受限 循环中段最划算]
+C --&gt; H[轮数过大 增益饱和反转]
+D --&gt; I[每轮加小 LoRA 适配器]
+I --&gt; J[轮数越多 收益越明显]
+J --&gt; K[只多百分之一到四参数 省参数不省算力]
+E --&gt; L[串行解码 延迟随轮数涨]
+L --&gt; M[PLT 跨 token 传状态 并行算]
+M --&gt; N[原版丢质量 两路量级差十到三百倍]
+N --&gt; O[修复 分别归一化 门控混合 保留当前 embedding]
+O --&gt; P[1B 两轮优于全栈循环 四轮仍有差距]
+F --&gt; Q[结论 按主导约束选型]
+G --&gt; Q
+J --&gt; Q
+P --&gt; Q</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">模型架构</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

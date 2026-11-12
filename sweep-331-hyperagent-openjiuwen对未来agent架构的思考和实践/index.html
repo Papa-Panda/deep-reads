@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HyperAgent：openJiuwen对未来Agent架构的思考和实践</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>HyperAgent：openJiuwen对未来Agent架构的思考和实践</h1>
+<p class="sub">金雪锋解读 openJiuwen 9 月发布的 HyperAgent 架构：Agent 既是软件程序又是智能主体，从 DeepAgent 走向 HyperAgent 需要 AgentOS 而非只是 Harness；八大特征（主动性、持久性、成长、协作、确定性、可扩展、开放性、经济性）+ CoRSI 协同自进化 + Swarm 协作 + 模型路由与全任务成本优化。值得他看的是它把 Agent 运行时从“调模型循环”升级到“操作系统”的整套设计讲全了，正撞 Agent infra 主线，且明确区分了已开源与仍是目标架构的部分。</p>
+<p class="meta">2026-11-11</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2103877820657165415">https://zhuanlan.zhihu.com/p/2103877820657165415</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读，2026-11-11）</h2>
+<ul>
+<li>起点：Agent 的双重属性</li>
+<li>软件程序一面：需要运行时、数据、工具，满足可靠性、安全、可观测、可追溯</li>
+<li>智能主体一面：通用编码与办公能力，自主性、个性、成长、协作，随经验变化</li>
+<li>演进双驱动：应用边界扩大（要更好的运行时与 DFx 工程）与 Agent 替代更多人类工作（要更强自主性）</li>
+<li>从 DeepAgent 到 HyperAgent：八大特征</li>
+<li>主动性：被动响应 → 目标与事件驱动，判断推进、调整或等待</li>
+<li>持久性：Sessionful → Sessionless，用户围着任务与 Agent 转，不围着会话转</li>
+<li>成长：SI → RSI → CoRSI（Artifact、Harness、Model 三方协同自进化）</li>
+<li>协作：单 Agent → 跨模型、工具、Harness 的异构协作</li>
+<li>确定性：个人任务执行 → 复杂环境下可靠可验证的执行</li>
+<li>可扩展：开发者友好 → RSI 友好（Skill/Connect/Plugin → Agent/Agent Team/Agent App 组合）</li>
+<li>开放性：数字世界访问 → 物理环境操纵与 Agent 互联（MCP、CUA、设备适配器）</li>
+<li>经济性：单次调用优化 → 全任务成本优化（token、工具调用、多 Agent 通信、重执行、运维、人工干预）</li>
+<li>AgentOS：不只是 Harness</li>
+<li>Harness 只管模型调用、上下文管理、工具编排、执行循环；AgentOS 还覆盖开发、运行、协作、演化</li>
+<li>六层架构（层名在配图中，文本未列出）</li>
+<li>贯穿各层的两项能力：资产市场（Agent Hub、Skill Hub、MCP Hub、Plugin Hub）与 AgentOps（运行时观测、效果评估、身份权限、版本管理）</li>
+<li>HyperAgent 作为“元 Agent 应用”</li>
+<li>前后端完整 + 内置通用 Coding 与办公能力，可直接当应用用</li>
+<li>经 Skill、插件、UI 扩展机制组合出任务专用的 Agent 应用</li>
+<li>多 Agent 系统：Sessionful Agent + Sessionless 的 Persistent Agent，由 SwarmEngine 协调</li>
+<li>记忆引擎与 RSI 引擎：记忆积累工作事实、用户偏好、任务经验，支撑个性化行为</li>
+<li>部署形态：Agent Serving 与分布式执行</li>
+<li>一个 HyperAgent = 前端 + 一个 Agent Serving（Gateway、Agents、Workers、记忆引擎、RSI、存储、沙箱、推理资源）</li>
+<li>Distributed Executor 调度多个 Agent Serving；Agent Protocol 连接运行单元</li>
+<li>个人桌面部署与企业分布式部署；计算与持久态分离，沙箱按需分配</li>
+<li>智能主体一侧的四项设计</li>
+<li>主动性：EDA 事件驱动 + 全双工交互 + 异步工具执行（TaskLoop FOLLOWUP/STEER/ABORT）</li>
+<li>持久性：Persistent Agent 带稳定身份、职责、记忆、任务态与工作区；Sessionless 指用户不组织会话，内部仍有受管 Session</li>
+<li>成长 CoRSI：Artifact 优化产物、Harness 优化 Prompt/Skill/Tool/Rails/执行策略、Model 从任务反馈改进数据与模型；执行轨迹 → 评估诊断 → 隔离验证 → 版本发布 → 下一轮</li>
+<li>协作 Swarm：共享群组上下文 + 协调者分工 + 成员适配器与协作契约；Agent 内 Workers 执行子任务，Swarm 组织 Agent 间协作</li>
+<li>应用一侧的四项设计</li>
+<li>确定性：计算与持久态分离、弹性沙箱、会话亲和与并发控制、关键业务动作核验运行与恢复结果</li>
+<li>可扩展：受控插件机制 + Rails 约束 + RSI 友好扩展点（模块化、可替换、可定位执行轨迹）</li>
+<li>开放性：数字世界（Connect、工具、API、MCP、CUA）与物理世界（设备适配器、ADF 设备基础设施）</li>
+<li>经济性：计算亲和性（按任务阶段统筹 AI 计算、存储、通用计算，主动 KV 管理）+ 模型路由（按能力、延迟、预算、可用性选模型，Model Router + StateProvider + AlgorithmProvider + report 反馈）</li>
+<li>边界与提醒</li>
+<li>明确区分已开源与仍是目标架构的部分：CoRSI 的 Model 一侧仍是演进方向，部分组件端到端集成待按部署场景验证</li>
+<li>出发点：把 Agent 当作长期运行、持续成长的“数字主体”，而非一次性调用</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Agent 双重属性 软件程序 + 智能主体] --&gt; B[演进 DeepAgent → HyperAgent]
+B --&gt; C[八大特征 主动 持久 成长 协作 确定 可扩展 开放 经济]
+C --&gt; D[AgentOS 不止 Harness 覆盖开发 运行 协作 演化]
+D --&gt; E[元 Agent 应用 前后端完整 + 内置通用能力]
+E --&gt; F[多 Agent 系统 Sessionful + Persistent Agent SwarmEngine 协调]
+F --&gt; G[记忆引擎 + RSI 引擎]
+G --&gt; H[部署 Agent Serving + Distributed Executor + Agent Protocol]
+H --&gt; I[主体侧设计 EDA全双工 Persistent Agent CoRSI Swarm]
+H --&gt; J[应用侧设计 确定性 可扩展 开放性 经济性]
+I --&gt; K[目标 长期运行持续成长的数字主体]
+J --&gt; K</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

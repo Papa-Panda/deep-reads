@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一只鹈鹕，怎么成了全球顶级AI的噩梦？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>一只鹈鹕，怎么成了全球顶级AI的噩梦？</h1>
+<p class="sub">林亦LYi 讲 Simon Willison 的“鹈鹕骑自行车”民间测试如何走红又失效：它测的是无法靠记忆作弊的原创空间理解与盲写 SVG 能力；走红后被针对性训练污染，连带揭示 MMLU 等公开基准的泄露、同质化与脱离真实使用问题，以及 harness 对模型表现的放大作用。值得他看的是它把“跑分为什么越来越不代表真实能力”讲透了，直接关联他的评测与 post-training 工作。注：部分细节据视频音频转录整理，个别编号为近似。</p>
+<p class="meta">2026-11-11</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1Hrxe6YEMC">https://www.bilibili.com/video/BV1Hrxe6YEMC</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（视频已完整观看，内容据音频转录整理，个别编号为近似）</h2>
+<ul>
+<li>起点：一只骑自行车的鹈鹕</li>
+<li>英国程序员 Simon Willison 设计的民间测试：一句话让模型生成鹈鹕骑自行车的图</li>
+<li>选鹈鹕的原因：喜欢这种动物，更关键的是幻想场景几乎不可能出现在训练数据里，防记忆作弊</li>
+<li>为什么难：测的是真本事</li>
+<li>空间理解：自行车两轮一线 + 车架结构；鹈鹕腿部比例、膝踝方向与人不同，模型得理解鹈鹕实际怎么蹬车</li>
+<li>盲写代码：直接写 SVG，无视觉反馈、只有一次输出机会，全图得靠心算</li>
+<li>当时顶级模型也只能画出两个圆圈加几笔</li>
+<li>走红与失效：测试被污染</li>
+<li>出名后人人换着动物考（猫骑车等）；Willison 拿出备用题：火烈鸟骑自行车</li>
+<li>另一开发者 8 种动物 × 6 种交通工具 = 48 种组合，7 个前沿模型各跑 3 轮：结果提示全行业可能针对整个 SVG 绘图方向做了专项训练</li>
+<li>2025 年一研究团队：约 30 亿参数小模型 + 100 万文本-SVG 训练对，在 SVG 美感上据称超过大得多的前沿模型（具体对比对象转录不清，作近似处理）</li>
+<li>民间测试动物园</li>
+<li>9.9 vs 9.11 哪个大：训练数据满是软件版本号，模型把 9.11 排在 9.9 之后</li>
+<li>数 strawberry 里有几个 R：分词后模型数不清字母</li>
+<li>弱智吧问题、洗车问题（一句“开车还是走路去洗车”让模型过度权衡距离、成本、健康、热车）</li>
+<li>代码与游戏类：一句话复现 Mac 桌面、两模型下五子棋/四子棋、把模型放进 Minecraft 求生</li>
+<li>为什么不用标准基准：三点失效</li>
+<li>泄露：MMLU 等公开题流传五六年，答案网上到处是，厂商清洗不干净，模型靠记忆刷高分</li>
+<li>同质化：用测试重叠度工具发现很多基准测的是同一能力，跑十个基准等于重复测一件事</li>
+<li>脱离真实使用：基准高 200 分，日常写代码体感没差别；小孩一眼能看出的问题基准测不到</li>
+<li>人类盲投与 harness 的影响</li>
+<li>Arena 式真人盲投一度流行，但投票者多为技术爱好者，样本有偏</li>
+<li>模型周围的 harness 与模型本身同等重要：无文字 2D 游戏测试里，最强模型单打约 30%，加 agent harness 后大幅提升（具体数值转录不清）</li>
+<li>静态基准跟不上真实的 agent 化使用</li>
+<li>鹈鹕测试还剩的两个用处</li>
+<li>直观：两张图并排，任何人一眼看出哪张更好</li>
+<li>良心测试：有开发者建站让各模型每天画一只鹈鹕，能立刻发现厂商悄悄降级模型</li>
+<li>收尾：两年时间线</li>
+<li>两年前：顶级模型面对这句奇怪指令，只能在代码里摸索，画出两个圆和一个三角</li>
+<li>现在：车架有结构，脚踏、羽毛、光影俱全，鹈鹕朝观众骑来</li>
+<li>落点：基准分数会褪色，但现实中不存在的鹈鹕从模型脑内的代码行里骑了出来</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[Willison 设计鹈鹕骑车测试 防记忆作弊] --&gt; B[测真本事 空间理解 + 盲写 SVG]
+B --&gt; C[走红后被污染 换动物 48 组合专项训练]
+C --&gt; D[民间测试动物园 9.9 vs 9.11 数 R 弱智吧 洗车]
+D --&gt; E[标准基准失效 泄露 同质化 脱离真实]
+E --&gt; F[盲投有偏 harness 与模型同等重要]
+F --&gt; G[鹈鹕剩余价值 直观对比 + 厂商良心测试]
+G --&gt; H[两年进步 两圆一三角 → 结构光影俱全]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">评测</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-11</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

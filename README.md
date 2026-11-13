@@ -60,6 +60,10 @@
 | sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
+| sweep-129- | 深读 | [【RL 入门到 GRPO 18】GRPO 到底改了 PPO 什么？去掉 Critic、换成组内基线、KL 进损失](./sweep-129-rl-入门到-grpo-18-grpo-到底改了-ppo-什么-去掉-critic-换成组内基线/) |  |
+| sweep-128- | 深读 | [法国国债利差飙升至「欧债危机」以来最高水平，欧洲央行拟采取危机干预，法国会引爆金融危机么？](./sweep-128-法国国债利差飙升至-欧债危机-以来最高水平-欧洲央行拟采取危机干预-法国会引爆金融危机么/) |  |
+| sweep-127- | 深读 | [江门、大亚湾在中微子研究方面取得大量成果，为什么没能拿到、甚至没能分享 2026 物理学诺奖？](./sweep-127-江门-大亚湾在中微子研究方面取得大量成果-为什么没能拿到-甚至没能分享-2026-物理学诺奖/) |  |
+| sweep-126- | 深读 | [为什么伽罗瓦 19 岁就发明的群论，绝大多数那个专业的研究生终其一生都学不会？](./sweep-126-为什么伽罗瓦-19-岁就发明的群论-绝大多数那个专业的研究生终其一生都学不会/) |  |
 | sweep-125- | 深读 | [一个直径十厘米的圆里可以不重叠地排列多少个边长一厘米的正方形？](./sweep-125-一个直径十厘米的圆里可以不重叠地排列多少个边长一厘米的正方形/) |  |
 | sweep-124- | 深读 | [华为与高通宣布达成广泛专利许可协议，意味着什么？释放了哪些信号？](./sweep-124-华为与高通宣布达成广泛专利许可协议-意味着什么-释放了哪些信号/) |  |
 | sweep-123- | 深读 | [拉马努金圆周率公式的原理是什么？](./sweep-123-拉马努金圆周率公式的原理是什么/) |  |
@@ -87,6 +91,10 @@
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-13 | 扫读 | [FP8 预训练与中训练的 Train Loss 系统性比 BF16 高 5%该怎么办？](./sweep-338-fp8-预训练与中训练的-train-loss-系统性比-bf16-高-5-该怎么办/) | 知乎提问：FP8 预训练/中训练的 Train Loss 为何系统性比 BF16 高 5%？主答（附 114 篇文献）把 |
+| 2026-11-12 | 扫读 | [洞穿 AI 泡沫迷雾，预见全球金融变局](./sweep-337-洞穿-ai-泡沫迷雾-预见全球金融变局/) | 高志凯博士预测美国 AI 泡沫破灭倒计时并推演全球金融危机：以犀利视角直击全球科技与资本的核心逻辑，拨开大国博弈的迷雾。 |
+| 2026-11-12 | 扫读 | [从 Dual GEMM 到 MXFP8：拆解与加速 DeepSeek V4 DSA](./sweep-336-从-dual-gemm-到-mxfp8-拆解与加速-deepseek-v4-dsa/) | Dingirsu 拆解 DeepSeek V4 稀疏注意力 DSA 在 Blackwell 上的 BF16 kernel |
+| 2026-11-12 | 扫读 | [乱谈kernel之large EP is not all you need](./sweep-335-乱谈kernel之large-ep-is-not-all-you-need/) | 是小肖啊在 NVL72 上实测 DeepInfer 的 DeepGEMM MegaMoE kernel，拆解 DeepS |
 | 2026-11-12 | 扫读 | [字节OneTrans-GSR：一场本末倒置的执念](./sweep-334-字节onetrans-gsr-一场本末倒置的执念/) | 石塔西（清华博士、《互联网大厂推荐算法实战》作者）拆解字节 2026 年 11 月的 OneTrans-GSR 论文：用 |
 | 2026-11-12 | 扫读 | [英伟达的生意，美国越来越看不顺眼了](./sweep-333-英伟达的生意-美国越来越看不顺眼了/) | 解密狗讲英伟达遭美国本土反弹的机制：矛盾不在芯片本身，而在数据中心——白宫 2026 年 3 月 4 日的 Ratepa |
 | 2026-11-11 | 扫读 | [面向 SGLang 的 Profile Analysis SKILL: 3 张表定位 Kernel Fuse 和 Overlap 机会](./sweep-332-面向-sglang-的-profile-analysis-skill-3-张表定位-kernel/) | BBuf 做的 SGLang Profile Analysis SKILL：把 torch profiler 的 tra |
@@ -283,10 +291,6 @@
 | 2026-10-07 | 扫读 | [一人干翻2000人大厂！41岁程序员靠AI年入4亿美元，奥特曼：我想见他](./sweep-132-一人干翻2000人大厂-41岁程序员靠ai年入4亿美元-奥特曼-我想见他/) | 新智元据纽约时报报道写的 AI 商业故事：41 岁创始人 Matthew Gallagher 用 2 万美元启动远程医疗 |
 | 2026-10-07 | 扫读 | [一口气实测GrokBot和Meta Muse/个人Agent Harness系统设计/跨harness记忆实测](./sweep-131-一口气实测grokbot和meta-muse-个人agent-harness系统设计-跨harn/) | 肖恩君Sean 实测两周 Grok Bot 与 Meta Muse 两套个人 Agent Harness 并拆架构：Gr |
 | 2026-10-07 | 扫读 | [一口气学会AI Agent可观测性与Evals/LLM Ops/Tracing/成本追踪/开源实测](./sweep-130-一口气学会ai-agent可观测性与evals-llm-ops-tracing-成本追踪-开源实/) | 白板加实测讲透 Agent 可观测与评测的分工：observability 是相机，记录每次运行与成本；eval 是裁判 |
-| 2026-10-07 | 扫读 | [【RL 入门到 GRPO 18】GRPO 到底改了 PPO 什么？去掉 Critic、换成组内基线、KL 进损失](./sweep-129-rl-入门到-grpo-18-grpo-到底改了-ppo-什么-去掉-critic-换成组内基线/) | 58 秒把 GRPO 对 PPO 的改动讲到公式级：删掉与策略等大的 Critic；同题采样一组答案，用组均值与标准差算 |
-| 2026-10-06 | 扫读 | [法国国债利差飙升至「欧债危机」以来最高水平，欧洲央行拟采取危机干预，法国会引爆金融危机么？](./sweep-128-法国国债利差飙升至-欧债危机-以来最高水平-欧洲央行拟采取危机干预-法国会引爆金融危机么/) | 知乎热榜162万热度、44个回答的宏观金融题：法德10年期利差一周内急升至约150bp、为2012年欧债危机以来最高。最 |
-| 2026-10-06 | 扫读 | [江门、大亚湾在中微子研究方面取得大量成果，为什么没能拿到、甚至没能分享 2026 物理学诺奖？](./sweep-127-江门-大亚湾在中微子研究方面取得大量成果-为什么没能拿到-甚至没能分享-2026-物理学诺奖/) | 知乎热榜332万热度、30个回答的硬核物理题：2026物理学诺奖独授IceCube的Halzen，大亚湾与江门为何无缘。 |
-| 2026-10-06 | 扫读 | [为什么伽罗瓦 19 岁就发明的群论，绝大多数那个专业的研究生终其一生都学不会？](./sweep-126-为什么伽罗瓦-19-岁就发明的群论-绝大多数那个专业的研究生终其一生都学不会/) | 知乎热榜 78 万热度、135 个回答、221 万浏览的硬核数学题：题目前提先被高赞回答拆掉——今天学的伽罗瓦理论不是少 |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从 Dual GEMM 到 MXFP8：拆解与加速 DeepSeek V4 DSA</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从 Dual GEMM 到 MXFP8：拆解与加速 DeepSeek V4 DSA</h1>
+<p class="sub">Dingirsu 拆解 DeepSeek V4 稀疏注意力 DSA 在 Blackwell 上的 BF16 kernel（Dual GEMM 如何把大 GEMM 拆成小块以喂饱 tensor core），再用 MXFP8 做到相对 FlashMLA 约 2 倍加速（prefill 2.03 倍、decode 2.05 至 2.22 倍），代价是 AIME 2025 掉 10 个点、GPQA 与 GSM8K 掉约 2 至 3.5 个点，作者把精度修复留给未来的 attention QAT。值得他看的是 kernel 级的逐周期 profiling 与 rank-1 量化 scale 分解，正撞稀疏注意力与量化主线。</p>
+<p class="meta">2026-11-12</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2093333147786266301">https://zhuanlan.zhihu.com/p/2093333147786266301</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读，Dingirsu，2026-11-07；开源代码 MXDSA）</h2>
+<ul>
+<li>DSA 是什么：DeepSeek V4 的每 token 稀疏注意力</li>
+<li>计算流与标准 attention 相同：QK GEMM、online softmax、rescale O、SV GEMM</li>
+<li>关键在 GEMM 如何组织；V4 Flash：64 头、head dim 512</li>
+<li>BF16 DSA kernel 拆解：Dual GEMM</li>
+<li>QK GEMM 用 tcgen05 的 mma ws 指令；M=64、N=64 时非 ws 模式只写 TMEM 一半列</li>
+<li>把逻辑 64×64×512 GEMM 拆成多个 64×128×128，Q/K 沿特征维切 8 个 64 宽子块，奇偶分开累加</li>
+<li>128 头用 2sm GEMM：两 SM 分担 K/V，SV 需重排 TiledMMA 让 KV 复用同一 SMEM</li>
+<li>Profiling：为什么值得上 MXFP8</li>
+<li>Prefill：QK/SV GEMM 约 512 周期，softmax 全程约 700 周期（实测约 800），GEMM 尚能盖住</li>
+<li>MXFP8 后 GEMM 周期减半至 256，softmax 成瓶颈，须缩短 softmax</li>
+<li>Decode：GEMM 与 softmax 串行，KV 占满放不下第三份，MXFP8 缩 KV 腾出重叠空间</li>
+<li>MXFP8 算法设计</li>
+<li>MXFP8 要求 M 不小于 128，64 头不满足：相邻 Q token 合并，Q 由 seqlen 行 64 头变一半行数 128 头</li>
+<li>两 token 共享 topk：取 Q 均值算 topk（LongBench 上精度损失不大，相邻 token topk 高度共享）</li>
+<li>rank-1 scale 分解：scale 矩阵等于 token 因子与特征组因子外积，g0 固定为 1，解决 SV GEMM 的量化方向问题</li>
+<li>MXFP8 DSA kernel 结构改动</li>
+<li>取消 permute、Q 直接放 SMEM 缩短 prologue；QK 与 SV GEMM 由不同 CTA 发出</li>
+<li>实验：B302 上相对 FlashMLA 约 2 倍加速</li>
+<li>Prefill 峰值 2.03 倍（topk 3968：34.05ms 降到 16.82ms）；decode batch 64 峰值 2.05 倍，batch 128 峰值 2.22 倍</li>
+<li>精度代价：AIME 2025 96.67% 降到 86.67%（仅 30 题），GPQA 降 3.54 点，GSM8K 降 2.27 点</li>
+<li>结论：注意力量化天生敏感，修复留给未来的 attention QAT；V4.1 的 NVFP4 压缩 KV 无法直接与 MXFP8 做 MMA</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[DeepSeek V4 稀疏注意力] --&gt; B[BF16 内核拆解]
+B --&gt; C[Dual GEMM 拆分大矩阵]
+C --&gt; D[喂饱 tensor core]
+B --&gt; E[Profiling 找瓶颈]
+E --&gt; F[softmax 约 700 周期]
+F --&gt; G[换 MXFP8 后 GEMM 减半]
+G --&gt; H[softmax 成新瓶颈]
+H --&gt; I[MXFP8 算法设计]
+I --&gt; J[相邻 Q 合并满足 M128]
+J --&gt; K[取 Q 均值共享 topk]
+I --&gt; L[rank-1 scale 分解]
+L --&gt; M[KV 量化适配 SV GEMM]
+M --&gt; N[MXFP8 内核实现]
+N --&gt; O[实测相对 FlashMLA 约两倍]
+O --&gt; P[prefill 两倍 decode 两倍]
+O --&gt; Q[精度代价 AIME 掉 10 点]
+Q --&gt; R[修复留给 attention QAT]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-12</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

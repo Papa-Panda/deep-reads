@@ -60,6 +60,11 @@
 | sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
+| sweep-134- | 深读 | [如何看待法国 AI 公司 Mistral 发布的最新模型 Mistral Large 4？](./sweep-134-如何看待法国-ai-公司-mistral-发布的最新模型-mistral-large-4/) |  |
+| sweep-133- | 深读 | [跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent](./sweep-133-跑掉四五千万人民币等值token之后-两位英伟达工程师重新理解了agent/) |  |
+| sweep-132- | 深读 | [一人干翻2000人大厂！41岁程序员靠AI年入4亿美元，奥特曼：我想见他](./sweep-132-一人干翻2000人大厂-41岁程序员靠ai年入4亿美元-奥特曼-我想见他/) |  |
+| sweep-131- | 深读 | [一口气实测GrokBot和Meta Muse/个人Agent Harness系统设计/跨harness记忆实测](./sweep-131-一口气实测grokbot和meta-muse-个人agent-harness系统设计-跨harn/) |  |
+| sweep-130- | 深读 | [一口气学会AI Agent可观测性与Evals/LLM Ops/Tracing/成本追踪/开源实测](./sweep-130-一口气学会ai-agent可观测性与evals-llm-ops-tracing-成本追踪-开源实/) |  |
 | sweep-129- | 深读 | [【RL 入门到 GRPO 18】GRPO 到底改了 PPO 什么？去掉 Critic、换成组内基线、KL 进损失](./sweep-129-rl-入门到-grpo-18-grpo-到底改了-ppo-什么-去掉-critic-换成组内基线/) |  |
 | sweep-128- | 深读 | [法国国债利差飙升至「欧债危机」以来最高水平，欧洲央行拟采取危机干预，法国会引爆金融危机么？](./sweep-128-法国国债利差飙升至-欧债危机-以来最高水平-欧洲央行拟采取危机干预-法国会引爆金融危机么/) |  |
 | sweep-127- | 深读 | [江门、大亚湾在中微子研究方面取得大量成果，为什么没能拿到、甚至没能分享 2026 物理学诺奖？](./sweep-127-江门-大亚湾在中微子研究方面取得大量成果-为什么没能拿到-甚至没能分享-2026-物理学诺奖/) |  |
@@ -91,6 +96,11 @@
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-14 | 扫读 | [世界上只有三种曲面](./sweep-343-世界上只有三种曲面/) | 梅尔（北大数学基础强化班 22 届）「为什么我们需要拓扑」系列第二期，用原创动画讲闭曲面分类定理：任何闭曲面都可归为三类 |
+| 2026-11-14 | 扫读 | [《AI基础设施系列》之分布式训练范式总论](./sweep-342-ai基础设施系列-之分布式训练范式总论/) | 想飞的石头（AI基础设施系列第 1.2 章，2026-11-13）从 7B 模型 112GB 显存账本出发，系统讲透 D |
+| 2026-11-13 | 扫读 | [GRPO、Prefix Overlap 与 Critic：统一理解 Process Reward、Gradient Noise 与 Long-Horizon RL](./sweep-341-grpo-prefix-overlap-与-critic-统一理解-process-reward/) | haotian 把 ICML 2026《GRPO is Secretly a Process Reward Model》 |
+| 2026-11-13 | 扫读 | [在这里，万亿吨水被强行灌进火山……【地理志】](./sweep-340-在这里-万亿吨水被强行灌进火山-地理志/) | 芳斯塔芙「地理志」新作：讲透岩浆碰到水会发生什么——水瞬间汽化、蒸汽爆炸炸碎岩浆、形成爆炸坑并汇水成玛珥湖，落点在阿尔山 |
+| 2026-11-13 | 扫读 | [学生党福利来了！用一张游戏显卡跑通 DeepSeek V4.1-Flash 强化学习训练](./sweep-339-学生党福利来了-用一张游戏显卡跑通-deepseek-v4-1-flash-强化学习训练/) | remaper 在一张 24GB RTX 4090 上跑通 DeepSeek V4.1-Flash 的完整 GRPO 循 |
 | 2026-11-13 | 扫读 | [FP8 预训练与中训练的 Train Loss 系统性比 BF16 高 5%该怎么办？](./sweep-338-fp8-预训练与中训练的-train-loss-系统性比-bf16-高-5-该怎么办/) | 知乎提问：FP8 预训练/中训练的 Train Loss 为何系统性比 BF16 高 5%？主答（附 114 篇文献）把 |
 | 2026-11-12 | 扫读 | [洞穿 AI 泡沫迷雾，预见全球金融变局](./sweep-337-洞穿-ai-泡沫迷雾-预见全球金融变局/) | 高志凯博士预测美国 AI 泡沫破灭倒计时并推演全球金融危机：以犀利视角直击全球科技与资本的核心逻辑，拨开大国博弈的迷雾。 |
 | 2026-11-12 | 扫读 | [从 Dual GEMM 到 MXFP8：拆解与加速 DeepSeek V4 DSA](./sweep-336-从-dual-gemm-到-mxfp8-拆解与加速-deepseek-v4-dsa/) | Dingirsu 拆解 DeepSeek V4 稀疏注意力 DSA 在 Blackwell 上的 BF16 kernel |
@@ -286,11 +296,6 @@
 | 2026-10-08 | 扫读 | [如何看待 OpenAI 公开 722 份数学手稿，宣布解决包含「准黎曼猜想」的数百个数学问题？](./sweep-137-如何看待-openai-公开-722-份数学手稿-宣布解决包含-准黎曼猜想-的数百个数学问题/) | 知乎热榜条目，578 个回答、约 561 万浏览。前排回答恰好构成三种读法：高赞答主认为准黎曼级结果若成立将改写数学图景 |
 | 2026-10-07 | 扫读 | [余承东称华为将不得不涨价，存储元器件大涨使每部手机增超两百美元成本，会对消费者及手机市场有多大影响？](./sweep-136-余承东称华为将不得不涨价-存储元器件大涨使每部手机增超两百美元成本-会对消费者及手机市场有多大影/) | 知乎热榜约214万热度、233个回答。最值得看的是两条数据型回答：一条从供给侧拆解——AI服务器为绕开内存墙大量采购HB |
 | 2026-10-07 | 扫读 | [【漫士】为了抓住幽灵，人类在南极挖了1立方公里的冰](./sweep-135-漫士-为了抓住幽灵-人类在南极挖了1立方公里的冰/) | 漫士沉思录在2026物理诺奖独授IceCube领军人Halzen数小时后上线：23分44秒讲清为什么抓中微子要在南极冰盖 |
-| 2026-10-07 | 扫读 | [如何看待法国 AI 公司 Mistral 发布的最新模型 Mistral Large 4？](./sweep-134-如何看待法国-ai-公司-mistral-发布的最新模型-mistral-large-4/) | 知乎热榜114万热度、仅24个回答，却罕见地数据密集：三位答主分别拆架构、算力与基准价格且数字互相印证。总参1.05T、 |
-| 2026-10-07 | 扫读 | [跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent](./sweep-133-跑掉四五千万人民币等值token之后-两位英伟达工程师重新理解了agent/) | 涌现Lab 对谈两位英伟达工程师：相关工作烧掉约四五千万元等值 token 之后的方法论沉淀。核心是规格驱动的 RLCR |
-| 2026-10-07 | 扫读 | [一人干翻2000人大厂！41岁程序员靠AI年入4亿美元，奥特曼：我想见他](./sweep-132-一人干翻2000人大厂-41岁程序员靠ai年入4亿美元-奥特曼-我想见他/) | 新智元据纽约时报报道写的 AI 商业故事：41 岁创始人 Matthew Gallagher 用 2 万美元启动远程医疗 |
-| 2026-10-07 | 扫读 | [一口气实测GrokBot和Meta Muse/个人Agent Harness系统设计/跨harness记忆实测](./sweep-131-一口气实测grokbot和meta-muse-个人agent-harness系统设计-跨harn/) | 肖恩君Sean 实测两周 Grok Bot 与 Meta Muse 两套个人 Agent Harness 并拆架构：Gr |
-| 2026-10-07 | 扫读 | [一口气学会AI Agent可观测性与Evals/LLM Ops/Tracing/成本追踪/开源实测](./sweep-130-一口气学会ai-agent可观测性与evals-llm-ops-tracing-成本追踪-开源实/) | 白板加实测讲透 Agent 可观测与评测的分工：observability 是相机，记录每次运行与成本；eval 是裁判 |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

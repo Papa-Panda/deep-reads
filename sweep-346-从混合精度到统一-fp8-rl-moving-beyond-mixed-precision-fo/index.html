@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从混合精度到统一 FP8 RL：Moving Beyond Mixed Precision for Stable and Accelerated MoE RL</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从混合精度到统一 FP8 RL：Moving Beyond Mixed Precision for Stable and Accelerated MoE RL</h1>
+<p class="sub">多团队工程报告（InfiXAI、蚂蚁 AQ、SGLang RL、slime，2025-11-19）：把 FP8 推进 MoE 模型 RL 训练，先以对照实验归因 KL Loss 异常来自前向量化误差而非实现 bug，再在 Qwen3-30B-A3B 与 Qwen3-235B-A22B 上验证 FP8 的 TIS clipfrac 更低、训推 logprob 差更窄，且模型越大优势越明显；正撞 RL 训练与量化主线。</p>
+<p class="meta">2026-11-14</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/1974681194017865986">https://zhuanlan.zhihu.com/p/1974681194017865986</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读；Chayenne Zhao，多团队工程报告 InfiXAI / 蚂蚁 AQ / SGLang RL / slime，2025-11-19，239 赞 / 249 收藏）</h2>
+<ul>
+<li>硬件基础：FP8 为什么能加速</li>
+<li>Tensor Core 演进：Volta FP16 312 TFLOPS → Blackwell Ultra FP4 3670 TFLOPS</li>
+<li>FP8 格式 E4M3（7.46e-2 ~ 448）与 E5M2；量化需 scale，团队选 FP32 scale 而非 MXFP8 标准的 E8M0</li>
+<li>量化公式：逐 token scale S = max|X| / Vmax，Q(x) = round(x/S)</li>
+<li>FP8 训练难点</li>
+<li>显存/计算开销：TE 保留转置权重副本与高精度激活副本；小 batch 时 CPU 成瓶颈</li>
+<li>精度对齐：FP8 与 BF16 每次 GEMM 误差约 0.0007</li>
+<li>工程坑：TE 版本兼容、MLA 支持、优化器 offload 冲突</li>
+<li>KL Loss 异常归因：是 bug 还是量化误差</li>
+<li>cuBLAS vs DeepGEMM 单 GEMM 误差对比（约 0.00068 vs 0.00036–0.00065，logit 尺度约 10）</li>
+<li>Qwen3-4B + H800 假量化实验：误差来自量化本身，与 GEMM 实现无关</li>
+<li>四组对照 Case 1–4：前向量化误差主导，训练侧权重/激活量化贡献小；TIS-clipfrac 能度量影响</li>
+<li>结论：FP8 的 loss 与 TIS-clipfrac 变化与量化误差自洽，不是 bug</li>
+<li>MoE 模型上的验证</li>
+<li>Qwen3-30B-A3B（2×H20）与 Qwen3-235B-A22B（16×H20）</li>
+<li>FP8 RL 的 TIS clipfrac 更低，训推 logprob 差更窄；MoE 越大，FP8 优势越明显</li>
+<li>规模效应：30B → 1TB，clipfrac 与 logprob diff 都随规模增长</li>
+<li>未来工作</li>
+<li>TE-native 全 FP8、FP8 master weights、权重压缩、FP8 KV cache、FP8-native GRPO、全 FP8 RL 训练</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[MoE RL 想上 FP8 加速] --&gt; B[硬件基础：Tensor Core 演进 + E4M3/E5M2 + FP32 scale]
+B --&gt; C[难点：显存开销 / 精度对齐约 0.0007 每 GEMM / 工程坑]
+C --&gt; D[KL Loss 异常：是 bug 还是量化误差？]
+D --&gt; E[对照实验：cuBLAS vs DeepGEMM + 假量化 Qwen3-4B]
+E --&gt; F[结论：前向量化误差主导，非 bug；TIS-clipfrac 可度量]
+F --&gt; G[MoE 验证：30B-A3B 与 235B-A22B]
+G --&gt; H[FP8 clipfrac 更低，训推 logprob 差更窄]
+H --&gt; I[规模越大 FP8 优势越明显]
+I --&gt; J[未来：全 FP8 训练 + FP8 KV cache + FP8-native GRPO]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">训练优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-14</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

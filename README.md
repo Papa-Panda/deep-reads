@@ -60,6 +60,10 @@
 | sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
+| sweep-138- | 深读 | [【科学史】那些年，科学家用光遗传做的鬼畜实验……](./sweep-138-科学史-那些年-科学家用光遗传做的鬼畜实验/) |  |
+| sweep-137- | 深读 | [如何看待 OpenAI 公开 722 份数学手稿，宣布解决包含「准黎曼猜想」的数百个数学问题？](./sweep-137-如何看待-openai-公开-722-份数学手稿-宣布解决包含-准黎曼猜想-的数百个数学问题/) |  |
+| sweep-136- | 深读 | [余承东称华为将不得不涨价，存储元器件大涨使每部手机增超两百美元成本，会对消费者及手机市场有多大影响？](./sweep-136-余承东称华为将不得不涨价-存储元器件大涨使每部手机增超两百美元成本-会对消费者及手机市场有多大影/) |  |
+| sweep-135- | 深读 | [【漫士】为了抓住幽灵，人类在南极挖了1立方公里的冰](./sweep-135-漫士-为了抓住幽灵-人类在南极挖了1立方公里的冰/) |  |
 | sweep-134- | 深读 | [如何看待法国 AI 公司 Mistral 发布的最新模型 Mistral Large 4？](./sweep-134-如何看待法国-ai-公司-mistral-发布的最新模型-mistral-large-4/) |  |
 | sweep-133- | 深读 | [跑掉四五千万人民币等值Token之后，两位英伟达工程师重新理解了Agent](./sweep-133-跑掉四五千万人民币等值token之后-两位英伟达工程师重新理解了agent/) |  |
 | sweep-132- | 深读 | [一人干翻2000人大厂！41岁程序员靠AI年入4亿美元，奥特曼：我想见他](./sweep-132-一人干翻2000人大厂-41岁程序员靠ai年入4亿美元-奥特曼-我想见他/) |  |
@@ -96,6 +100,10 @@
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-15 | 扫读 | [推理优化：把 MoE 的 dispatch 与 combine 搬进交换机（INC-MoE）](./sweep-347-推理优化-把-moe-的-dispatch-与-combine-搬进交换机-inc-moe/) | 华为 INC-MoE 论文精讲：把 MoE 推理的 dispatch/combine 搬进交换机，利用网内 AllGat |
+| 2026-11-14 | 扫读 | [从混合精度到统一 FP8 RL：Moving Beyond Mixed Precision for Stable and Accelerated MoE RL](./sweep-346-从混合精度到统一-fp8-rl-moving-beyond-mixed-precision-fo/) | 多团队工程报告（InfiXAI、蚂蚁 AQ、SGLang RL、slime，2025-11-19）：把 FP8 推进 M |
+| 2026-11-14 | 扫读 | [人类造出了第一个细胞，从这个细胞，我们看到了几十亿年前祖先的样子【生命起源系列】](./sweep-345-人类造出了第一个细胞-从这个细胞-我们看到了几十亿年前祖先的样子-生命起源系列/) | 万物研究所「生命起源系列」新作：2026 年 7 月明尼苏达大学 Kate Adamala 团队造出土豆细胞 SpudC |
+| 2026-11-14 | 扫读 | [Karpathy 的 autoresearch 搬进搜广推，我发现最难的不是自驱动，是交付对齐](./sweep-344-karpathy-的-autoresearch-搬进搜广推-我发现最难的不是自驱动-是交付对齐/) | GuoXun（百度）把 Karpathy 的 autoresearch 自驱动实验范式搬进搜广推，开源 AlgoPilo |
 | 2026-11-14 | 扫读 | [世界上只有三种曲面](./sweep-343-世界上只有三种曲面/) | 梅尔（北大数学基础强化班 22 届）「为什么我们需要拓扑」系列第二期，用原创动画讲闭曲面分类定理：任何闭曲面都可归为三类 |
 | 2026-11-14 | 扫读 | [《AI基础设施系列》之分布式训练范式总论](./sweep-342-ai基础设施系列-之分布式训练范式总论/) | 想飞的石头（AI基础设施系列第 1.2 章，2026-11-13）从 7B 模型 112GB 显存账本出发，系统讲透 D |
 | 2026-11-13 | 扫读 | [GRPO、Prefix Overlap 与 Critic：统一理解 Process Reward、Gradient Noise 与 Long-Horizon RL](./sweep-341-grpo-prefix-overlap-与-critic-统一理解-process-reward/) | haotian 把 ICML 2026《GRPO is Secretly a Process Reward Model》 |
@@ -292,10 +300,6 @@
 | 2026-10-08 | 扫读 | [如何看待 DeepSeek 估值已接近 5000 亿元？](./sweep-143-如何看待-deepseek-估值已接近-5000-亿元/) | 知乎热榜条目（约126万热度，17个回答）。媒体称 DeepSeek 新一轮融资至少800亿元、估值约5000亿元，宁德 |
 | 2026-10-08 | 扫读 | [【漫士】双曲余弦：三角函数本来就是指数函数](./sweep-140-漫士-双曲余弦-三角函数本来就是指数函数/) | B站游客推荐流条目，漫士沉思录 18 分 11 秒数学科普。标题即论点：圆三角函数与双曲函数本是同一套指数函数在实轴与虚 |
 | 2026-10-08 | 扫读 | [如何评价字节 Seed 团队发现 DeepSeek 性能漂移？](./sweep-139-如何评价字节-seed-团队发现-deepseek-性能漂移/) | 知乎热榜约291万热度、18个回答。字节 Seed 论文《Periodic Weak Spots》指出 DeepSeek |
-| 2026-10-08 | 扫读 | [【科学史】那些年，科学家用光遗传做的鬼畜实验……](./sweep-138-科学史-那些年-科学家用光遗传做的鬼畜实验/) | B站热门条目，芳斯塔芙的科学史短片（8分11秒，约60.6万播放、9千余收藏），被 B 站编入 2026 诺贝尔生理学或 |
-| 2026-10-08 | 扫读 | [如何看待 OpenAI 公开 722 份数学手稿，宣布解决包含「准黎曼猜想」的数百个数学问题？](./sweep-137-如何看待-openai-公开-722-份数学手稿-宣布解决包含-准黎曼猜想-的数百个数学问题/) | 知乎热榜条目，578 个回答、约 561 万浏览。前排回答恰好构成三种读法：高赞答主认为准黎曼级结果若成立将改写数学图景 |
-| 2026-10-07 | 扫读 | [余承东称华为将不得不涨价，存储元器件大涨使每部手机增超两百美元成本，会对消费者及手机市场有多大影响？](./sweep-136-余承东称华为将不得不涨价-存储元器件大涨使每部手机增超两百美元成本-会对消费者及手机市场有多大影/) | 知乎热榜约214万热度、233个回答。最值得看的是两条数据型回答：一条从供给侧拆解——AI服务器为绕开内存墙大量采购HB |
-| 2026-10-07 | 扫读 | [【漫士】为了抓住幽灵，人类在南极挖了1立方公里的冰](./sweep-135-漫士-为了抓住幽灵-人类在南极挖了1立方公里的冰/) | 漫士沉思录在2026物理诺奖独授IceCube领军人Halzen数小时后上线：23分44秒讲清为什么抓中微子要在南极冰盖 |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

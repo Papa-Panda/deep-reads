@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推理优化：把 MoE 的 dispatch 与 combine 搬进交换机（INC-MoE）</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>推理优化：把 MoE 的 dispatch 与 combine 搬进交换机（INC-MoE）</h1>
+<p class="sub">华为 INC-MoE 论文精讲：把 MoE 推理的 dispatch/combine 搬进交换机，利用网内 AllGather 收重、ReduceScatter 发重的互补让两者同时在飞，OLMoE-1B-7B 上 TTFT 最高降 33%；正撞推理优化与通信主线，作者的七条自我批判（模拟交换机、只有 prefill、未开源）同样值得看。</p>
+<p class="meta">2026-11-15</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2099380728895104850">https://zhuanlan.zhihu.com/p/2099380728895104850</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读；Arthur，芯片公司 AI Infra 工程师，2026-10-29；精讲华为 INC-MoE 论文 arXiv:2610.36339）</h2>
+<ul>
+<li>问题：MoE 推理的通信瓶颈</li>
+<li>每层 dispatch + combine 都在关键路径上，跨节点带宽远低于节点内</li>
+<li>vLLM 默认路径三段串行：AllGather → 专家计算 → ReduceScatter</li>
+<li>环形集合通信天生对称：单条已占满双向链路，重叠 AG 与 RS 省不了时间</li>
+<li>刻意取舍：用 AG/RS 代替 all-to-all，只多传约 9%，换来与路由无关的规整通信模式</li>
+<li>关键洞察 1：网内 AG 收重、网内 RS 发重，可以同时跑</li>
+<li>网内 AG：每 rank 只发 S/N，收 (N-1)/N·S；网内 RS：发 (N-1)/N·S，只收 S/N</li>
+<li>各自单独跑与环形一样快；并发时每方向只传 S 字节，理论节省 (N-2)/(2(N-1))：N=4 时 33.3%，N=8 时 42.9%，趋近 50%</li>
+<li>前提 N≥3；N=2 时无增益，只适合多节点 scale-out</li>
+<li>关键洞察 2：只卸载不够，AG 与 RS 必须同时在飞</li>
+<li>同层内 AG 与 RS 严格依赖：分 band + 融合成一个 persistent kernel，三类 thread-block（gather / compute / reduce）各司其职</li>
+<li>稳态三 band 齐飞：gather 发 j+1 的 AG、compute 算 j 的 FFN、reduce 做 j-1 的 RS</li>
+<li>工程要点：bit-exact 的 band 边界、按 Tmax 填充的布局、单调递增计数器 + epoch 的完成信号、每 band 一次跨 rank barrier、空 band 也要走全流程、尾部协助</li>
+<li>实现：消息语义、零拷贝、epilogue 融合</li>
+<li>消息而非内存语义：交换机做 multicast 与 reduction，端点不需知道对端显存布局</li>
+<li>AG 用 rooted multicast，RS 用 rooted reduction（到达→规约→转发三级流水线）</li>
+<li>FFN epilogue 融合进 RS 发送缓冲：SwiGLU 在寄存器里算完，down 投影直接按路由权重累加进 Z</li>
+<li>零拷贝输出：结果以 tensor view 交给 serving engine；可直接接入 vLLM</li>
+<li>实验：TTFT 降 20.2%–33.1%</li>
+<li>测试台：4 卡 EP + 1 卡模拟交换机，400 Gbps 共享链路；OLMoE-1B-7B，prefill only</li>
+<li>集合通信层面：网内有效带宽 163–172 Gbps，比环形高 25.6%–31.8%</li>
+<li>端到端 TTFT：24K tokens/卡降 20.2%，126K 降 33.1%；单卡吞吐 +25.3%–49.5%；逐 token 余弦相似度 1.0</li>
+<li>作者自己的七条批判</li>
+<li>交换机是单卡模拟的，含仿真伪影；基线只有 vLLM 默认路径，未与 DeepEP / FlashMoE 等实测对比</li>
+<li>只有 prefill，无 decode 数据；AG/RS 冗余随 N 增大；依赖现有网络没有的交换机能力；层间无流水线；未开源</li>
+<li>可迁移的结论</li>
+<li>判断重叠是否有用的判据：单跑时是否已对称占满双向链路</li>
+<li>用规整性换可卸载性：多传 9% 换来交换机可识别、可复制、可规约的固定模式</li>
+<li>三个工程坑：band 边界算术必须全 rank 一致、空 band 走全流程、跨 rank 同步点要少而粗</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[MoE 推理：每层 dispatch + combine 在关键路径] --&gt; B[vLLM 默认三段串行：AG → 专家计算 → RS]
+B --&gt; C[环形集合通信对称占满双向链路 重叠无用]
+C --&gt; D[改用 AG/RS：多传 9% 换规整通信模式]
+D --&gt; E[网内 AG 收重 + 网内 RS 发重]
+E --&gt; F[分 band 融合成 persistent kernel 三类 block 齐飞]
+F --&gt; G[AG 占接收方向 RS 占发送方向 FFN 藏在中间]
+G --&gt; H[TTFT 降 20%–33% 吞吐 +25%–50%]
+H --&gt; I[但交换机是模拟的 只有 prefill 未开源]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-15</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

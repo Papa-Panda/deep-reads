@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从一次GDR的D2H拷贝，理解 QP、MR、CQ 和网卡 DMA</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从一次GDR的D2H拷贝，理解 QP、MR、CQ 和网卡 DMA</h1>
+<p class="sub">德布劳钦（LLM Infra 底层码农，2026-10-25）以 DeepSeek DeepInfer 的 KV swap-in 为引子，用一个 4096 字节 GDR D2H 拷贝最小 demo，把 RDMA READ 全链路讲透：QP/MR/CQ、控制面与数据面、网卡 DMA 如何绕过 CPU 与 GPU SM、经 PCIe BAR 搬数据；64 赞 / 142 收藏，正撞推理优化与 GPU 底层主线，适合当作 RDMA/GDR 的案头手册。</p>
+<p class="meta">2026-11-16</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2097738239109079766">https://zhuanlan.zhihu.com/p/2097738239109079766</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读；德布劳钦，LLM Infra底层码农，编辑于 2026-10-25；64 赞 / 142 收藏）</h2>
+<ul>
+<li>背景：为什么要用网卡搬数据</li>
+<li>DeepSeek 开源推理框架 DeepInfer：命中的 KV Cache 先取到 host，再 swap-in 进 GPU，与逐层前向计算重叠</li>
+<li>KV 块拷贝粒度很细，CUDA 拷贝引擎在此场景表现差</li>
+<li>改用 GDR（GPUDirect RDMA）：RDMA 网卡搬数据，跑满 PCIe 带宽，不占 GPU SM</li>
+<li>核心只两行：ibv_post_send 提交请求 + ibv_poll_cq 轮询完成</li>
+<li>一、先把整件事讲一遍：RDMA READ 是什么</li>
+<li>RDMA：本端网卡直接读写对端已授权内存，对端 CPU 不参与每次传输；常用 WRITE 与 READ</li>
+<li>QP（Queue Pair）是网卡上的通信端点：网卡存连接状态，host 存 SQ（主动发起请求）与 RQ（接收对端 SEND）</li>
+<li>请求方 QP0（本地 host 缓冲 H）与响应方 QP1（远端 GPU 缓冲 D），一次 READ 读 4096 字节；demo 中两 QP 在同一网卡上</li>
+<li>一次 READ 的七步：CPU 写 WQE → 敲 doorbell → 网卡 DMA 读 WQE 校验 lkey → QP0 发 READ 请求（只含地址与 rkey，无数据）→ QP1 校验 rkey、经 PCIe BAR 读 GPU 显存 → 网卡 DMA 写 host H → 写 CQE，CPU 轮询得知完成</li>
+<li>谁搬数据：网卡内的 DMA 硬件；CPU 只做控制面，GPU 拷贝引擎与 SM 均不参与</li>
+<li>二、MR：为什么要先"登记"内存</li>
+<li>host 指针 H 与 GPU 指针 D 都是虚拟地址，网卡走 PCIe 总线地址，无法直接用；且 OS 可能换出/迁移页面</li>
+<li>ibv_reg_mr：驱动 pin 住内存、建网卡可用映射、记录访问权限，得到 MR</li>
+<li>每次 MR 产生 lkey（本地访问凭证）与 rkey（对端访问凭证）；网卡每次访问都校验 key、地址范围与权限</li>
+<li>三、创建 CQ 和 QP，把执行条件准备好</li>
+<li>控制面 vs 数据面：登记内存、建 CQ/QP、连接 QP 只做一次；每次传输重复的 post_send + poll_cq 属数据面</li>
+<li>纠正误解：kernel bypass 指高频数据面操作不进内核，不是驱动从不参与——驱动在控制面建好受保护通道，用户态才能安全绕过内核</li>
+<li>先建 CQ（容量 16），再建两个 RC（Reliable Connection）QP；QP = 连接上下文 + SQ/RQ 两条队列</li>
+<li>连接 QP：三次 ibv_modify_qp 走 INIT（选端口、允许远端读写）→ RTR（写入对端 QPN/GID/PSN/MTU）→ RTS（设起始序列号与重试策略）</li>
+<li>术语：QPN 为 QP 编号；GID 为 RoCE 网络地址（demo 用 GID index 3，IPv4 映射 RoCE v2）；PSN 为包序列号（检丢包乱序，非应用请求号）；MTU 决定 4096 字节请求拆包数</li>
+<li>四、CPU 提交请求</li>
+<li>组装 WR：SGE（本地段地址 + 长度 4096 + lkey）、wr_id=7（应用自编号，用于匹配完成）、opcode=RDMA_READ、remote_addr=D、rkey、SIGNALED（完成时留 CQ 记录）</li>
+<li>ibv_post_send：provider（mlx5）把 WR 编码为 WQE 写进 SQ，再敲 doorbell（只写网卡寄存器一个位置，不带数据）</li>
+<li>返回 0 只表示请求已入队，不代表数据已读回；WR/SGE 栈上结构可复用，但 D 与 H 两块数据缓冲在传输期间不可改写或释放</li>
+<li>五、网卡执行：从 WQE 到 DMA</li>
+<li>网卡自取 WQE、找 QP0 上下文 → 校验本地目标 H（lkey 与范围）→ QP0 发 READ 请求 → QP1 校验 GPU MR 后经 PCIe 读显存并返回 → 请求方 DMA 写 host</li>
+<li>PCIe 拓扑：网卡与 GPU 是对等 PCIe 设备，经下游桥 B → 上游桥 → 下游桥 A → 网卡，读 GPU 不经过 host 内存；写 host 再经 PCIe root 与内存控制器</li>
+<li>六、CPU 查完成：CQ 如何工作</li>
+<li>CQE/WC 只有元数据：哪个请求（wr_id）、哪个 QP、何种操作、成功与否，不带数据</li>
+<li>ibv_poll_cq 非阻塞：返回 0 表示暂无记录；有记录 ≠ 成功，必须依次校验 status、wr_id/qp_num、opcode；多 QP 共享 CQ 时按 wr_id 与 qp_num 分发</li>
+<li>七、把所有环节串起来：完整最小伪代码</li>
+<li>准备阶段（控制面）：分配 H/D → 开设备 → 建 PD/CQ → 登记两块 MR → 建两个 RC QP → 互相连接</li>
+<li>每次传输：组装 WR → post_send → poll 直到完成 → 校验成功与匹配</li>
+<li>验证设计：D2H（GPU 填 pattern_B → CPU 清 H → READ → CPU 校验）与 H2D（pattern_A 镜像）对照；全程唯一一次 cudaMemcpy 只读 4 字节错误计数，证明走的确实是 GDR 路径</li>
+<li>拆卸顺序：先停掉未完成访问 → 销 QP → 注销 MR → 销 CQ/PD/ctx → 最后释放 GPU 与 host 内存</li>
+<li>注：§3.2 处设备名字符串页面渲染有乱码，§7 伪代码拼为 roce_vf_rail5；§6.1 一句页面渲染截断，含义（仅元数据）由上下文明确</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[DeepInfer KV swap-in：细粒度 KV 块拷贝
+CUDA 拷贝引擎表现差] --&gt; B[改用 GDR：RDMA 网卡搬数据
+跑满 PCIe 带宽 不占 GPU SM]
+B --&gt; C[核心只两行代码
+ibv_post_send + ibv_poll_cq]
+C --&gt; D[RDMA READ 模型：QP0 请求方读 QP1 响应方
+本地 H 为 host 远端 D 为 GPU]
+D --&gt; E[一次 READ 七步]
+E --&gt; F[CPU 写 WQE + 敲 doorbell]
+F --&gt; G[网卡 DMA 读 WQE 校验 lkey]
+G --&gt; H[QP0 发 READ 请求 仅含地址与 rkey]
+H --&gt; I[QP1 校验 rkey 经 PCIe BAR 读 GPU 显存
+SM 不参与]
+I --&gt; J[网卡 DMA 写 host H]
+J --&gt; K[数据落盘后网卡写 CQE
+CPU 轮询 CQ 得知完成]
+K --&gt; L[前提：MR 登记]
+L --&gt; M[虚拟地址非总线地址 驱动 pin 内存建映射
+lkey 本地凭证 rkey 远端凭证]
+M --&gt; N[控制面一次建好：CQ/QP 创建
+INIT → RTR → RTS 连接]
+N --&gt; O[数据面每次重复：WR/SGE 组装
+post_send 提交 poll_cq 查完成]
+O --&gt; P[验证：D2H 与 H2D 镜像对照
+全程只用一次 4 字节 cudaMemcpy]
+P --&gt; Q[拆卸顺序：停访问 → 销 QP → 注销 MR → 释放内存]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-16</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

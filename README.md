@@ -59,7 +59,11 @@
 | sweep-18-a | 深读 | [Amazon Q2 FY26 Earnings Call \| $AMZN \| 🔴 WATCH LIVE](./sweep-18-amazon-q2-fy26-earnings-call-amzn-watch-live/) |  |
 | sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
+| sweep-144- | 深读 | [Strata 支持 12GB 显存运行 125B 大模型，其技术难度有多大？](./sweep-144-strata-支持-12gb-显存运行-125b-大模型-其技术难度有多大/) |  |
+| sweep-143- | 深读 | [如何看待 DeepSeek 估值已接近 5000 亿元？](./sweep-143-如何看待-deepseek-估值已接近-5000-亿元/) |  |
+| sweep-140- | 深读 | [【漫士】双曲余弦：三角函数本来就是指数函数](./sweep-140-漫士-双曲余弦-三角函数本来就是指数函数/) |  |
 | sweep-14-t | 深读 | [The Inference Shift \| Stratechery by Ben Thompson](./sweep-14-the-inference-shift-stratechery-by-ben-thompson/) |  |
+| sweep-139- | 深读 | [如何评价字节 Seed 团队发现 DeepSeek 性能漂移？](./sweep-139-如何评价字节-seed-团队发现-deepseek-性能漂移/) |  |
 | sweep-138- | 深读 | [【科学史】那些年，科学家用光遗传做的鬼畜实验……](./sweep-138-科学史-那些年-科学家用光遗传做的鬼畜实验/) |  |
 | sweep-137- | 深读 | [如何看待 OpenAI 公开 722 份数学手稿，宣布解决包含「准黎曼猜想」的数百个数学问题？](./sweep-137-如何看待-openai-公开-722-份数学手稿-宣布解决包含-准黎曼猜想-的数百个数学问题/) |  |
 | sweep-136- | 深读 | [余承东称华为将不得不涨价，存储元器件大涨使每部手机增超两百美元成本，会对消费者及手机市场有多大影响？](./sweep-136-余承东称华为将不得不涨价-存储元器件大涨使每部手机增超两百美元成本-会对消费者及手机市场有多大影/) |  |
@@ -100,6 +104,10 @@
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-16 | 扫读 | [从一次GDR的D2H拷贝，理解 QP、MR、CQ 和网卡 DMA](./sweep-351-从一次gdr的d2h拷贝-理解-qp-mr-cq-和网卡-dma/) | 德布劳钦（LLM Infra 底层码农，2026-10-25）以 DeepSeek DeepInfer 的 KV swa |
+| 2026-11-15 | 扫读 | [驯化小麦：人类为什么对碳水如此死心塌地？](./sweep-350-驯化小麦-人类为什么对碳水如此死心塌地/) | 大圆镜科普今日新作：从第一个把麦子磨成粉的人讲起，追问小麦如何被驯化、传入中国并成为约 25 亿人的主食，以及人类为何对 |
+| 2026-11-15 | 扫读 | [PagedAttention 与 RadixAttention：KV Cache 的两场救赎](./sweep-349-pagedattention-与-radixattention-kv-cache-的两场救赎/) | Arthur（芯片公司 AI Infra 工程师）把 PagedAttention 与 RadixAttention 两 |
+| 2026-11-15 | 扫读 | [大模型推理夯实：并行策略图解](./sweep-348-大模型推理夯实-并行策略图解/) | 科英（2026-05-09，491 赞 / 1402 收藏）把推理并行 7 种策略 TP、PP、DP、EP、DP Att |
 | 2026-11-15 | 扫读 | [推理优化：把 MoE 的 dispatch 与 combine 搬进交换机（INC-MoE）](./sweep-347-推理优化-把-moe-的-dispatch-与-combine-搬进交换机-inc-moe/) | 华为 INC-MoE 论文精讲：把 MoE 推理的 dispatch/combine 搬进交换机，利用网内 AllGat |
 | 2026-11-14 | 扫读 | [从混合精度到统一 FP8 RL：Moving Beyond Mixed Precision for Stable and Accelerated MoE RL](./sweep-346-从混合精度到统一-fp8-rl-moving-beyond-mixed-precision-fo/) | 多团队工程报告（InfiXAI、蚂蚁 AQ、SGLang RL、slime，2025-11-19）：把 FP8 推进 M |
 | 2026-11-14 | 扫读 | [人类造出了第一个细胞，从这个细胞，我们看到了几十亿年前祖先的样子【生命起源系列】](./sweep-345-人类造出了第一个细胞-从这个细胞-我们看到了几十亿年前祖先的样子-生命起源系列/) | 万物研究所「生命起源系列」新作：2026 年 7 月明尼苏达大学 Kate Adamala 团队造出土豆细胞 SpudC |
@@ -296,10 +304,6 @@
 | 2026-10-09 | 扫读 | [OpenAI 爆冷，1-9 月年化营收低于预期 200 亿，美股、日经科技板块重挫，如何看其业绩影响？](./sweep-147-openai-爆冷-1-9-月年化营收低于预期-200-亿-美股-日经科技板块重挫-如何看其业绩/) | 知乎热榜条目（202万热度，67个回答，约29万浏览）。FT 披露 OpenAI 投资者文件显示年化收入接近500亿美元 |
 | 2026-10-09 | 扫读 | [史上最大现金收购案 富二代如何正确拼爹](./sweep-146-史上最大现金收购案-富二代如何正确拼爹/) | B站游客推荐流条目，小Lin说商业分析合集新集（13分54秒，2026-10-09 发布，约28万播放、约6000收藏） |
 | 2026-10-09 | 扫读 | [如何看待 Claude 辅助提出 3SUM 猜想的反例？](./sweep-145-如何看待-claude-辅助提出-3sum-猜想的反例/) | 知乎热榜条目（176万热度，15个回答，约30万浏览）。一篇新论文借稀疏歪边图中的三角形与一类细矩阵乘法，把两个经典问题 |
-| 2026-10-09 | 扫读 | [Strata 支持 12GB 显存运行 125B 大模型，其技术难度有多大？](./sweep-144-strata-支持-12gb-显存运行-125b-大模型-其技术难度有多大/) | 知乎热榜条目（17个回答，约7.2万浏览）。Strata 并不是把 125B 模型塞进 12GB 显存：目标模型极度稀疏 |
-| 2026-10-08 | 扫读 | [如何看待 DeepSeek 估值已接近 5000 亿元？](./sweep-143-如何看待-deepseek-估值已接近-5000-亿元/) | 知乎热榜条目（约126万热度，17个回答）。媒体称 DeepSeek 新一轮融资至少800亿元、估值约5000亿元，宁德 |
-| 2026-10-08 | 扫读 | [【漫士】双曲余弦：三角函数本来就是指数函数](./sweep-140-漫士-双曲余弦-三角函数本来就是指数函数/) | B站游客推荐流条目，漫士沉思录 18 分 11 秒数学科普。标题即论点：圆三角函数与双曲函数本是同一套指数函数在实轴与虚 |
-| 2026-10-08 | 扫读 | [如何评价字节 Seed 团队发现 DeepSeek 性能漂移？](./sweep-139-如何评价字节-seed-团队发现-deepseek-性能漂移/) | 知乎热榜约291万热度、18个回答。字节 Seed 论文《Periodic Weak Spots》指出 DeepSeek |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

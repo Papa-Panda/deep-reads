@@ -59,6 +59,10 @@
 | sweep-18-a | 深读 | [Amazon Q2 FY26 Earnings Call \| $AMZN \| 🔴 WATCH LIVE](./sweep-18-amazon-q2-fy26-earnings-call-amzn-watch-live/) |  |
 | sweep-17-a | 深读 | [$APP AppLovin Q1 2026 Earnings Conference Call](./sweep-17-app-applovin-q1-2026-earnings-conference-call/) |  |
 | sweep-16-c | 深读 | [Chip design from the bottom up – Reiner Pope](./sweep-16-chip-design-from-the-bottom-up-reiner-pope/) |  |
+| sweep-148- | 深读 | [中美新一轮算力建设，统筹规划对比自由市场](./sweep-148-中美新一轮算力建设-统筹规划对比自由市场/) |  |
+| sweep-147- | 深读 | [OpenAI 爆冷，1-9 月年化营收低于预期 200 亿，美股、日经科技板块重挫，如何看其业绩影响？](./sweep-147-openai-爆冷-1-9-月年化营收低于预期-200-亿-美股-日经科技板块重挫-如何看其业绩/) |  |
+| sweep-146- | 深读 | [史上最大现金收购案 富二代如何正确拼爹](./sweep-146-史上最大现金收购案-富二代如何正确拼爹/) |  |
+| sweep-145- | 深读 | [如何看待 Claude 辅助提出 3SUM 猜想的反例？](./sweep-145-如何看待-claude-辅助提出-3sum-猜想的反例/) |  |
 | sweep-144- | 深读 | [Strata 支持 12GB 显存运行 125B 大模型，其技术难度有多大？](./sweep-144-strata-支持-12gb-显存运行-125b-大模型-其技术难度有多大/) |  |
 | sweep-143- | 深读 | [如何看待 DeepSeek 估值已接近 5000 亿元？](./sweep-143-如何看待-deepseek-估值已接近-5000-亿元/) |  |
 | sweep-140- | 深读 | [【漫士】双曲余弦：三角函数本来就是指数函数](./sweep-140-漫士-双曲余弦-三角函数本来就是指数函数/) |  |
@@ -104,6 +108,10 @@
 | sweep-100- | 深读 | [Claude Code源码曝光 底层技术硬核拆解：1884个文件背后，Anthropic如何构建Agent Runtime？](./sweep-100-claude-code源码曝光-底层技术硬核拆解-1884个文件背后-anthropic如何构建/) |  |
 | sweep-10-雪 | 深读 | [雪球 402127008 - 抓取受限](./sweep-10-雪球-402127008-抓取受限/) |  |
 | deepread-l | 深读 | [LangChain smithtune × 小米 HySparse2 深读](./deepread-langchain-smithtune-小米-hysparse2-深读/) |  |
+| 2026-11-17 | 扫读 | [EUV光刻机 \| "上帝的手术刀"](./sweep-355-euv光刻机-上帝的手术刀/) | Vibe-SCI（2026-11-15，5 分 02 秒）硬核科普：激光轰击锡滴打出极紫外光、真空反射镜与掩模如何把电路 |
+| 2026-11-17 | 扫读 | [RL修炼第六弹：低精度FP8，FP4 和 Trace](./sweep-354-rl修炼第六弹-低精度fp8-fp4-和-trace/) | 大海无量（2026-11-05，RL修炼系列第六弹）把 RL 训练的低精度 rollout 从头讲透：FP8/FP4/M |
+| 2026-11-16 | 扫读 | [GPU 同步方法与实现：以DeepEP、MegaMoE 与 NVLinkOneSided为例](./sweep-353-gpu-同步方法与实现-以deepep-megamoe-与-nvlinkonesided为例/) | 盖茨比（编辑于 2026-11-16）以 DeepEP、DeepGEMM MegaMoE 与 NVLinkOneSide |
+| 2026-11-16 | 扫读 | [Post-train RL 的近期有意思的工作](./sweep-352-post-train-rl-的近期有意思的工作/) | 孙元宝儿（echo-r1 团队）介绍两项后训练 RL 工作：Echo-N1 把 RL 从数学/代码拓展到共情对话（con |
 | 2026-11-16 | 扫读 | [从一次GDR的D2H拷贝，理解 QP、MR、CQ 和网卡 DMA](./sweep-351-从一次gdr的d2h拷贝-理解-qp-mr-cq-和网卡-dma/) | 德布劳钦（LLM Infra 底层码农，2026-10-25）以 DeepSeek DeepInfer 的 KV swa |
 | 2026-11-15 | 扫读 | [驯化小麦：人类为什么对碳水如此死心塌地？](./sweep-350-驯化小麦-人类为什么对碳水如此死心塌地/) | 大圆镜科普今日新作：从第一个把麦子磨成粉的人讲起，追问小麦如何被驯化、传入中国并成为约 25 亿人的主食，以及人类为何对 |
 | 2026-11-15 | 扫读 | [PagedAttention 与 RadixAttention：KV Cache 的两场救赎](./sweep-349-pagedattention-与-radixattention-kv-cache-的两场救赎/) | Arthur（芯片公司 AI Infra 工程师）把 PagedAttention 与 RadixAttention 两 |
@@ -300,10 +308,6 @@
 | 2026-10-10 | 扫读 | [英特尔 CEO 陈立武称内存短缺明年或进一步恶化，CPU 也缺货，内存、电力、散热都是基建瓶颈，如何解读？](./sweep-151-英特尔-ceo-陈立武称内存短缺明年或进一步恶化-cpu-也缺货-内存-电力-散热都是基建瓶颈/) | 知乎热榜条目（146万热度，60个回答，约34万浏览）。英特尔 CEO 在 AI Infrastructure Summ |
 | 2026-10-10 | 扫读 | [攒多少钱才能不上班？我和 Opus 5.5 做了一部 46 分钟的关于财务自由和 FIRE 的动画](./sweep-150-攒多少钱才能不上班-我和-opus-5-5-做了一部-46-分钟的关于财务自由和-fire-的动/) | B站游客推荐流条目，plotome 出品的 46 分钟长动画。它不贩卖财务自由鸡汤，而是拆 4% 法则与 25 倍年支出 |
 | 2026-10-10 | 扫读 | [如果把一根压紧的弹簧放进酸里溶解，它的弹性势能到哪里去了？](./sweep-149-如果把一根压紧的弹簧放进酸里溶解-它的弹性势能到哪里去了/) | 知乎热榜条目（270万热度，382个回答，8321关注）。经典物理思想实验：压紧的弹簧被酸逐层溶掉，储存的弹性势能不可能 |
-| 2026-10-09 | 扫读 | [中美新一轮算力建设，统筹规划对比自由市场](./sweep-148-中美新一轮算力建设-统筹规划对比自由市场/) | B站游客推荐流条目（约5.7万播放，片长约16分半，章节完整）。以 DeepSeek 与华为昇腾合作补齐 AI 产业生态 |
-| 2026-10-09 | 扫读 | [OpenAI 爆冷，1-9 月年化营收低于预期 200 亿，美股、日经科技板块重挫，如何看其业绩影响？](./sweep-147-openai-爆冷-1-9-月年化营收低于预期-200-亿-美股-日经科技板块重挫-如何看其业绩/) | 知乎热榜条目（202万热度，67个回答，约29万浏览）。FT 披露 OpenAI 投资者文件显示年化收入接近500亿美元 |
-| 2026-10-09 | 扫读 | [史上最大现金收购案 富二代如何正确拼爹](./sweep-146-史上最大现金收购案-富二代如何正确拼爹/) | B站游客推荐流条目，小Lin说商业分析合集新集（13分54秒，2026-10-09 发布，约28万播放、约6000收藏） |
-| 2026-10-09 | 扫读 | [如何看待 Claude 辅助提出 3SUM 猜想的反例？](./sweep-145-如何看待-claude-辅助提出-3sum-猜想的反例/) | 知乎热榜条目（176万热度，15个回答，约30万浏览）。一篇新论文借稀疏歪边图中的三角形与一类细矩阵乘法，把两个经典问题 |
 | 2026-09-29 | 想法 | [Muse 替代信息流](./idea-8-muse-替代信息流/) | 核心判断：信息流时间会少，但不会自动少。设计从刷流到定向提问的替代回路——找答案就问 Muse、无聊就离屏、睡前听音频— |
 | 2026-09-29 | 想法 | [CPU 与虚拟机](./idea-7-cpu-与虚拟机/) | 讲清 socket / core / thread / vCPU 四级概念、hypervisor 时间片调度、硬件虚拟化 |
 | 2026-09-29 | 想法 | [Loop / Graph Engineering](./idea-6-loop-graph-engineering/) | 澄清三个易混概念：Loop 是运行时控制结构，Graph 是控制流的显式表示，Engineering 是让循环可靠的整套 |

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>万字详解Search Agent 数据合成方案（DeepDive、WebSailor-V2、REDSearcher）</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎收藏</div>
+<h1>万字详解Search Agent 数据合成方案（DeepDive、WebSailor-V2、REDSearcher）</h1>
+<p class="sub">余培杰（腾讯混元，2026-02-20，113 赞 / 213 收藏）万字拆解三套 Search Agent 数据合成方案：共用“建图 → 随机游走取子图 → 生成 QA”三步；DeepDive 开源代码逐行讲透（出度过滤 + LLM 选下一跳 + 四测难度过滤）；WebSailor-V2 用 Weisfeiler-Leman 保证子图非同构多样性与三招混淆法；REDSearcher 再加树宽 / 信息分散度与五步 Verifier Pipeline；BrowseComp 15.3 → 35.3 → 42.1，上下文管理再推到 57.4。正撞 Agent 数据合成与后训练主线。</p>
+<p class="meta">2026-11-19 · 作者：余培杰</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2007944059558323475">https://zhuanlan.zhihu.com/p/2007944059558323475</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读；余培杰，腾讯混元 Agent，2026-02-20；113 赞 / 213 收藏）</h2>
+<ul>
+<li>总表：三套方案对照</li>
+<li>DeepDive：SFT 1016 + RL 2234 = 3250 条，BrowseComp 15.3，清华 &amp; 智谱，2025-09-12</li>
+<li>WebSailor-V2：30000+ 条，BrowseComp 35.3，阿里通义，2025-09-16，数据集未开源</li>
+<li>REDSearcher：SFT 10000 + RL 1000，总表称 30000 条，BrowseComp 42.1，上下文管理后 57.4，小红书，2026-02-17</li>
+<li>注：REDSearcher 总表中 SFT 与 RL 之和（11000）与总条数（30000）对不上，原文未给剩余数据的拆分</li>
+<li>共用三步流水线</li>
+<li>构建知识图谱 → 选初始节点随机游走生成子图 → 按子图生成 QA 对</li>
+<li>三套方法的差别主要是每一步的优化</li>
+<li>DeepDive（开源完整，最易懂）</li>
+<li>游走约束：节点出度过滤 [dmin, dmax]（太高则答案易猜，太低则走不下去）+ LLM 选与当前路径最相关的下一跳</li>
+<li>QA 生成：取末节点属性作金答案；LLM 模糊化路径上的实体属性（如具体日期泛化成时间范围）</li>
+<li>难度过滤：GPT-4o 测四次，答对一次即丢弃，只留四次全败的题</li>
+<li>代码 random_walk_kilt.py：KILT 图上受控游走，路径 ≥5 跳；LLM 只回 1–5 的数字选下一跳；失败回滚到历史节点；每 5 步存一条，100 步或 100 节点封顶</li>
+<li>代码 generate_qa.py：提示词模板要求逐节点设线索、至多 15 条、800 字内、全部时间/人名/地名/事件信息模糊化；示例问 Transformer 核心机制，答 self-attention</li>
+<li>短板：BrowseComp 仅 15.3，难度与多样性不足，数据量 3000 条偏少</li>
+<li>WebSailor-V2</li>
+<li>建图：从种子实体出发用 Web 工具扩展相关实体，不直接用现成维基图谱</li>
+<li>取子图：随机游走 + Weisfeiler-Leman 算法验“非同构”，覆盖链到复杂环、割点/桥等多种拓扑</li>
+<li>三招混淆法加难<ul>
+<li>语义混淆：关键信息不明说或间接描述（如“该成果首次发表的两个重要会议中较早的那个”），逼 Agent 先重建缺失实体再验证</li>
+<li>掺假噪声：插入事实错误的干扰项（如同一作者另一篇论文的发表年份），逼多源交叉验证与纠错</li>
+<li>结构不确定性：删关键节点/边（割点、桥），逼 Agent 经由替代路径或图冗余重建多跳关系，按 orbit 节点分布不确定性类型</li>
+</ul>
+</li>
+<li>结果：BrowseComp 35.3；但训练集 30000+ 条是 DeepDive 的 10 倍，质量与数量的贡献拆不开</li>
+<li>REDSearcher</li>
+<li>两指标：树宽（图结构复杂度）与信息分散度（覆盖全部关键证据最少需要几个信源；越大越逼多轮检索合成）</li>
+<li>子图抽取：按指定树宽 + 分散度构造推理图，LLM Agent 做“拓扑加密”，让依赖图出现环与交错约束</li>
+<li>QA 生成：模糊化关键实体（如地名换成地图距离约束）</li>
+<li>五步 Verifier Pipeline（难、真、可解、答案唯一）<ul>
+<li>无工具 LLM 预筛：能答对即删</li>
+<li>检索可达检查：答案须出现在搜索前 50 条摘要里</li>
+<li>幻觉/不一致检查：拿建图证据对问题验矛盾</li>
+<li>Agent 多轮 rollout 验证：至少一轮答对才保留，通过率作置信度</li>
+<li>答案唯一性检查：出现合理解答即丢弃</li>
+</ul>
+</li>
+<li>结果：BrowseComp 42.1（+6.8）；MidTrain 引入教师模型、数据量等多变量，严格比较不易</li>
+<li>上下文管理：上下文超阈值时清空工具调用历史、只留原问题与最小任务说明，从新上下文重启 rollout，+15.3 至 57.4；作者认为本质是 Test-Time Scaling</li>
+<li>作者总结：复杂拓扑子图 + 实体/属性模糊、噪声注入、删关键节点边 + 信息分散度等监控指标，是当前最优配方</li>
+<li>评论区讨论：同 hop 数的子图比链式难得多、也难构造；单跳多约束问题同样难，不必执着多跳</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[共用三步：建知识图谱 → 随机游走取子图 → 生成 QA 对] --&gt; B[DeepDive：开源易懂，KILT 图上受控随机游走]
+B --&gt; C[出度过滤 + LLM 选下一跳，路径 ≥5 跳]
+C --&gt; D[末节点属性作答案，实体属性模糊化]
+D --&gt; E[GPT-4o 四测全败才保留，BrowseComp 15.3]
+E --&gt; F[WebSailor-V2：种子实体用 Web 工具扩图]
+F --&gt; G[Weisfeiler-Leman 验子图非同构，覆盖链/环/割点等拓扑]
+G --&gt; H[三招加难：语义混淆 / 掺假噪声 / 删关键节点边]
+H --&gt; I[BrowseComp 35.3，但数据量 3 万+ 是 10 倍，质与量难拆开]
+I --&gt; J[REDSearcher：树宽 + 信息分散度双指标控子图]
+J --&gt; K[拓扑加密造环与交错约束，从顺藤摸瓜变联合验证]
+K --&gt; L[五步 Verifier：无工具预筛 / 检索可达 / 幻觉检查 / 多轮 rollout / 答案唯一性]
+L --&gt; M[BrowseComp 42.1，上下文管理重置工具历史再推到 57.4]
+M --&gt; N[作者结论：复杂拓扑子图 + 模糊/噪声/删边 + 分散度监控是当前最优配方]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent数据</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-19</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

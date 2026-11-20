@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>有一段咒语可以加快 Agent 理解你的代码！AOCI 索引赏析～</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>有一段咒语可以加快 Agent 理解你的代码！AOCI 索引赏析～</h1>
+<p class="sub">飞天闪客（2026-11-18，5:51）讲 AOCI 索引：把每个文件压成一条固定维度的字母编码记录（职责/关联/接口/补充），整项目索引一次读进 Agent 上下文，免去盲目翻文件烧 context；官方对照实验相关文件召回率 57.2%→74.8%，50 万行代码压成约 20 万 token 索引，靠文件哈希增量更新。Agent infra 里代码认知压缩的新思路，结尾还留了“维度是否最优”的开放问题。注：视频无简介，数字来自视频旁白与转录。</p>
+<p class="meta">2026-11-20</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1mWsU67ECh">https://www.bilibili.com/video/BV1mWsU67ECh</a></div>
+<div class="sec"><h2>大纲</h2><h2>问题：大项目塞不进上下文</h2>
+<ul>
+<li>小项目可整体塞进 Agent 上下文，大项目不行</li>
+<li>Vue3 约 160 万 token；K8s 约 7000 万 token——1M 上下文一次最多读约 1/70</li>
+<li>现状 workaround：先让 AI 通读项目写一份 README，下次先读 README——等于手动做了一次索引工程</li>
+</ul>
+<h2>AOCI 的思路：为 Agent 而写的压缩索引</h2>
+<ul>
+<li>README 是给人看的自然语言；能否把同样信息压成专供 Agent 读的摘要？</li>
+<li>AOCI：代码认知压缩新范式</li>
+<li>每个文件压成一条记录，固定维度 + 统一字母编码</li>
+<li>例：UserService.java: F:users | R:user | A:get | S:id</li>
+<li>四栏：负责什么、改它要盯谁、对外暴露什么接口、补充信息</li>
+<li>全项目记录合起来就是一份索引，可一次读进上下文</li>
+<li>比喻：像一张简化关系表——改代码就更新它的记录；一文件一条记录</li>
+</ul>
+<h2>实操演示：5 万行新闻聚合站</h2>
+<ul>
+<li>步骤 1：经 MCP 安装 AOCI Code（官方配置现已自动写好，交给 Agent 执行）</li>
+<li>步骤 2：建索引——模型按 AOCI 规则把每个文件压成一条记录，需耗时</li>
+<li>产出：项目内索引文件 + 可视化整站结构的网页（入口层、元信息、核心索引）+ 一份面向 Agent 的项目总述文档</li>
+<li>演示任务：加“删除新闻”功能——Agent 凭完整索引直接定位修改点，改真实文件后功能跑通；视频称 Agent 对系统整体把握约 99%（UP 自认小演示代表性有限）</li>
+</ul>
+<h2>官方对照实验</h2>
+<ul>
+<li>4 个仓库 93 个真实 issue，SWE-benchmark 式测试：相关文件召回率 57.2%→74.8%</li>
+<li>未见过的仓库：修复率 66.7%→约 82%（该数字转录不清，仅供参考）</li>
+<li>规模收益：50 万行代码 → 约 20 万 token 索引；70 万行 → 约 30 万 token，占 1M 上下文的 30%，余 70% 给对话</li>
+<li>保鲜：按文件哈希增量更新，只重建改过的文件，不用全量重扫</li>
+</ul>
+<h2>开放问题与评论区质疑</h2>
+<ul>
+<li>索引终究还是一份文档：为什么不直接让 AI 写自己的 README？AOCI 的维度与格式是否最优，尚未定论</li>
+<li>UP 的追问：如果它真是更优解，大模型会不会自然而然学到这种结构总结？</li>
+<li>评论质疑 1（冷鸟社区）：快速迭代项目里索引易过期，增量更新是否够用</li>
+<li>评论质疑 2（ousannwangmm，178 赞）：怕刚跑起来就被大模型厂商内化进工具链，又得迁移，不如等厂商更新</li>
+<li>评论追问（弹幕）：AI 拆 spec 的任务粒度仍是人类规模，这部分优化还没见过</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[大项目塞不进 Agent 上下文：K8s 约 7000 万 token] --&gt; B[现状：先让 AI 写 README，下次先读它]
+B --&gt; C[问题：README 是给人看的自然语言]
+C --&gt; D[AOCI：每文件压成一条字母编码记录]
+D --&gt; E[四栏：职责 F / 关联 R / 接口 A / 补充 S]
+E --&gt; F[全项目索引一次读进上下文]
+F --&gt; G[Agent 先有整站地图，再读相关源码]
+G --&gt; H[召回率 57.2% → 74.8%，50 万行压成约 20 万 token]
+H --&gt; I[哈希增量更新保鲜]
+I --&gt; J[开放问题：维度是否最优？厂商会不会内化？]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-20</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

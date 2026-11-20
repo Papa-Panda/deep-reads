@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSI-Infra Bench Preview：给 AI Agent 10 小时优化真实训练基础设施</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>RSI-Infra Bench Preview：给 AI Agent 10 小时优化真实训练基础设施</h1>
+<p class="sub">ydove1031（2026-11-19）介绍北大 RSI-Infra Bench Preview：给 Agent 每个任务 10 小时，在 1–4 张 Hopper 卡上优化 8 个真实训练负载（预训练/SFT/RL/OPD），按验证加速比 ln(S)/ln(S_best) 打分；Claude Opus 5.5 以 40.00 居首，3DGS 任务达 5.82×；轨迹分析显示手写 kernel 数量与得分相关性 +0.72，轮数多反而无益。正撞 Agent infra 与训练优化主线。</p>
+<p class="meta">2026-11-19</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2106788355182743918">https://zhuanlan.zhihu.com/p/2106788355182743918</a></div>
+<div class="sec"><h2>大纲</h2><h2>大纲（全文已通读；ydove1031，2026-11-19；16 赞 / 21 收藏）</h2>
+<ul>
+<li>立论：测 Agent 优化真实训练 infra 的能力与速度</li>
+<li>每个模型每任务 10 小时墙钟预算，不是只看最终分数</li>
+<li>详情见博客与 GitHub（DAGroup-PKU/ResearchBoost-Agent）</li>
+<li>评测设计三原则</li>
+<li>固定 10 小时预算；真实训练负载；全程可验证反馈</li>
+<li>8 个任务：LLM 与多模态理解/生成，覆盖预训练、SFT、RL、OPD，含 GDN、YOCO 架构</li>
+<li>1–4 张 Hopper 卡；每模型每任务只跑一次</li>
+<li>计分方法</li>
+<li>终评按 参考 → Agent 实现 → 参考 顺序计时</li>
+<li>单任务分 = ln(S) / ln(S_best)，S 为验证加速比</li>
+<li>榜单（9 模型 × 8 任务）</li>
+<li>Opus 5.5（Claude Code）40.00 居首；Sonnet 5.5 36.64；GPT-6.2 Astra 28.50</li>
+<li>最高单项：3DGS 任务 Opus 达 5.82x</li>
+<li>4 个模型构成得分–API 成本 Pareto 前沿（成本不含 GPU）</li>
+<li>轨迹分析（任务内 Spearman 相关）</li>
+<li>手写 kernel 数量 +0.72（覆盖 6 个任务）；优化类别覆盖 +0.60</li>
+<li>尝试→落地转化率 +0.50；工作日志轮数 −0.41（多轮不等于更好）</li>
+<li>三个案例（均为完整实现并终评）</li>
+<li>3DGS × Opus：5.82x，visibility-aware Lazy Adam + 融合训练流水线</li>
+<li>R3 × Opus：2.41x，结构改动 + 手写 kernel，bitwise（N0）正确性要求</li>
+<li>Slime GRPO × Sonnet：2.40x，跨 GPU 重分 GDN 计算，前向输出 bitwise 一致</li>
+<li>诊断报告：31 个主要优化机会，区分“未尝试”与“尝试未落地”</li>
+<li>日志中没有某想法 ≠ 模型缺乏相关知识</li>
+<li>展望：Preview 版，征求 infra 专家合作（新负载、正确性检查、计时方法、轨迹深挖）</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[给 Agent 10 小时墙钟预算] --&gt; B[8 个真实训练负载：预训练/SFT/RL/OPD]
+B --&gt; C[Agent 逐轮迭代优化：可测正确性与加速]
+C --&gt; D[终评 Harbor 协议：参考 → Agent 版 → 参考]
+D --&gt; E[计分 ln S / ln S_best，S 为验证加速比]
+E --&gt; F[榜单：Opus 5.5 40.00 居首，3DGS 达 5.82x]
+F --&gt; G[轨迹分析：手写 kernel 数与得分相关 +0.72]
+G --&gt; H[诊断报告：区分知识缺口与实现/调试困难]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-19</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从 Harness 自我改进到模型权重更新：一次 SIA 复现实践</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>从 Harness 自我改进到模型权重更新：一次 SIA 复现实践</h1>
+<p class="sub">Johnson7788（2026-11-18）复现 SIA 论文（arXiv:2605.27276）：Harness 自我改进 + 权重更新双循环，Qwen3-8B + deepseek-v4-pro 在 GPQA 上实测；Harness Gen 2 改动反而退化、权重单更新不稳定、两者结合在 40 题上 62.5%→80% 但 p=0.1213 未达显著——罕见诚实的复现日记，LoRA 参数、失败分析与工程踩坑全给齐了。Agent harness 与自蒸馏实战，值得慢读。</p>
+<p class="meta">2026-11-20</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2106737988910819302">https://zhuanlan.zhihu.com/p/2106737988910819302</a></div>
+<div class="sec"><h2>大纲</h2><h2>SIA 是什么</h2>
+<ul>
+<li>双循环：Harness 改进 + 权重更新</li>
+<li>反馈模型分析失败 → 提 Harness 改动；筛出的轨迹用作训练数据</li>
+<li>复现三问：反馈模型能否定位真问题；轨迹训练能否稳定提分；两者结合是否优于单用</li>
+<li>来源论文：SIA: Self Improving AI with Harness &amp; Weight Updates（arXiv:2605.27276）</li>
+</ul>
+<h2>实验设置</h2>
+<ul>
+<li>硬件与模型：A800-SXM4-80GB；目标 Qwen3-8B；反馈模型 deepseek-v4-pro</li>
+<li>任务：GPQA（198 题）与 LawBench</li>
+<li>权重更新：LoRA SFT，拒绝采样自蒸馏</li>
+<li>rank 16 / alpha 32 / dropout 0；可训参数 43,646,976（~0.53%）</li>
+<li>3 epoch，lr 1.5e-5，seq 8192，paged_adamw_8bit；81 步，6 分 36 秒，终 loss 0.10–0.16</li>
+<li>训练数据：109 条 = 69 条正确 Gen-1 轨迹 + 40 条教师解法</li>
+<li>防泄漏：教师只见题面不见答案，事后程序校验</li>
+<li>教师单次 59.5%（44/74），5 次升温采样后 70.3%（52/74）</li>
+</ul>
+<h2>Harness 阶段：Gen 2 反而退化</h2>
+<ul>
+<li>Gen 1：87 对 / 95 错 / 16 未答，准确率 43.94%；物理 57.0%、生物 57.9%、化学 29.0%</li>
+<li>主因：严格 JSON 输出失败——推理常超 3.1 万字符，8192 token 上限内到不了 JSON；并发长生成超时</li>
+<li>Gen 2“修复”翻车：关 thinking、强制 JSON、加续写 → 正确 87→36，未答 16→147，准确率 43.94%→18.18%</li>
+<li>评估陷阱：Gen 2 的 70.59% 是 correct/(correct+incorrect)，排除了未答题</li>
+<li>续写还把吞吐从约 1.8 题/分钟拖到约 0.1</li>
+<li>教训：Harness 改动先小样本验证；汇报必须含总题数、已答、未答与全量准确率</li>
+</ul>
+<h2>权重阶段：单更新不稳定</h2>
+<ul>
+<li>Qwen2.5-3B / LawBench：18.95%→26.83%（+7.88pp，p&lt;0.01）</li>
+<li>Qwen3-8B / GPQA：多配置无稳定提升</li>
+<li>ORPO 反例：教师格式数据把平均生成从 8192 token 压到 819 token，准确率 65%→50%；STEM + 难度感知数据更跌到 32.5%</li>
+<li>解释：模型学了模仿/压缩格式，丢了难题所需的推理</li>
+</ul>
+<h2>结合：有信号，未证实</h2>
+<ul>
+<li>同 40 道 held-out 题、同解析器：基线 + disciplined 提示 25/40（62.5%）→ 结合模型 + disciplined 32/40（80%）</li>
+<li>但 McNemar χ²=2.400，p=0.1213，未达显著；11 题改对、4 题改错，净 +7</li>
+<li>提示依赖：结构化控制标签在 disciplined 提示下用 92.5%，普通 CoT 下 0%——是条件激活而非内化</li>
+<li>对照 D-CoT 论文用了 5,079 例，本复现仅 109 例，不可直接比</li>
+</ul>
+<h2>工程踩坑实录</h2>
+<ul>
+<li>环境：无 sudo、Xcode 许可挡 Git、缺 CA 证书、GitHub 超时走代理/镜像</li>
+<li>框架：transformers 4.48 不认 Qwen3（升 4.51.3）；trl 0.12.2 无 GRPO（升 0.16.1）</li>
+<li>训练：LoRA 参数须显式 requires_grad_(True) 才有梯度；右侧 padding 破坏批量生成，改左侧</li>
+<li>数据与服务：教师 JSON 截断（max_tokens 4000→24000）、未转义控制字符、并发提速 4→155 题/分钟、runs 目录已存在致 SIA 退出、服务重启抹掉整批评估、双进程抢约 71GB 显存改串行</li>
+</ul>
+<h2>作者结论</h2>
+<ul>
+<li>Harness 改善执行与输出完整性，不增加模型知识</li>
+<li>轨迹数据质量与分布重于数量</li>
+<li>结合有正信号但样本太小；下一步：更大独立评估、扩展 LawBench、加 RAG/外部高质量数据、换更大基座</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[SIA 双循环：Harness 改进 + 权重更新] --&gt; B[Harness 跑 GPQA 收集轨迹]
+B --&gt; C[反馈模型分析失败并提改动]
+C --&gt; D[Gen 2 改动翻车：正确 87→36，未答 16→147]
+D --&gt; E[教训：小样本验证 + 全量准确率汇报]
+B --&gt; F[筛 109 条轨迹：69 正确轨迹 + 40 教师解法]
+F --&gt; G[LoRA SFT：rank 16，3 epoch，81 步]
+G --&gt; H[权重单更新：Qwen3-8B/GPQA 无稳定提升]
+G --&gt; I[结合 + disciplined 提示：62.5% → 80%]
+I --&gt; J[McNemar p=0.1213 未显著，属条件激活非内化]
+J --&gt; K[结论：信号积极，样本太小，待更大评估]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent Harness</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-20</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

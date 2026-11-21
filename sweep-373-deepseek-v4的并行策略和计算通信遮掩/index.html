@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek-V4的并行策略和计算通信遮掩</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>DeepSeek-V4的并行策略和计算通信遮掩</h1>
+<p class="sub">九老师（2026-05-04，502 赞 / 754 收藏）精讲 DeepSeek-V4 论文的并行策略：MoE 的 MFU 塌陷本质是通信 bound 而非专家切太小；16 PP × 64 EP × ZeRO-1 DP 跑在 2048 张 H800 上，DualPipe 挤气泡 + Waved-EP 在单 kernel 内做波次重叠，小批量 RL 场景相对 Comet 加速 1.96×；附 TileLang vs Triton 的取舍与硬件启示。AI Infra 深度长文，值得慢读。</p>
+<p class="meta">2026-11-21</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2034669267807888405">https://zhuanlan.zhihu.com/p/2034669267807888405</a></div>
+<div class="sec"><h2>大纲</h2><h2>问题：MoE 的 MFU 塌陷怪谁</h2>
+<ul>
+<li>不是专家切太小：切完后专家维度仍 ≥1024，算力强度不是瓶颈</li>
+<li>真因是通信 bound：算力 bound、访存 bound 之外必须再加第三个 bound</li>
+<li>解法：设计良好的 GPU 并行策略 + 计算通信遮掩（overlap）</li>
+</ul>
+<h2>并行策略全家桶与 DeepSeek 的配方</h2>
+<ul>
+<li>显存账：10B 模型 FP16 混合精度要 160GB（参数 20 + 梯度 20 + AdamW 矩 80 + 主权重 40），3–5B 就得跳出朴素 DP</li>
+<li>策略菜单：DP / ZeRO-1（只分片优化器状态）/ TP（分片存储+计算）/ PP（按层分片，通信量小）/ EP（MoE 标配，token 经 all-to-all 换专家）/ CP（沿 seq 切 attention）</li>
+<li>配方：16 PP × 64 EP × ZeRO-1 DP，2048 张 H800；节点内 NVLink 900GB/s，节点间 IB 仅 50GB/s，IB 是主瓶颈</li>
+<li>取舍：不用 TP、不用 ZeRO-2/3，避免每个 micro-batch 都跟 EP 抢 IB 带宽</li>
+</ul>
+<h2>让 EP 在 IB 上跑起来</h2>
+<ul>
+<li>EP 三步串行：dispatch（all-to-all 分发）→ 专家计算 → combine（all-to-all 汇总）</li>
+<li>V3 限制：top-k=8 的专家平均只取最好的 4 个节点，IB 流量合并后经 NVLink 转发；V4 取消该限制</li>
+</ul>
+<h2>流水线气泡与 DualPipe</h2>
+<ul>
+<li>GPipe 气泡大已被弃；1F1B 不减气泡但早释显存；ZB1P 把反向拆成 dx/dw，dw 可塞进气泡时隙</li>
+<li>DualPipe（V3）：两路微批次反向流动，前向与反向精确交错；H800 的 132 个 SM 中 20 个专做通信，通信与计算真正重叠</li>
+</ul>
+<h2>Waved-EP（V4 的新东西）</h2>
+<ul>
+<li>单 kernel 内把专家分波次：第一波通信完成才开始算，后面波次的通信与前面波次的计算重叠，不再依赖 PP 调度</li>
+<li>适合小批量 RL 与推理：RL 场景相对 Comet 加速 1.96×，通用场景 1.50–1.73×；注意论文未与 DualPipe 直接对比，大批量下两者接近</li>
+<li>工具：kernel 用 TileLang 而非 Triton 写——Triton 缺跨卡通信原语与细粒度重叠控制</li>
+</ul>
+<h2>硬件启示</h2>
+<ul>
+<li>8 卡节点 + IB 也能跑 1T+ 模型；厂商不该只堆通信带宽，要看重叠下的总功耗</li>
+<li>反向路线：英伟达用 NVLink 堆卡数（GB200 NVL72、Rubin Ultra NVL576），让带宽快到遮掩不再重要</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[问题：MoE 的 MFU 为什么塌] --&gt; B[不是专家切太小：切完维度仍 ≥1024]
+B --&gt; C[真因：通信 bound——算力/访存之外第三个 bound]
+C --&gt; D[配方：16 PP × 64 EP × ZeRO-1 DP，2048 张 H800]
+D --&gt; E[EP 在 IB 上跑：top-k=8 限 4 节点，IB 流量并入 NVLink]
+E --&gt; F[气泡挤压：GPipe → 1F1B → ZB1P 拆 dx/dw]
+F --&gt; G[DualPipe：双向微批次流 + 20/132 SM 专做通信]
+G --&gt; H[Waved-EP：单 kernel 内按波次重叠 dispatch/计算/combine]
+H --&gt; I[小批量 RL 相对 Comet 加速 1.96×，通用 1.50–1.73×]
+I --&gt; J[结论：8 卡节点 + IB 也能跑 1T+ 模型，通信遮掩是艺术]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">AI Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-21</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

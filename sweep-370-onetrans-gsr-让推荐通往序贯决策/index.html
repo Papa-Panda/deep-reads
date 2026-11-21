@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OneTrans-GSR：让推荐通往序贯决策</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>OneTrans-GSR：让推荐通往序贯决策</h1>
+<p class="sub">字节电商推荐团队把重排 + 混排合成一个自回归 Transformer 整页生成：预训练 → SFT → RL（每请求 32 个 slate 组内优势），线上人均 GMV +2.63%、延迟 −13%；作者还从 2019 年原型一路讲到 GRPO 组内基线的起源、行为克隆与 RL 之争，以及反事实 / 奖励 hacking 这一未解核心难题——RL 配方与推荐系统交叉的深度长文，值得慢读。</p>
+<p class="meta">2026-11-20</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2107194945606112483">https://zhuanlan.zhihu.com/p/2107194945606112483</a></div>
+<div class="sec"><h2>大纲</h2><h2>推荐为什么要从“打分”走向“序贯决策”</h2>
+<ul>
+<li>点wise排序对齐业务目标高效，却破坏列表体验与多样性</li>
+<li>散列、MMR 是补丁：MMR 降 CTR 但提 session 点击；I2I 相似商品相邻摆放使 CTR 减半，证明列表上下文重要</li>
+</ul>
+<h2>2019 原型：模拟器 + 策略 + 组内基线</h2>
+<ul>
+<li>模拟器（奖励模型）预测每位置 CTR 与 PBR（位置跳出率）；整页点击期望 CTE = Σ CTR_t · Π(1−PBR_k)</li>
+<li>Transformer Encoder 建模列表内交互；策略用 GRU 逐个选品</li>
+<li>离线日志训练失败：off-policy gap 本质是离线问题，改用 on-policy 模拟器</li>
+<li>误打误撞的基线：batch 内按位置减均值可复现地 work，溯源 self-critic / 组内基线思想，后被 DeepSeek 命名为 GRPO；4 样本已得大部分收益</li>
+<li>工程：并行/串行拆图、候选一次编码、GRU 增量解码，延迟 218ms → 16ms；单列 feed 替换精排，A/B 胜出，多样性自然涌现</li>
+</ul>
+<h2>OneTrans-GSR：一个自回归 Transformer 生成整页</h2>
+<ul>
+<li>一模型替代重排 + 混排：生成商品卡、短视频、直播、广告卡整页</li>
+<li>奖励模型：EOS 预测整页点击 / 订单 / GMV + 14 天复购 LTV；每位置点击 / 转化头作辅助 loss</li>
+<li>训练三段：长行为序列 next-token 预训练 → 历史曝光 SFT 模仿旧策略 → RL：每请求 rollout 32 个 slate，冻结奖励模型给组内优势，KL 约束贴近预训练 decoder</li>
+<li>硬规则（散列 / 去重 / 配额）进解码 mask / logit 调整，训练与 serving 共用；软偏好（疲劳 / 冷启 / 探索）进奖励</li>
+<li>线上：一次 prefill 编码用户序列与全部候选进 KV cache，逐槽按 decoder 隐状态与候选向量相似度解码；32 个 slate 并行采样，取序列 log-prob 最高者曝光</li>
+</ul>
+<h2>线上效果与扩展性</h2>
+<ul>
+<li>一周 A/B vs Generator–Evaluator：人均 GMV +2.63%，广告主价值 +2.06%，复购率 +2.03%，重排 + 混排端到端延迟 −13%</li>
+<li>奖励模型越大判别越强；decoder 越大订单 / GMV 增益越高；采样组 8→128 三目标皆升、边际递减</li>
+</ul>
+<h2>行为克隆 vs RL，与具身智能的类比</h2>
+<ul>
+<li>推荐与具身都是不能在真实环境自由试错的 Agent（坏列表损体验与 GMV；机器人损硬件），都要先克隆演示</li>
+<li>消融：预训练 + SFT 不加 RL 已胜旧策略点击，但订单微升、GMV 更低；加 RL 后订单与 GMV 大幅上升</li>
+<li>克隆给合格起点，KL 对冲奖励模型不准；奖励模型越准，克隆 / KL 越可省（可验证奖励的 RLVR 数学任务如 DAPO 去掉 KL）</li>
+</ul>
+<h2>未解难题：反事实与奖励 hacking</h2>
+<ul>
+<li>日志只记录已展示组合的反馈；单奖励模型离线预估 GMV +33.7%，线上仅 +1.41%</li>
+<li>三模型集成减去分歧：离线 +28.7%，线上 +2.63%</li>
+<li>出路：短视野想象 + critic（SuperMimic 想 32 步，critic 补余下；GSR 视野一页，LTV 模型即 critic）、度量奖励模型与真实世界排序一致性（DreamDojo 世界模型与真机成功率相关 0.995）、流式更新奖励模型 + 探索流量桶</li>
+<li>推荐世界模型比机器人更难：用户无方程；策略塑造用户（非平稳环境）；奖励更稀疏延迟</li>
+</ul>
+<h2>理论收束：压缩即智能与 Bitter Lesson</h2>
+<ul>
+<li>压缩 = 智能（Sutskever 2023；Hutter 奖 / AIXI）、Bitter Lesson、Reward is Enough、Amodei 的 BBOC</li>
+<li>今天推荐算力多花在 CTR / CVR 等费率估计，真正决策（放什么、怎么排、多目标权衡）仍靠人工公式规则——最重要一环最依赖人类知识，违背上述原则；端到端列表生成把决策交给模型、由奖励驱动</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[点wise排序：目标对齐但破坏列表体验] --&gt; B[补丁：散列/MMR，治标不治本]
+B --&gt; C[2019原型：模拟器预测每位置CTR与PBR]
+C --&gt; D[策略逐个选品：GRU + 组内基线，GRPO前身]
+D --&gt; E[工程优化：延迟218ms → 16ms，单列feed胜精排]
+E --&gt; F[OneTrans-GSR：单个Transformer生成整页]
+F --&gt; G[预训练 → SFT模仿旧策略 → RL：32个slate组内优势 + KL约束]
+G --&gt; H[线上A/B：人均GMV +2.63%，延迟 −13%]
+H --&gt; I[未解难题：反事实——单奖励模型离线+33.7% 线上仅+1.41%]
+I --&gt; J[三奖励模型集成减分歧：线上升至+2.63%]
+J --&gt; K[出路：短视野想象+critic、流式奖励模型、探索流量桶]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RL</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-20</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

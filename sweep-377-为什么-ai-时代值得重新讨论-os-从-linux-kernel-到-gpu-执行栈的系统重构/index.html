@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>为什么 AI 时代值得重新讨论 OS：从 Linux Kernel 到 GPU 执行栈的系统重构</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>为什么 AI 时代值得重新讨论 OS：从 Linux Kernel 到 GPU 执行栈的系统重构</h1>
+<p class="sub">王多鱼-加油（2026-04-06，409 赞 / 626 收藏）从第一性原理讲 OS 的本质是资源抽象：Linux 靠进程/虚拟内存/文件等抽象赢了 CPU 时代，而 AI 把系统重心移到 GPU 张量程序——FlashAttention、Triton/CuTe、vLLM 的 PagedAttention 正在长出新的执行栈与内存/调度子系统；所谓 AI OS 不是取代 Linux 的新内核，而是其上的一层层新系统层。AI Infra 的系统视角长文，值得慢读。</p>
+<p class="meta">2026-11-21</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2024418152105214167">https://zhuanlan.zhihu.com/p/2024418152105214167</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. OS 的本质：抽象决定成败</h2>
+<ul>
+<li>Linux 的伟大不在功能清单，而在选对了 CPU 时代的资源抽象</li>
+<li>进程/线程：资源归属、隔离与容错边界；虚拟内存：把物理字节变成可组织的策略对象</li>
+<li>文件/Socket：持久化与通信的统一接口；驱动与系统调用：把硬件细节藏进内核语义</li>
+</ul>
+<h2>2. AI 把系统重心移出内核</h2>
+<ul>
+<li>传统热路径：线程拿 CPU 时间、碰虚拟内存、调系统调用</li>
+<li>LLM 训练与推理的胜负手：计算图下沉、算子融合、tile 尺寸、HBM/共享内存/寄存器间的数据搬运、流间同步、多卡集合通信与计算重叠、KV 缓存分配与请求调度</li>
+<li>真正重要的一等对象变成张量、布局、图、核函数、流、KV 缓存、请求、会话、上下文</li>
+</ul>
+<h2>3. GPU 已有自己的执行栈</h2>
+<ul>
+<li>驱动：上下文、地址空间映射、命令提交，是硬件资源进入系统秩序的第一站</li>
+<li>CUDA/HIP 运行时：流、事件、分配器、核函数启动、图执行、异步拷贝与同步——是 GPU 时代的 POSIX</li>
+<li>栈的形态：驱动 → 运行时 → 编译器 → 核函数 DSL → 服务/运行时系统 → 分布式运行时</li>
+</ul>
+<h2>4. 编译器正在成为系统组件</h2>
+<ul>
+<li>MLIR/Triton/CuTe 里融合、分块与布局不是局部优化，而是资源组织</li>
+<li>tile 选择决定寄存器/共享内存占用、bank 冲突、occupancy 与通信重叠；融合决定中间结果是否落 HBM；布局决定访存模式，进而决定核函数代码与同步</li>
+<li>编译器与运行时边界模糊：编译器预先定下运行时要面对的资源形状</li>
+</ul>
+<h2>5. FlashAttention、Triton 与 vLLM：新的系统层</h2>
+<ul>
+<li>FlashAttention 的启示：瓶颈常是跨内存层级的数据搬运而非 FLOPs，核函数设计即内存系统设计</li>
+<li>Triton/CuTe：把并行结构、布局与数据搬运以恰当形式暴露出来，如同当年的页、inode、socket、epoll</li>
+<li>vLLM 的新矛盾：同时处理数百个长度/阶段/SLA 各异的请求，最稀缺的是 HBM 尤其是 KV 缓存；PagedAttention 是真正的页式缓存管理，系统要调度 token 生成顺序、批次合并与驻留策略</li>
+</ul>
+<h2>6. 什么是 AI OS</h2>
+<ul>
+<li>不是取代 Linux 的单体新内核，而是在 Linux 之上的新系统层</li>
+<li>Linux 仍管通用隔离、设备、网络、文件系统、安全与基础资源控制</li>
+<li>其上：GPU 驱动 + 运行时 + 编译器 + 通信运行时构成新「执行内核」；再上：服务系统、会话运行时、内存运行时；顶层：Agent、工作流、工具与策略层</li>
+<li>真正的问题：谁先把这些新一等对象抽象清楚，谁先把驱动、运行时、编译器、核函数、内存、调度与请求语义组织成稳定系统</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[OS 的本质：资源抽象、隔离与调度] --&gt; B[Linux 赢在 CPU 时代的抽象：进程/虚拟内存/文件]
+B --&gt; C[AI 转移重心：CPU 程序 → GPU 张量程序]
+C --&gt; D[新的一等对象：张量/布局/图/核函数/流/KV 缓存/请求]
+D --&gt; E[GPU 执行栈：驱动 → 运行时 → 编译器 → 核函数 DSL]
+E --&gt; F[FlashAttention/Triton/CuTe：暴露新的系统约束]
+F --&gt; G[vLLM/PagedAttention：长出内存与调度子系统]
+G --&gt; H[AI OS：Linux 之上的新系统层，而非替代内核]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">AI Infra</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-21</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

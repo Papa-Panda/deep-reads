@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>为什么中国模型都在开源？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>为什么中国模型都在开源？</h1>
+<p class="sub">林亦LYi 以“斩杀线”（能力-成本 Pareto 前沿）解释中国开源模型为何在海外走红：Agent 时代成本爆炸倒逼性价比优先，DeepSeek/Qwen/Kimi 接连落在前沿线上，“顶尖大脑+便宜模型执行”成主流分工；开源生态才是更深的护城河。注：视频含 AWS Bedrock 品牌植入，数据为视频自述，未独立核验。</p>
+<p class="meta">2026-11-22</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1dZWv6XEAp">https://www.bilibili.com/video/BV1dZWv6XEAp</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 谜题：不是最顶尖，却在海外悄然走红</h2>
+<ul>
+<li>美国企业在 OpenRouter 上对中国模型的使用占比，从年初 13% 涨到 40% 以上</li>
+<li>这些模型并非世界顶尖，问题是它们凭什么赢</li>
+</ul>
+<h2>2. 诱因：Agent 时代的成本爆炸</h2>
+<ul>
+<li>2026 年春 OpenClaw 引爆 Agent 潮：Agent 消耗的 token 超过全部人类对话之和，单个 Agent 任务成本约 15 倍于普通对话</li>
+<li>账单爆炸：某旅游巨头全年预算 4 月烧完；Meta、特斯拉等限制用量、改用便宜模型</li>
+<li>买家标准转向：从“性能最大化”到“性价比最大化”</li>
+</ul>
+<h2>3. 分析工具：斩杀线（Pareto 前沿）</h2>
+<ul>
+<li>把每个模型按能力与单任务成本画在图上，落在前沿上的模型无法被更便宜的替代而不损失性能</li>
+<li>DeepSeek 某次发布以约 1% 的成本做到约 98% 的顶尖能力，斩杀线图走红，此后成了中国厂商发布会的标配</li>
+<li>接力：Qwen 超越 DeepSeek-V4；DeepSeek-V4.1 刷新性能与价格；最新 Kimi 模型以约 1/15 的 Claude 价格对标顶尖</li>
+</ul>
+<h2>4. 企业实践：“够用就好”胜过“最好”</h2>
+<ul>
+<li>多数日常任务上中国模型已经够用，不必在最难的前沿上赢硅谷</li>
+<li>案例一：某研发/AI 公司切到 DeepSeek-V4，输出质量不降，价格降约 10 倍，省下数百万美元</li>
+<li>案例二：某创业公司 1000 个 Agent 挂在 200 美元订阅后，顶尖 API 账单可达每天 10 万美元；重构分工后 Agent 数翻三倍，成本降到每天约 100 美元</li>
+<li>主流共识成型：顶尖大脑做核心规划与验证，便宜模型做日常执行</li>
+</ul>
+<h2>5. 云厂商背书与开源护城河</h2>
+<ul>
+<li>AWS 把 DeepSeek、Qwen、Kimi 等做成 Bedrock 重点供给，配模型切换/回退机制；2026 年 2 月推出 Project Mantle 分布式推理引擎，加速开源模型上云</li>
+<li>更深的锁定是开源：Hugging Face 上中国开源模型下载份额达 40%，Qwen 家族衍生模型下半年突破 15 万个；类比安卓——开放权重把技术影响力嵌进全球开发者生态</li>
+<li>数据主权疑虑的解法：模型以打包权重部署在客户自己的隔离云区域，服务商看不到用户提示词</li>
+</ul>
+<h2>6. 主权 AI 浪潮与结论</h2>
+<ul>
+<li>斯坦福 2026 AI Index：前沿模型研发高度集中，但越来越多发展中国家加速建设可控的本国 AI 体系，开源可本地部署的中国模型是热门选择</li>
+<li>新加坡政府支持的 AI 项目选 Qwen 为东南亚区域模型底座；马来西亚宣布以 DeepSeek 建设国家主权 AI 生态</li>
+<li>结论：全球 AI 竞赛不是谁消灭谁——旗舰模型攻 20% 的前沿难题，开源平价模型服务 80% 的日常需求</li>
+</ul>
+<p>注：视频含 AWS Bedrock 品牌植入，数据为视频自述（部分转录自自动字幕），未独立核验。</p></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[谜题：非顶尖的中国模型，在美企用量占比从 13% 涨到 40% 以上] --&gt; B[诱因：2026 年春 Agent 爆发，单个 Agent 任务成本约 15 倍于普通对话]
+B --&gt; C[买家标准变了：从追求性能上限，转向追求性价比]
+C --&gt; D[工具：斩杀线 = 能力-成本的 Pareto 前沿，落在前沿上才不可替代]
+D --&gt; E[中国模型接连落在斩杀线上：DeepSeek、Qwen、Kimi 轮番刷新性价比]
+E --&gt; F[企业实践：够用就好，顶尖大脑做规划，便宜模型做执行]
+F --&gt; G[案例：研发公司切到 DeepSeek-V4，质量不降、价格降约 10 倍]
+F --&gt; H[案例：创业公司 1000 个 Agent，成本从每天 10 万美元降到约 100 美元]
+G --&gt; I[云厂商背书：AWS Bedrock 上架中国模型，Project Mantle 加速开源模型部署]
+H --&gt; I
+I --&gt; J[更深护城河：开源生态——HF 下载份额 40%，Qwen 衍生模型超 15 万个]
+J --&gt; K[主权 AI 浪潮：新加坡、马来西亚等国以 Qwen / DeepSeek 为底座建本国体系]
+K --&gt; L[结论：旗舰模型攻 20% 的前沿难题，开源平价模型服务 80% 的日常需求]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">商业分析</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-22</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

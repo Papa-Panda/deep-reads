@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>训了一个kernel优化模型后的感想</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>训了一个kernel优化模型后的感想</h1>
+<p class="sub">RL Framework 团队的唐剑以有限经费只训一个模型 KODA（Qwen3.6-35B-A3B），专攻 Kernel 算子优化并支持 RLVR/PRM：SFT 拿了 70–80% 的正确率涨点、RL 抬高上限；多目标奖励必须让正确率做门控，否则 GRPO 下正确率先崩；复读源于数据太难致过渡 token 概率最高，RL 格式惩罚 + 课程学习可解。可直接借鉴的 RLVR 实战手记。</p>
+<p class="meta">2026-11-23</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2108235534212527828">https://zhuanlan.zhihu.com/p/2108235534212527828</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 为什么训：框架团队要从真实训练拿认知</h2>
+<ul>
+<li>作者在 RL Framework 团队：只有从真实训练中拿到认知，才能做好框架</li>
+<li>经费有限，只训一个模型；目标：Kernel 算子优化上很强，同时支持 RLVR 和 PRM 收益</li>
+</ul>
+<h2>2. KODA：基座与 Harness</h2>
+<ul>
+<li>模型名 KODA，基座 Qwen3.6-35B-A3B，只在自家 Harness 上训练</li>
+<li>自研 Harness 已在 GitHub 开源，同名 KODA</li>
+</ul>
+<h2>3. 涨点来源：SFT 拿大头，RL 抬上限</h2>
+<ul>
+<li>SFT 贡献约 70–80% 的正确率涨点、50–60% 的效率（加速比）涨点</li>
+<li>RL 份额较小，但大幅抬高了上限</li>
+<li>经验规则：SFT 超过 4 个 epoch 后，正确率还能涨，效率不再提升，还会伤害后续 RL</li>
+</ul>
+<h2>4. 多目标奖励设计是关键</h2>
+<ul>
+<li>初始奖励：正确率只给 1 分，加速最高 10 分</li>
+<li>GRPO 下正确但不加速的样本优势为负，加速主导奖励、正确率被牺牲：正确率先崩，加速随后也崩</li>
+<li>修正：正确率做门控（分值最大），再在正确的基础上算加速奖励</li>
+</ul>
+<h2>5. 泛化怎么来的：跨任务、跨 GPU</h2>
+<ul>
+<li>参考 sol-execbench 的任务设计，在 H20 Sandbox 里训练，KernelBench 上仍表现好</li>
+<li>sm100 系列 GPU 上评估，正确率与加速比与 H20 结果相近</li>
+<li>采样轨迹显示：给定 GPU 架构，模型用相似的优化思路，自主切换新指令集尝试</li>
+</ul>
+<h2>6. 复读问题：成因假说与解法</h2>
+<ul>
+<li>复读在前沿通用模型也有，小模型更常见</li>
+<li>作者假说：训练数据太难，分叉点处各解 logprob 都很低，过渡 token（如 “wait, let me reconsider.”）概率最高而重复</li>
+<li>续 RFT、续 OPD 都效果差；起效的是 RL 格式惩罚 + 课程学习</li>
+<li>RL 格式训练比做题有效得多，稍微调整就能解决</li>
+</ul>
+<h2>7. 结论：同尺寸 SOTA，已内部使用</h2>
+<ul>
+<li>同尺寸达到 SOTA，接近前沿通用模型；已内部用于 Kernel 优化</li>
+<li>Kernel 训练的工程难题多于 SWE 训练：GPU Sandbox、verify 设计、数据分布、训推效率</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[目标：Kernel优化强 + 支持RLVR/PRM] --&gt; B[基座 Qwen3.6-35B-A3B + 自研Harness KODA]
+B --&gt; C[SFT：70-80%正确率涨点，50-60%效率涨点]
+C --&gt; D[RL：份额小但大幅抬高上限]
+D --&gt; E[奖励设计：正确率做门控，再算加速奖励]
+E --&gt; F[泛化：跨任务 KernelBench + 跨GPU sm100]
+F --&gt; G[复读：数据太难致过渡token概率最高而重复]
+G --&gt; H[解法：RL格式惩罚 + 课程学习]
+H --&gt; I[同尺寸SOTA，已内部用于Kernel优化]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">RLVR</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

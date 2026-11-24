@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek-V4.1-Flash 在 H20 上的七步优化：端到端延迟 13.6 秒降到 4.7 秒</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>DeepSeek-V4.1-Flash 在 H20 上的七步优化：端到端延迟 13.6 秒降到 4.7 秒</h1>
+<p class="sub">BBuf 解读蚂蚁国际 AI Infra 团队的 LMSYS 博客（2026-11-19）：8 卡 H20-3e + SGLang 上 DeepSeek-V4.1-Flash 的七步优化——prefill CP + decode DP、FP8 DeepGEMM 做 Indexer 打分、可中断 CUDA Graph、MoE EP 改 TP 等，端到端延迟 13.63s→4.70s、吞吐 847→2465 tok/s，GSM8K 精度基本无损（96.42% vs 96.50%）；附每步开关与 SGLang PR，可直接复现。推理优化 + 稀疏注意力 kernel 的实战手记。</p>
+<p class="meta">2026-11-23</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2108248698329229282">https://zhuanlan.zhihu.com/p/2108248698329229282</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 背景：为什么是这台机器、这个模型</h2>
+<ul>
+<li>蚂蚁国际 AI Infra 团队，LMSYS 博客（2026-11-19）的中文解读；原作者 Siyuan Chen 等</li>
+<li>一台 8×H20-3e，SGLang 部署 DeepSeek-V4.1-Flash，PD 分离：前 4 卡 prefill、后 4 卡 decode，KV 经 Mooncake 走 NVLink</li>
+<li>模型要点：稀疏注意力 + Indexer（每 query 只看 128 窗口 + 至多 512 压缩位）、DSpark 投机解码（每轮约 5.4 token）</li>
+<li>指标：TTFT、TPOT、E2E（≈ TTFT + 499×TPOT，500 输出 token）</li>
+</ul>
+<h2>2. 测试设置</h2>
+<ul>
+<li>256 请求、并发 24，共享 61440 token 系统提示 + 每请求 4096 token 问题，输出 500 token</li>
+<li>预热 10 请求、测前清缓存；实测缓存命中 93.21%</li>
+<li>基线 TP4：E2E 13633.80 ms，吞吐 846.76 tok/s，TTFT 12037.73 ms；prefill 排队中位数 15 请求</li>
+</ul>
+<h2>3. 第 1 步：prefill 用 CP，decode 用 DP（-44.6%，最大头）</h2>
+<ul>
+<li>prefill 由 TP4 改交错 CP4：按 token 行切分，Indexer 打分真正除以 4</li>
+<li>关键：Indexer 是 MQA 形态、不能按头切，TP 下每卡重复全量打分还要 all-reduce</li>
+<li>decode 由 TP4 改 DP4 注意力 + DP LM head：每卡 1/4 请求、完整注意力头</li>
+<li>代价：MoE 附近 all-gather、可能的请求不均衡；E2E 7547.46 ms</li>
+</ul>
+<h2>4. 第 2 步：Indexer 打分改 FP8 DeepGEMM（-29.9%）</h2>
+<ul>
+<li>FP4 key 一次打包取回，转 FP8 E4M3 后调 DeepGEMM fp8_mqa_logits：点积、ReLU、头加权、头求和核内融合</li>
+<li>中间量由每位置 32×BF16（64 B）压到 1×FP32（4 B），省 16 倍；H20 上 FP8 算力是 BF16 的 2 倍</li>
+<li>顺带去掉 Torch 回退同步（tolist/.item、逐请求 torch.topk）；与 BF16 的 top-k 重合 99.08%</li>
+<li>SGLang PR #49066，2026-11-18 合入；E2E 5294.89 ms</li>
+</ul>
+<h2>5. 第 3–4 步：可中断 CUDA Graph 与 MoE EP→TP</h2>
+<ul>
+<li>第 3 步：prefill 用 Breakable CUDA Graph，可录片段进图、运行时元数据保持 eager；代价是图 token 上限 8192、捕获约 388 秒，实验分支限定</li>
+<li>第 4 步：MoE 由 EP 改 TP——无 all-to-all 的 EP 路由不均，rank 在 all-reduce 处空等约 100 微秒；TP 把每专家中间维切到 4 卡，算量拉平</li>
+<li>两步合计 E2E 5294.89 → 4811.81 ms；prefill 排队中位数降到 0</li>
+</ul>
+<h2>6. 第 5–7 步：边际优化与测量噪声</h2>
+<ul>
+<li>第 5 步：Indexer 打分预算 64 MiB → 2 GiB，CP4 的 8192 token chunk 由 2 块变 1 块；-0.79%，在噪声内（PR #49067）</li>
+<li>第 6 步：两个 Triton 核融合 prefill 的候选块发布与回写；45 次测量 E2E 稳在约 4.77 s（PR #49069）</li>
+<li>第 7 步：DSpark 验证时复用分页 Indexer 的 K tile，每 128 位 tile 只读一次、反量化一次；七步中唯一的 decode 侧 kernel 优化，也是唯一降低 TPOT 的一步（PR #49068）</li>
+<li>终点 E2E 4698.65 ms，吞吐 2464.90 tok/s；TTFT 12.04 s → 1.89 s，TPOT 反升 3.20 → 5.62 ms——prefill 变快后 decode 更忙、batch 更大所致</li>
+</ul>
+<h2>7. 混部对照、精度与复现</h2>
+<ul>
+<li>第 8 步混部（单 4 卡 worker）：E2E 18.62 s → 7.96 s；每 GPU 吞吐 371 vs PD 的 308 tok/s——延迟选 PD，单位算力选混部</li>
+<li>精度：GSM8K 96.42%（1267/1314）vs 基线 96.50%（1268/1314），只差一题；64K 检索 10/10</li>
+<li>复现：SYChen123/sglang 分支 v4.1/h20-dev-pd-blog，commit b07c701；四个 Indexer PR 已于 11 月 18–19 日合入主线，完整复现仍需实验分支</li>
+</ul>
+<h2>8. 作者读后五点</h2>
+<ul>
+<li>先找请求在哪里排队（基线 TTFT 大头是排队）；按阶段选并行切法；小步收益只有 1–2% 且要诚实报噪声；TPOT 上升不一定是坏事；PD 与混部是延迟换成本的取舍</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+A[起点：8卡H20-3e + SGLang，TP4基线 E2E 13.63s] --&gt; B[第1步：prefill CP + decode DP，7.55s]
+B --&gt; C[第2步：Indexer打分改FP8 DeepGEMM，5.29s]
+C --&gt; D[第3步：prefill可中断CUDA Graph，5.10s]
+D --&gt; E[第4步：MoE EP改TP，4.81s]
+E --&gt; F[第5-7步：大分块 + Triton融合 + K tile复用，4.70s]
+F --&gt; G[终点：E2E 13.63s → 4.70s，吞吐 847 → 2465 tok/s]
+G --&gt; H[精度核验：GSM8K 96.42% vs 96.50%，基本无损]
+F --&gt; I[第8步：混部对照，4卡 7.96s，单位算力更省]
+I --&gt; H</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-23</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

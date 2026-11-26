@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>最后一颗明珠 Claude × 黎曼猜想</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>最后一颗明珠 Claude × 黎曼猜想</h1>
+<p class="sub">凛雪_Yuki（2026-11-21，26 分钟）梳理 Claude 参与黎曼猜想证明的人机协作事件：AI 给出证明尝试，数学家逐行解读核验，UP 主等解读完成再做重置版。数学硬核科普 × AI 前沿的结合点。未读到逐字文稿，结构据视频简介与页面信息整理。</p>
+<p class="meta">2026-11-25</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1A1yxzCE15">https://www.bilibili.com/video/BV1A1yxzCE15</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 主角：黎曼猜想</h2>
+<ul>
+<li>1859 年黎曼提出，关于素数分布规律的世纪难题，数学皇冠上的明珠</li>
+<li>悬赏百万美元的千禧年难题之一，167 年未解</li>
+</ul>
+<h2>2. 事件：Claude 给出证明</h2>
+<ul>
+<li>视频围绕 Claude 与黎曼猜想的人机证明工作展开</li>
+<li>UP 主凛雪_Yuki（2026-11-21 发布，26 分钟）梳理这次证明尝试的来龙去脉</li>
+</ul>
+<h2>3. 关键：数学家的解读与核验</h2>
+<ul>
+<li>证明的每一步都需要数学家逐行解读、验证</li>
+<li>UP 主说明：等数学家解读完再做重置版，体现了对证明严谨性的敬畏</li>
+</ul>
+<h2>4. 意义：AI 参与前沿数学</h2>
+<ul>
+<li>AI 不再只是解题工具，已能参与最前沿的数学证明工作</li>
+<li>人类核验仍是最后一关：机器给出“神谕”，人来判定真伪</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[黎曼猜想：素数分布的终极之谜&lt;br/&gt;1859 年至今未解] --&gt; B[Claude 给出证明尝试&lt;br/&gt;人机协作的数学工作]
+    B --&gt; C[数学家解读“神谕”&lt;br/&gt;逐行核验证明步骤]
+    C --&gt; D{证明站得住吗}
+    D --&gt;|关键步骤待核验| E[重置版：等解读完成再更新]
+    D --&gt;|若成立| F[数学皇冠上的明珠摘下&lt;br/&gt;素数理论与 AI 数学的新纪元]
+    E --&gt; G[启示：AI 已能参与最前沿数学证明&lt;br/&gt;人类核验仍是最后一关]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">AI</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-25</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

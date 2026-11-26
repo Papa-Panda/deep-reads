@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>当 Agentic RL 训练，遇到长上下文压缩</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>当 Agentic RL 训练，遇到长上下文压缩</h1>
+<p class="sub">喔喔喔（2026-11-22）从 RL 前缀一致性出发，讲清 Agentic RL 长轨迹触发上下文压缩后为何不能再把整条轨迹拼成一个训练样本：按压缩边界切分、优势广播到各段、摘要生成本身也要进 loss（CompactionRL 实测 +2.3pp），并给出 Gateway 采集轨迹树的工程实现。Agent RL 训练与上下文压缩的硬核工程拆解。</p>
+<p class="meta">2026-11-26</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2107938229118842397">https://zhuanlan.zhihu.com/p/2107938229118842397</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 背景：长任务逼出上下文压缩</h2>
+<ul>
+<li>Agent 任务常需数百轮，每轮追加模型推理、工具返回与报错日志，1M 上下文也不够</li>
+<li>工程做法：接近预算时把早期交互摘要成 summary，保留系统提示、任务描述与最近若干轮原文，继续执行</li>
+<li>核心问题：压缩替换了前缀，轨迹不再是连续序列，训练必须正视压缩</li>
+</ul>
+<h2>2. 为什么无压缩时“整条轨迹当一个样本”是成立的</h2>
+<ul>
+<li>一条轨迹 = 一个训练样本，一次前向 + loss mask（模型生成部分为 1，其余为 0），一个 reward 训多轮决策</li>
+<li>前提是前缀一致性：Agent 上下文只追加不改写，因果注意力下 m3 看到的仍是推理时的真实前缀</li>
+<li>RL 的关键要求：训练前缀必须与推理时前缀逐 token 相同</li>
+</ul>
+<h2>3. 压缩如何破坏前缀一致性</h2>
+<ul>
+<li>压缩后 p1..x4 被改写成新的起点 p1'，后续采样的前缀与原始轨迹无法对齐</li>
+<li>结论：含压缩的轨迹在概率意义上断成两段，不能硬拼成一条训练序列</li>
+</ul>
+<h2>4. 主流方法：三个问题</h2>
+<ul>
+<li>奖励分配：优势广播（ReSum-GRPO，整条 rollout 的优势分给各段）；ContextPilot（按片段重采样、片段奖励取均值再标准化）；CompactionRL（PPO + GAE，按后段可训 token 数折扣前段优势）</li>
+<li>损失聚合：各段在各自真实前缀下分别算 logprob 与概率比 ρ，进入 GRPO clip 目标；batch 总损失按 rollout 平均 vs 按有效 token 平均，权重不同</li>
+<li>摘要本身训不训：只当输入 vs 计入 loss；CompactionRL 实测：训摘要生成，SWE-bench Verified 200 题 Pass@1 64.5% → 66.8%（GLM-4.5-Air），+2.3pp</li>
+</ul>
+<h2>5. 工程实现：Gateway 采集完整轨迹树</h2>
+<ul>
+<li>Agent 与 vLLM 之间加 Gateway，每次调用按 TITO（Token-In / Token-Out）记录 token ID 与采样 logprob，挂到 rollout_id 下的轨迹树</li>
+<li>前缀匹配：匹配则只追加新尾巴；失配（压缩后的首个请求带 p1'）则开新分支</li>
+<li>rollout 结束：每条根到叶路径展开成一个训练段（同 rollout_id + batch_id，含完整 token 序列、loss_mask、logprob），分别入队；也可用于 SFT</li>
+<li>训练：按 batch_id 取 rollout，按 rollout_id 分组算优势；每段在其真实前缀下重算 logprob → 概率比 → clip 损失 → 聚合更新</li>
+</ul>
+<h2>6. 结论与设计建议</h2>
+<ul>
+<li>按压缩边界切分，不硬拼；摘要生成本身应进 loss；优势方案与损失聚合方式都是设计决策</li>
+<li>段内须完整保存 prompt、工具返回与摘要，保证训练与推理前缀一致</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[Agent 长任务：数百轮交互&lt;br/&gt;推理 + 工具返回 + 报错日志不断追加] --&gt; B[上下文逼近预算&lt;br/&gt;触发上下文压缩]
+    B --&gt; C[早期交互 → 摘要 S&lt;br/&gt;保留任务描述 + 最近轮次原文]
+    C --&gt; D{轨迹含压缩？}
+    D --&gt;|否| E[整条轨迹一个样本&lt;br/&gt;一次前向 + loss mask]
+    D --&gt;|是| F[按压缩边界切分&lt;br/&gt;A-1 / A-2 各自真实前缀]
+    F --&gt; G[奖励：整任务最终 reward&lt;br/&gt;优势广播到各段]
+    G --&gt; H[各段分别算 logprob&lt;br/&gt;概率比 ρ 进 GRPO clip 目标]
+    H --&gt; I[聚合：按 rollout 平均&lt;br/&gt;或按有效 token 平均]
+    I --&gt; J[Gateway 采集：TITO 记录&lt;br/&gt;前缀匹配建轨迹树]
+    J --&gt; K[根到叶路径 → 训练段入队&lt;br/&gt;训练 / 也可用于 SFT]
+    K --&gt; L[结论：摘要生成也进 loss&lt;br/&gt;CompactionRL +2.3pp]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">Agent RL</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-26</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

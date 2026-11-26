@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>【Green Context MoE】GC MoE K3：Kimi K3.1 Pro MoE 全量优化</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · 知乎推荐</div>
+<h1>【Green Context MoE】GC MoE K3：Kimi K3.1 Pro MoE 全量优化</h1>
+<p class="sub">木子知（2026-11-24）用 CUDA Green Context 把整个 Kimi K3.1 Pro latent-MoE 子层当作一个调度单元：计算/通信双分区 + 5 个基础角色 + 2 个条件角色按数据就绪推进，GB200 上相对 SGLang 平均快 1.13×、vLLM 快 1.37×；附 GitHub 实现与 arXiv 论文。MoE 推理调度的硬核实战拆解。</p>
+<p class="meta">2026-11-25</p>
+</div>
+<div class="src">原文链接：<a href="https://zhuanlan.zhihu.com/p/2108321381012203489">https://zhuanlan.zhihu.com/p/2108321381012203489</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. K3 的 latent-MoE 为什么特殊</h2>
+<ul>
+<li>路由：7168→896 线性层，sigmoid 分数 + expert bias 选 Top16；896 个路由专家各为 3584→3072→3584 门控 MLP，SiTU 门控</li>
+<li>潜空间 7168→3584：路由专家只在降维潜空间里算；2 个共享专家直接读原始 X，可与路由分支并行</li>
+<li>精度：路由权重 FP4（K32 scale）、路由激活 FP8 E4M3，共享与上投影 BF16；输出 Y = U + S + P</li>
+</ul>
+<h2>2. 现状：SGLang 与 vLLM 的 Mega MoE 方案</h2>
+<ul>
+<li>两者路由部分都用 DeepGEMM Mega MoE：一次设备调用完成路由交换 + 专家 MLP</li>
+<li>SGLang：共享 MLP 放辅助流，主流跑 Mega MoE + RMSNorm + 上投影；Mega MoE 的 SM 上限为设备 SM 数 − 2</li>
+<li>vLLM：门控/Top16 与 latent-down 在双流重叠，但 Mega MoE 与共享 MLP 在主流上串行</li>
+</ul>
+<h2>3. CUDA Green Context：一句话</h2>
+<ul>
+<li>驱动级 SM 分区接口：把 SM 切成计算分区与通信分区，可并发执行</li>
+<li>GC MoE K3：路由元数据发布与跨 rank 交换放通信分区，投影、归一化与专家主 GEMM 放计算分区；Routed Assist 开启时通信分区也可跑路由 GEMM</li>
+</ul>
+<h2>4. 七个角色与数据流</h2>
+<ul>
+<li>计算分区：Front（1，合并 GEMM + 就地 FP8 量化）→ Compute（4，路由/共享 W1/W2）→ Finalize（5，FP32 加权合并 → RMSNorm → 上投影）</li>
+<li>通信分区：Router（2，Top16）→ Dispatch（3，token 交换走有界 ring）</li>
+<li>条件角色：Reduce（6，split-K FP32 分部求和）、Routed Assist（7，通信分区空闲 SM 复用跑路由 GEMM）</li>
+</ul>
+<h2>5. 四条优势</h2>
+<ul>
+<li>整层一个调度单元：按任务/数据就绪推进，不按框架流调度</li>
+<li>重叠：early-shared 让 Front 两轮 TMA 后即触发共享 W1；Finalize 合并时预取上投影权重</li>
+<li>跨 rank 回收去掉尾部屏障：接收计数双缓冲跨两代，按 token 只查选中专家所在 rank 的返回 epoch</li>
+<li>数值边界显式：路由权重在 Finalize 合并处乘（Mega MoE 在 SiTU 后乘），实数相等、有限精度不等，精度校验需按各自路径算参考输出</li>
+</ul>
+<h2>6. GB200 实测数字</h2>
+<ul>
+<li>24 个点（EP8/16/32 × 每 rank 1–128 token）全部快于两个基线</li>
+<li>等权平均：相对 SGLang 1.1324×，相对 vLLM 1.3651×；最佳 EP32、每 rank 2 token：128.456 µs vs 156.994 µs</li>
+<li>附 GitHub 实现 gc-moe 与 arXiv:2611.30542</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[Front ① 计算分区&lt;br/&gt;合并 GEMM + 就地 FP8 量化] --&gt; B[Router ② 通信分区&lt;br/&gt;sigmoid + bias 选 Top16]
+    B --&gt; C[Dispatch ③ 通信分区&lt;br/&gt;token 交换进有界 ring]
+    C --&gt; D[Compute ④ 计算分区&lt;br/&gt;路由 W1/W2 + 共享 W1/W2]
+    D --&gt; E[Finalize ⑤ 计算分区&lt;br/&gt;FP32 加权合并 → RMSNorm → 上投影]
+    E --&gt; F[输出 Y = U + S + P]
+    A -.-&gt;|early-shared| D
+    C -.-&gt;|通信分区空闲后| G[Routed Assist ⑦&lt;br/&gt;复用 SM 跑路由 GEMM]
+    G -.-&gt; D
+    E --&gt; H[Reduce ⑥&lt;br/&gt;split-K FP32 分部求和]
+    H --&gt; F</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">AI</span><span class="tag">推理优化</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-25</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>

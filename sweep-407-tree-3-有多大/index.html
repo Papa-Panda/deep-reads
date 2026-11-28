@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TREE(3) 有多大？</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#f7f5f1;--card:#fff;--ink:#23272f;--muted:#6b7280;--accent:#1e40af;
+--accent-ink:#1e3a8a;--accent-bg:#eff6ff;--border:#e8e4dc;--radius:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;border-radius:20px;padding:40px 36px}
+.kicker{display:inline-block;font-size:13px;letter-spacing:.1em;background:rgba(255,255,255,.18);
+padding:4px 14px;border-radius:999px;margin-bottom:16px}
+.hero h1{margin:0 0 10px;font-size:26px;line-height:1.45;font-weight:700}
+.hero .sub{opacity:.9;font-size:15px;margin:6px 0 0}
+.hero .meta{opacity:.75;font-size:13.5px;margin:10px 0 0}
+.hero .meta a{color:#fff}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+padding:30px 34px;margin:0 0 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.sec h2{margin:0 0 18px;font-size:21px;color:var(--accent-ink);
+border-bottom:2px solid var(--accent-bg);padding-bottom:10px}
+.sec ul,.sec ol{margin:0 0 14px;padding-left:24px}
+.sec li{margin-bottom:10px}
+.sec li::marker{color:var(--accent);font-weight:600}
+.sec p{margin:0 0 14px}
+.src{margin:20px 0;padding:14px 20px;background:var(--accent-bg);border-radius:12px;font-size:15px}
+.src a{color:var(--accent-ink);font-weight:600;word-break:break-all}
+.mermaid{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent-ink)}
+.footer{margin-top:28px;font-size:13px;color:var(--muted);text-align:center}
+.tag{display:inline-block;font-size:12.5px;background:#eef2ff;color:var(--accent-ink);
+border-radius:999px;padding:2px 12px;margin:0 6px 6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../">← 全部内容</a>
+<div class="hero">
+<div class="kicker">扫读 SWEEP · B站推荐</div>
+<h1>TREE(3) 有多大？</h1>
+<p class="sub">派蒙科普耗时两年半打磨的硬核数学科普（2026-11-20，45万播放）：从定义出发讲清 TREE(3)——带标签树的 Kruskal 序列最长长度，为什么它有限却远大于葛立恒数，并触及快增长层级与序数 Γ₀ 的纵深。数学硬核科普，符合他“第一性原理”的口味。未读到原文细节（纯视频无逐字文稿），大纲据视频简介与 TREE(3) 的标准数学内容整理。</p>
+<p class="meta">2026-11-27</p>
+</div>
+<div class="src">原文链接：<a href="https://www.bilibili.com/video/BV1AuyxzuEnK">https://www.bilibili.com/video/BV1AuyxzuEnK</a></div>
+<div class="sec"><h2>大纲</h2><h2>1. 引子：从葛立恒数到 TREE(3)</h2>
+<ul>
+<li>葛立恒数已大到无法用常规记号写出；TREE(3) 比它还要大得多</li>
+<li>本视频耗时两年半打磨，是 UP 主“每天一个数学小知识”葛立恒数一期的续篇</li>
+</ul>
+<h2>2. TREE(n) 的游戏规则</h2>
+<ul>
+<li>取一串有限树，每个节点标 1、2、3 三种标签之一</li>
+<li>序列规则：后面的树不能“包含”前面的树（不存在保持标签的同胚嵌入）</li>
+<li>TREE(n) 就是满足规则的最长序列长度</li>
+</ul>
+<h2>3. 为什么序列必然终止：Kruskal 树定理</h2>
+<ul>
+<li>Kruskal 定理保证任何无限树序列中必有一棵可嵌入另一棵</li>
+<li>因此最长合法序列是有限的——TREE(3) 是一个确定的有限整数</li>
+</ul>
+<h2>4. 小情形对照：TREE(1) 与 TREE(2)</h2>
+<ul>
+<li>TREE(1) = 1，TREE(2) = 3，规模尚可手算</li>
+<li>标签从 2 增加到 3，长度从 3 跳到天文数字</li>
+</ul>
+<h2>5. 量级：与葛立恒数的对比</h2>
+<ul>
+<li>TREE(3) 远远大于葛立恒数，连高德纳箭头记号也难以企及</li>
+<li>直观解释：每多一个标签，嵌套的组合爆炸就上一个层级</li>
+</ul>
+<h2>6. 数学纵深：快增长层级与序数</h2>
+<ul>
+<li>TREE(3) 的增长速度对应快增长层级中极高的序数（约 Γ₀ 量级）</li>
+<li>它是“可证明存在、却无法具体写出”的大数的典型</li>
+</ul>
+<h2>7. 收束：有限与可把握的鸿沟</h2>
+<ul>
+<li>有限 ≠ 可想象：数学能证明它存在，却给不出它的十进制写法</li>
+<li>第一性原理式的科普：从定义出发，一步步把“大”讲清楚</li>
+</ul></div>
+<div class="sec"><h2>流程图</h2><div class="mermaid">graph TD
+    A[问题：TREE（3）到底有多大] --&gt; B[定义游戏：带 1/2/3 标签的树排成序列]
+    B --&gt; C[规则：后树不能包含前树]
+    C --&gt; D[Kruskal 树定理：序列必然有限]
+    D --&gt; E[TREE（3）等于最长序列长度]
+    E --&gt; F[对照：TREE（1）=1，TREE（2）=3]
+    F --&gt; G[量级：远大于葛立恒数]
+    G --&gt; H[纵深：快增长层级与序数]
+    H --&gt; I[结论：有限却不可想象的大数]</div></div>
+<div class="sec"><h2>标签</h2><span class="tag">数学</span><span class="tag">大数</span></div>
+<div class="footer">Papa-Panda / deep-reads · 知乎/B站扫读归档 · 2026-11-27</div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'default'});</script>
+</body>
+</html>
